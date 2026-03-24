@@ -8,6 +8,34 @@
 
 #include "menus.h"
 
+void crearMenuBienvenida(){
+	printf("======================= \n");
+	printf("Bienvenido a Nombre_App \n");
+	printf("1. Inicio sesion \n");
+	printf("2. Registrarse \n");
+	printf("3. Salir \n");
+	printf("======================= \n");
+}
+
+void crearMenuInicioSesion(){
+	printf("======================= \n");
+	printf("Inicio de sesion \n");
+	printf("Usuario (DNI): \n");
+	printf("Contraseña: \n");
+	printf("======================= \n");
+}
+
+void crearMenuRegistro(){
+	printf("======================= \n");
+	printf("Registro \n");
+	printf("Nombre: \n");
+	printf("Apellido: \n");
+	printf("Usuario (DNI): \n");
+	printf("Contraseña: \n");
+	printf("======================= \n");
+}
+
+
 void crearMenuPrincipal(){
 	printf("======================= \n");
 	printf("1. Gestionar negocios \n");

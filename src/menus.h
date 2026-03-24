@@ -8,7 +8,9 @@
 #ifndef MENUS_H_
 #define MENUS_H_
 
-
+void crearMenuBienvenida();
+void crearMenuInicioSesion();
+void crearMenuRegistro();
 void crearMenuPrincipal();
 void crearMenuNegocios();
 void crearMenuAnyadirNegocios();

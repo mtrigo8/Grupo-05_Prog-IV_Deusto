@@ -13,6 +13,6 @@
 #include "menus.h"
 
 int main(void) {
-	crearMenuPrincipal();
+	crearMenuBienvenida();
 	return EXIT_SUCCESS;
 }
