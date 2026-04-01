@@ -42,7 +42,14 @@ int convertirDiasInt(char dias[]){
 
 void crearMenuBienvenida(){
 	printf("======================= \n");
-	printf("Bienvenido a Nombre_App \n");
+	printf("  ____ _ _         _   _       _      \n");
+	printf(" / ___(_) |_ _   _| | | |_   _| |__   \n");
+	printf("| |   | | __| | | | |_| | | | | '_ \\ \n");
+	printf("| |___| | |_| |_| |  _  | |_| | |_) | \n");
+	printf(" \\____|_|\\__|\\__, |_| |_|\\__,_|_.__/  \n");
+	printf("             |___/                    \n");
+	printf("======================= \n");
+	printf("Bienvenido a CityHub \n");
 	printf("1. Inicio sesion \n");
 	printf("2. Registrarse \n");
 	printf("3. Salir \n");
