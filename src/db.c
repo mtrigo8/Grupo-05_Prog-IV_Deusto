@@ -63,40 +63,56 @@ int borrar_reservas(sqlite3 *db) {
 }
 
 //Falta acabarlo
-int insert_usuario(sqlite3 *db, char datos[][]) {
+int insert_usuario(sqlite3 *db, char *datos[]) {
 	sqlite3_stmt *stmt;
 
-	char sql[] = "insert into country (id_usuario, nombre, DNI, password_hash, id_rol) values (NULL, ?, ?, ?, 2)";
-	int result = sqlite3_prepare_v2(db, sql, strlen(sql) + 1, &stmt, NULL) ;
-	if (result != SQLITE_OK) {
-		printf("Error preparing statement (INSERT)\n");
-		printf("%s\n", sqlite3_errmsg(db));
-		return result;
-	}
+	    // Se cambió el nombre de la tabla de 'country' a 'usuario' (o el que corresponda en tu BD)
+	    char sql[] = "insert into usuario (id_usuario, nombre, DNI, password_hash, id_rol) values (NULL, ?, ?, ?, 2)";
 
-	printf("SQL query prepared (INSERT)\n");
+	    // Usar -1 hace que SQLite lea hasta el carácter nulo ('\0') automáticamente
+	    int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+	    if (result != SQLITE_OK) {
+	        printf("Error preparing statement (INSERT)\n");
+	        printf("%s\n", sqlite3_errmsg(db));
+	        return result;
+	    }
 
-	result = sqlite3_bind_text(stmt, 1, name, strlen(name), SQLITE_STATIC);
-	if (result != SQLITE_OK) {
-		printf("Error binding parameters\n");
-		printf("%s\n", sqlite3_errmsg(db));
-		return result;
-	}
+	    printf("SQL query prepared (INSERT)\n");
 
-	result = sqlite3_step(stmt);
-	if (result != SQLITE_DONE) {
-		printf("Error inserting new data into country table\n");
-		return result;
-	}
+	    // Asumimos el orden: datos[0] = nombre, datos[1] = DNI, datos[2] = password_hash
+	    // Usamos SQLITE_TRANSIENT por seguridad, para que SQLite gestione su propia copia del string
+	    result = sqlite3_bind_text(stmt, 1, datos[0], -1, SQLITE_TRANSIENT);
+	    if (result == SQLITE_OK) {
+	        result = sqlite3_bind_text(stmt, 2, datos[1], -1, SQLITE_TRANSIENT);
+	    }
+	    if (result == SQLITE_OK) {
+	        result = sqlite3_bind_text(stmt, 3, datos[2], -1, SQLITE_TRANSIENT);
+	    }
 
-	result = sqlite3_finalize(stmt);
-	if (result != SQLITE_OK) {
-		printf("Error finalizing statement (INSERT)\n");
-		printf("%s\n", sqlite3_errmsg(db));
-		return result;
-	}
+	    if (result != SQLITE_OK) {
+	        printf("Error binding parameters\n");
+	        printf("%s\n", sqlite3_errmsg(db));
+	        // IMPORTANTE: Liberar el statement antes de salir por error para evitar fugas de memoria
+	        sqlite3_finalize(stmt);
+	        return result;
+	    }
 
-	printf("Prepared statement finalized (INSERT)\n");
+	    result = sqlite3_step(stmt);
+	    if (result != SQLITE_DONE) {
+	        printf("Error inserting new data into table\n");
+	        printf("%s\n", sqlite3_errmsg(db));
+	        sqlite3_finalize(stmt); // Liberar antes de salir por error
+	        return result;
+	    }
 
-	return SQLITE_OK;
+	    result = sqlite3_finalize(stmt);
+	    if (result != SQLITE_OK) {
+	        printf("Error finalizing statement (INSERT)\n");
+	        printf("%s\n", sqlite3_errmsg(db));
+	        return result;
+	    }
+
+	    printf("Prepared statement finalized (INSERT) - Usuario insertado con exito\n");
+
+	    return SQLITE_OK;
 }
