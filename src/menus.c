@@ -5,8 +5,40 @@
  *      Author: markel.trigo
  */
 
-
+#include <stdio.h>
+#include <stdlib.h>
 #include "menus.h"
+#include  "estructuras.h"
+
+int convertirDiasInt(char dias[]){
+	//IAG
+	int mascara = 0;
+	    char buffer[256];
+
+	    strncpy(buffer, dias, sizeof(buffer) - 1);
+	    buffer[sizeof(buffer) - 1] = '\0';
+
+	    for (int i = 0; buffer[i] != '\0'; i++) {
+	        buffer[i] = toupper((unsigned char)buffer[i]);
+	    }
+
+	    char *token = strtok(buffer, ", ");
+
+	    while (token != NULL) {
+	        if      (strcmp(token, "LUNES") == 0)     mascara |= 1;
+	        else if (strcmp(token, "MARTES") == 0)    mascara |= 2;
+	        else if (strcmp(token, "MIERCOLES") == 0) mascara |= 4;
+	        else if (strcmp(token, "JUEVES") == 0)    mascara |= 8;
+	        else if (strcmp(token, "VIERNES") == 0)   mascara |= 16;
+	        else if (strcmp(token, "SABADO") == 0)    mascara |= 32;
+	        else if (strcmp(token, "DOMINGO") == 0)   mascara |= 64;
+
+	        token = strtok(NULL, ", ");
+	    }
+
+	    return mascara;
+}
+
 
 void crearMenuBienvenida(){
 	printf("======================= \n");
@@ -17,21 +49,21 @@ void crearMenuBienvenida(){
 	printf("======================= \n");
 }
 
-void crearMenuInicioSesion(){
+void crearMenuInicioSesion(Usuario u){
 	printf("======================= \n");
 	printf("Inicio de sesion \n");
-	printf("Usuario (DNI): \n");
-	printf("Contraseña: \n");
+	printf("Usuario (DNI): %s \n", u.dni);
+	printf("Contraseña: %s \n", u.contrasena);
 	printf("======================= \n");
 }
 
-void crearMenuRegistro(){
+void crearMenuRegistro(Usuario u){
 	printf("======================= \n");
 	printf("Registro \n");
-	printf("Nombre: \n");
-	printf("Apellido: \n");
-	printf("Usuario (DNI): \n");
-	printf("Contraseña: \n");
+	printf("Nombre: %s \n", u.nombre);
+	printf("Apellido: %s \n", u.apellido);
+	printf("Usuario (DNI): %s \n", u.dni);
+	printf("Contraseña: %s \n", u.contrasena);
 	printf("======================= \n");
 }
 
@@ -54,21 +86,24 @@ void crearMenuNegocios(){
 	printf("======================= \n");
 }
 
-void crearMenuAnyadirNegocios(){
+void crearMenuAnyadirNegocios(Negocio n){
 	printf("======================= \n");
 	printf("Anyadir negocio\n");
-	printf("Nombre del negocio: \n");
-	printf("Municipio: \n");
-	printf("Horario(Separado por coma) \n");
+	printf("Nombre del negocio: %s\n", n.nombre);
+	printf("Municipio: %s\n", n.municipio);
+	printf("Hora apertura(hh:mm) %s\n", n.hora_apertura);
+	printf("Hora cierre(hh:mm) %s\n", n.hora_cierre);
+	printf("Dias abierto separado por comas %s\n", n.dias);
+	printf("Tipo de negocio: %s\n", n.tipo);
 	printf("Pulse Enter al finalizar \n");
 	printf("======================= \n");
 }
 
-void crearMenuEliminarNegocios(){
+void crearMenuEliminarNegocios(Negocio n){
 	printf("======================= \n");
 	printf("Eliminar negocio \n");
-	printf("Negocio: \n");
-	printf("Municipio: \n");
+	printf("Negocio: %s\n", n.nombre);
+	printf("Municipio: %s\n", n.municipio);
 	printf("Pulse Enter al finalizar \n");
 	printf("======================= \n");
 }
@@ -82,20 +117,23 @@ void crearMenuEliminarNegociosConfirm(char *negocio, char *municipio){
 	printf("======================= \n");
 }
 
-void crearMenuModificarNegocios(){
+void crearMenuModificarNegocios(Negocio n){
 	printf("======================= \n");
 	printf("Modificar negocio \n");
-	printf("Negocio: \n");
-	printf("Municipio: \n");
-	printf("Horario(Separado por coma): \n");
+	printf("Negocio: %s\n", n.nombre);
+	printf("Municipio: %s\n",n.municipio);
+	printf("Hora apertura(hh:mm) %s\n", n.hora_apertura);
+	printf("Hora cierre(hh:mm) %s\n", n.hora_cierre);
 	printf("Pulse Enter al finalizar \n");
 	printf("======================= \n");
 }
 
-void crearMenuUsuario(){
+void crearMenuUsuario(Usuario u){
 	printf("======================= \n");
-	printf("1. Gestionar negocios \n");
-	printf("2. Gestionar usuario \n");
-	printf("3. Salir \n");
-	printf("======================= \n");
+		printf("Modificacion usuario \n");
+		printf("Nombre: %s \n", u.nombre);
+		printf("Apellido: %s \n", u.apellido);
+		printf("Usuario (DNI): %s \n", u.dni);
+		printf("Contraseña: %s \n", u.contrasena);
+		printf("======================= \n");
 }
