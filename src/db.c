@@ -62,57 +62,75 @@ int borrar_reservas(sqlite3 *db) {
 	return SQLITE_OK;
 }
 
-//Falta acabarlo
 int insert_usuario(sqlite3 *db, char *datos[]) {
-	sqlite3_stmt *stmt;
+    sqlite3_stmt *stmt;
+    // 1. Verificación de seguridad de entrada
+    if (db == NULL || datos == NULL || datos[0] == NULL || datos[1] == NULL || datos[2] == NULL || datos[3] == NULL) {
+        printf("Error: Datos de entrada nulos.\n");
+        return SQLITE_ERROR;
+    }
 
-	    // Se cambió el nombre de la tabla de 'country' a 'usuario' (o el que corresponda en tu BD)
-	    char sql[] = "insert into usuario (id_usuario, nombre, DNI, password_hash, id_rol) values (NULL, ?, ?, ?, 2)";
+    char sql[] = "INSERT INTO usuario (id_usuario, nombre, apellido, DNI, password_hash, id_rol) VALUES (NULL, ?, ?, ?, 2)";
 
-	    // Usar -1 hace que SQLite lea hasta el carácter nulo ('\0') automáticamente
-	    int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
-	    if (result != SQLITE_OK) {
-	        printf("Error preparing statement (INSERT)\n");
-	        printf("%s\n", sqlite3_errmsg(db));
-	        return result;
-	    }
+    int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+    if (result != SQLITE_OK) {
+        printf("Error preparando el INSERT: %s\n", sqlite3_errmsg(db));
+        return result;
+    }
 
-	    printf("SQL query prepared (INSERT)\n");
 
-	    // Asumimos el orden: datos[0] = nombre, datos[1] = DNI, datos[2] = password_hash
-	    // Usamos SQLITE_TRANSIENT por seguridad, para que SQLite gestione su propia copia del string
-	    result = sqlite3_bind_text(stmt, 1, datos[0], -1, SQLITE_TRANSIENT);
-	    if (result == SQLITE_OK) {
-	        result = sqlite3_bind_text(stmt, 2, datos[1], -1, SQLITE_TRANSIENT);
-	    }
-	    if (result == SQLITE_OK) {
-	        result = sqlite3_bind_text(stmt, 3, datos[2], -1, SQLITE_TRANSIENT);
-	    }
+    sqlite3_bind_text(stmt, 1, datos[0], -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 2, datos[1], -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 3, datos[2], -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 4, datos[3], -1, SQLITE_TRANSIENT);
 
-	    if (result != SQLITE_OK) {
-	        printf("Error binding parameters\n");
-	        printf("%s\n", sqlite3_errmsg(db));
-	        // IMPORTANTE: Liberar el statement antes de salir por error para evitar fugas de memoria
-	        sqlite3_finalize(stmt);
-	        return result;
-	    }
+    result = sqlite3_step(stmt);
 
-	    result = sqlite3_step(stmt);
-	    if (result != SQLITE_DONE) {
-	        printf("Error inserting new data into table\n");
-	        printf("%s\n", sqlite3_errmsg(db));
-	        sqlite3_finalize(stmt); // Liberar antes de salir por error
-	        return result;
-	    }
+    if (result != SQLITE_DONE) {
+        printf("Error al insertar usuario: %s\n", sqlite3_errmsg(db));
+        sqlite3_finalize(stmt); // SIEMPRE finalizar, incluso si falla
+        return result;
+    }
 
-	    result = sqlite3_finalize(stmt);
-	    if (result != SQLITE_OK) {
-	        printf("Error finalizing statement (INSERT)\n");
-	        printf("%s\n", sqlite3_errmsg(db));
-	        return result;
-	    }
+    sqlite3_finalize(stmt);
+    printf("Usuario '%s' insertado con exito.\n", datos[0]);
 
-	    printf("Prepared statement finalized (INSERT) - Usuario insertado con exito\n");
+    return SQLITE_OK;
+}
 
-	    return SQLITE_OK;
+Usuario login_usuario(sqlite3 *db, char *dni, char *contrasena) {
+    sqlite3_stmt *stmt;
+    Usuario u;
+
+    memset(&u, 0, sizeof(Usuario));
+
+    // SQL: Buscamos por nombre Y contraseña
+    char sql[] = "SELECT nombre, apellido, DNI, password_hash FROM usuario WHERE DNI = ? AND password_hash = ?";
+
+    int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+    if (result != SQLITE_OK) {
+        printf("Error al preparar login: %s\n", sqlite3_errmsg(db));
+        return u;
+    }
+
+
+    sqlite3_bind_text(stmt, 1, dni, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 2, contrasena, -1, SQLITE_TRANSIENT);
+
+    result = sqlite3_step(stmt);
+
+    if (result == SQLITE_ROW) {
+        strcpy(u.nombre, (char *)sqlite3_column_text(stmt, 0));
+        strcpy(u.apellido, (char *)sqlite3_column_text(stmt, 1));
+        strcpy(u.dni, (char *)sqlite3_column_text(stmt, 2));
+        strcpy(u.contrasena, (char *)sqlite3_column_text(stmt, 3));
+
+        printf("Login exitoso. Bienvenido %s!\n", u.nombre);
+    } else {
+    	u.nombre[0] = '\0';
+        printf("ID de usuario o contraseña incorrectos.\n");
+    }
+
+    sqlite3_finalize(stmt);
+    return u;
 }
