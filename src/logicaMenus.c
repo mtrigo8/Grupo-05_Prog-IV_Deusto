@@ -66,8 +66,44 @@ void gestionMenuInicioSesion(sqlite3 *db) {
         getchar();
     }
 }
-void gestionMenuRegistro(sqlite3 *db){
 
+void gestionMenuRegistro(sqlite3 *db) {
+    Usuario u_temp;
+    memset(&u_temp, 0, sizeof(Usuario)); // Limpiar estructura
+
+    crearMenuRegistro(u_temp);
+    fflush(stdout);
+    scanf(" %49s", u_temp.nombre);
+
+    crearMenuRegistro(u_temp);
+    fflush(stdout);
+    scanf(" %49s", u_temp.apellido);
+
+    crearMenuRegistro(u_temp);
+    fflush(stdout);
+    scanf(" %19s", u_temp.dni);
+
+    crearMenuRegistro(u_temp);
+    fflush(stdout);
+    scanf(" %49s", u_temp.contrasena);
+
+    char *datos[4];
+    datos[0] = u_temp.nombre;
+    datos[1] = u_temp.apellido;
+    datos[2] = u_temp.dni;
+    datos[3] = u_temp.contrasena;
+
+    int res = insert_usuario(db, datos);
+
+    if (res == SQLITE_OK) {
+        printf("\nRegistro completado con éxito.\n");
+         //Aquí llamar a: gestionMenuPrincipal(db, u_final);
+    } else {
+        printf("\nError al registrar: El DNI ya existe o hubo un problema con la base de datos.\n");
+        printf("Presione Enter para volver al inicio...");
+        fflush(stdout);
+        while(getchar() != '\n'); // Limpiar buffer
+        getchar();                // Pausa
+    }
 }
-
 

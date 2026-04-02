@@ -70,7 +70,7 @@ int insert_usuario(sqlite3 *db, char *datos[]) {
         return SQLITE_ERROR;
     }
 
-    char sql[] = "INSERT INTO usuario (id_usuario, nombre, apellido, DNI, password_hash, id_rol) VALUES (NULL, ?, ?, ?, 2)";
+    char sql[] = "INSERT INTO usuario (id_usuario, nombre, apellido, DNI, password_hash, id_rol) VALUES (NULL, ?, ?, ?, ?, 2)";
 
     int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (result != SQLITE_OK) {
