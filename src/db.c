@@ -105,7 +105,7 @@ Usuario login_usuario(sqlite3 *db, char *dni, char *contrasena) {
     memset(&u, 0, sizeof(Usuario));
 
     // SQL: Buscamos por nombre Y contraseña
-    char sql[] = "SELECT nombre, apellido, DNI, password_hash FROM usuario WHERE DNI = ? AND password_hash = ?";
+    char sql[] = "SELECT nombre, apellido, DNI, password_hash, id_rol FROM usuario WHERE DNI = ? AND password_hash = ?";
 
     int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (result != SQLITE_OK) {
@@ -124,11 +124,9 @@ Usuario login_usuario(sqlite3 *db, char *dni, char *contrasena) {
         strcpy(u.apellido, (char *)sqlite3_column_text(stmt, 1));
         strcpy(u.dni, (char *)sqlite3_column_text(stmt, 2));
         strcpy(u.contrasena, (char *)sqlite3_column_text(stmt, 3));
-
-        printf("Login exitoso. Bienvenido %s!\n", u.nombre);
+        u.rol = sqlite3_column_int(stmt, 4);
     } else {
     	u.nombre[0] = '\0';
-        printf("ID de usuario o contraseña incorrectos.\n");
     }
 
     sqlite3_finalize(stmt);

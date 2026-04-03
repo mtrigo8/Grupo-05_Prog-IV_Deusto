@@ -55,8 +55,16 @@ void gestionMenuInicioSesion(sqlite3 *db) {
 
     if (strcmp(u_final.nombre,"") != 0) {
         // LOGIN CORRECTO
-        printf("\nAcceso concedido. Bienvenido, %s.\n", u_final.nombre);
-        	// Aquí llamar a: gestionMenuPrincipal(db, u_final);
+    	if (u_final.rol == 1){ //rol 1 = admin
+    		printf("\nAcceso concedido. Bienvenido, %s.\n", u_final.nombre);
+    		gestionMenuPrincipal(db, u_final);
+    	}else{
+    		printf("\nRegistro completado con éxito.\n");
+    		        printf("El apartado de consumidor no esta diseñado aún, intentelo más adelante. \n Presione Enter para volver al inicio...");
+    		        fflush(stdout);
+    		        while(getchar() != '\n');
+    		        getchar();
+    	}
     } else {
         // LOGIN FALLIDO
         printf("\nError: Usuario o contraseña incorrectos.\n");
@@ -97,7 +105,10 @@ void gestionMenuRegistro(sqlite3 *db) {
 
     if (res == SQLITE_OK) {
         printf("\nRegistro completado con éxito.\n");
-         //Aquí llamar a: gestionMenuPrincipal(db, u_final);
+        printf("El apartado de consumidor no esta diseñado aún, intentelo más adelante. \n Presione Enter para volver al inicio...");
+        fflush(stdout);
+        while(getchar() != '\n');
+        getchar();
     } else {
         printf("\nError al registrar: El DNI ya existe o hubo un problema con la base de datos.\n");
         printf("Presione Enter para volver al inicio...");
@@ -107,3 +118,39 @@ void gestionMenuRegistro(sqlite3 *db) {
     }
 }
 
+void gestionMenuPrincipal(sqlite3 *db, Usuario u_final){
+	int opcion = 0;
+	int salir = 0;
+
+	while (!salir){
+		crearMenuPrincipal();
+		fflush(stdout);
+
+		if (scanf(" %d", &opcion) != 1) {
+		   while(getchar() != '\n');
+		   opcion = 0;
+		        }
+
+		switch (opcion) {
+			case 1:
+				gestionMenuNegocios(db, u_final);
+				break;
+			case 2:
+				gestionMenuUsuario(db, u_final);
+				break;
+			case 3:
+				salir = 1;
+				break;
+			default:
+				printf("Opción invalida \n\n");
+		}
+	}
+}
+
+void gestionMenuNegocios(sqlite3 *db, Usuario u_final){
+
+}
+
+void gestionMenuUsuario(sqlite3 *db, Usuario u_final){
+
+}
