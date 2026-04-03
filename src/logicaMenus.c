@@ -148,9 +148,57 @@ void gestionMenuPrincipal(sqlite3 *db, Usuario u_final){
 }
 
 void gestionMenuNegocios(sqlite3 *db, Usuario u_final){
+	int opcion = 0;
+	int salir = 0;
 
+	while (!salir){
+		crearMenuNegocios();
+		fflush(stdout);
+
+		if (scanf(" %d", &opcion) != 1) {
+				   while(getchar() != '\n');
+				   opcion = 0;
+				        }
+
+		switch(opcion){
+		case 1:
+			gestionarMenuVerNegocio(db);
+			break;
+		case 2:
+			gestionMenuAnyadirNegocios(db);
+			break;
+		case 3:
+			gestionMenuEliminarNegocios(db);
+			break;
+		case 4:
+			gestionMenuModificarNegocios(db);
+			break;
+		case 5:
+			salir = 1;
+			break;
+		default:
+			printf("Opción invalida \n\n");
+		}
+
+	}
 }
 
 void gestionMenuUsuario(sqlite3 *db, Usuario u_final){
+
+}
+
+void gestionarMenuVerNegocio(sqlite3 *db){
+
+}
+
+void gestionMenuAnyadirNegocios(sqlite3 *db){
+
+}
+
+void gestionMenuEliminarNegocios(sqlite3 *db){
+
+}
+
+void gestionMenuModificarNegocios(sqlite3 *db){
 
 }
