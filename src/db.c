@@ -132,3 +132,73 @@ Usuario login_usuario(sqlite3 *db, char *dni, char *contrasena) {
     sqlite3_finalize(stmt);
     return u;
 }
+
+Negocio* get_negocios(sqlite3 *db, int *total_negocios) {
+    sqlite3_stmt *stmt;
+    int result;
+
+    *total_negocios = 0;
+
+    char sql_count[] = "SELECT COUNT(*) FROM servicio";
+    result = sqlite3_prepare_v2(db, sql_count, -1, &stmt, NULL);
+    if (result != SQLITE_OK) {
+        printf("Error preparando el COUNT: %s\n", sqlite3_errmsg(db));
+        return NULL;
+    }
+
+    int cantidad_exacta = 0;
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        cantidad_exacta = sqlite3_column_int(stmt, 0);
+    }
+    sqlite3_finalize(stmt);
+
+    if (cantidad_exacta == 0) {
+        return NULL;
+    }
+
+    Negocio *lista = malloc(cantidad_exacta * sizeof(Negocio));
+    if (lista == NULL) {
+        printf("Error: No se pudo asignar memoria para %d servicios.\n", cantidad_exacta);
+        return NULL;
+    }
+
+    char sql_datos[] = "SELECT nombre_servicio, municipio, hora_apertura, hora_cierre, fecha, tipo_servicio FROM servicio";
+    result = sqlite3_prepare_v2(db, sql_datos, -1, &stmt, NULL);
+    if (result != SQLITE_OK) {
+        printf("Error preparando el SELECT de datos: %s\n", sqlite3_errmsg(db));
+        free(lista);
+        return NULL;
+    }
+
+    int i = 0;
+    while (sqlite3_step(stmt) == SQLITE_ROW && i < cantidad_exacta) {
+        const char* val;
+
+        memset(&lista[i], 0, sizeof(Negocio));
+
+        val = (const char*)sqlite3_column_text(stmt, 0);
+        if (val) strncpy(lista[i].nombre, val, sizeof(lista[i].nombre) - 1);
+
+        val = (const char*)sqlite3_column_text(stmt, 1);
+        if (val) strncpy(lista[i].municipio, val, sizeof(lista[i].municipio) - 1);
+
+        val = (const char*)sqlite3_column_text(stmt, 2);
+        if (val) strncpy(lista[i].hora_apertura, val, sizeof(lista[i].hora_apertura) - 1);
+
+        val = (const char*)sqlite3_column_text(stmt, 3);
+        if (val) strncpy(lista[i].hora_cierre, val, sizeof(lista[i].hora_cierre) - 1);
+
+        lista[i].fecha = sqlite3_column_int(stmt, 4);
+
+        val = (const char*)sqlite3_column_text(stmt, 5);
+        if (val) strncpy(lista[i].tipo, val, sizeof(lista[i].tipo) - 1);
+
+        i++;
+    }
+
+    sqlite3_finalize(stmt);
+
+    *total_negocios = cantidad_exacta;
+
+    return lista;
+}

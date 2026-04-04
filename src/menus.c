@@ -7,6 +7,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #include <string.h>
 #include <ctype.h>
 #include "menus.h"
@@ -39,6 +41,31 @@ int convertirDiasInt(char dias[]){
 	    }
 
 	    return mascara;
+}
+
+void convertirIntDias(int mascara, char resultado[]) {
+	//IAG
+    // Array con los nombres de los días para facilitar la lectura
+    const char *nombres_dias[] = {"LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO", "DOMINGO"};
+
+    // Nos aseguramos de que el string de resultado empiece vacío
+    resultado[0] = '\0';
+    int primero = 1; // Bandera para saber si es el primer día y no poner coma
+
+    // Recorremos los 7 bits (0 al 6)
+    for (int i = 0; i < 7; i++) {
+        // (1 << i) va generando: 1, 2, 4, 8, 16, 32, 64
+        if (mascara & (1 << i)) {
+            // Si no es el primer día que añadimos, ponemos una coma antes
+            if (!primero) {
+                strcat(resultado, ", ");
+            }
+            // Añadimos el día correspondiente al string
+            strcat(resultado, nombres_dias[i]);
+            primero = 0; // Ya pasamos el primer elemento
+        }
+    }
+
 }
 
 
@@ -145,4 +172,23 @@ void crearMenuUsuario(Usuario u){
 		printf("Usuario (DNI): %s \n", u.dni);
 		printf("Contraseña: %s \n", u.contrasena);
 		printf("======================= \n");
+}
+
+void mostrarNegocios(Negocio* negocios, int cantidad_total){
+    printf("======================= \n");
+    printf("Mostrando todos los negocios en la base de datos\n");
+    printf("======================= \n");
+
+    int i = 0;
+    while(i < cantidad_total){
+        Negocio n = negocios[i];
+        char dias[100];
+        memset(dias, 0, sizeof(dias));
+        convertirIntDias(n.fecha, dias);
+        fflush(stdout);
+        printf("%d. %s en %s, de %s a %s, abierto: %s, tipo: %s\n",
+               i + 1, n.nombre, n.municipio, n.hora_apertura, n.hora_cierre, dias, n.tipo);
+        i++;
+    }
+    printf("======================= \n");
 }

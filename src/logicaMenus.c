@@ -188,7 +188,19 @@ void gestionMenuUsuario(sqlite3 *db, Usuario u_final){
 }
 
 void gestionarMenuVerNegocio(sqlite3 *db){
+    int t = 0;
+    Negocio * negocios = get_negocios(db, &t);
+    mostrarNegocios(negocios, t);
 
+    printf("\nPulse Enter para volver.\n");
+    fflush(stdout);
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+    getchar();
+
+    if (negocios != NULL) {
+        free(negocios);
+    }
 }
 
 void gestionMenuAnyadirNegocios(sqlite3 *db){

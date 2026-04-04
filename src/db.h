@@ -14,6 +14,7 @@ int registrar_log(sqlite3 *db, int id_usuario, const char *nivel, const char *me
 int borrar_reservas(sqlite3 *db);
 int insert_usuario(sqlite3 *db, char *datos[]);
 Usuario login_usuario(sqlite3 *db, char *nombre, char *contrasena);
+Negocio* get_negocios(sqlite3 *db, int *total_negocios);
 
 
 #endif /* DB_H_ */

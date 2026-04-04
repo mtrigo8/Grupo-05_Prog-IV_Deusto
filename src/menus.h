@@ -13,6 +13,7 @@
 #include  "estructuras.h"
 
 int convertirDiasInt(char dias[]);
+void convertirIntDias(int mascara, char resultado[]);
 void crearMenuBienvenida();
 void crearMenuInicioSesion(Usuario u);
 void crearMenuRegistro(Usuario u);
@@ -23,5 +24,8 @@ void crearMenuEliminarNegocios(Negocio n);
 void crearMenuEliminarNegociosConfirm(char *negocio, char *municipio);
 void crearMenuModificarNegocios(Negocio n);
 void crearMenuUsuario(Usuario u);
+void mostrarNegocios(Negocio* negocios, int cantidad_total);
+
+
 
 #endif /* MENUS_H_ */

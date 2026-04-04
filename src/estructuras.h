@@ -17,13 +17,14 @@ typedef struct {
 } Usuario;
 
 typedef struct {
-    char nombre[50];
+    char nombre[75];
     char municipio[50];
     char hora_apertura[20];
     char hora_cierre[20];
     int fecha;//dias en binario
     char tipo[50];
     char dias[50];//dias en string, provisional
+    char descripcion[1000];
 } Negocio;
 
 enum Dias {
