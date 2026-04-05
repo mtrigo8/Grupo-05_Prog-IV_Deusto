@@ -324,12 +324,14 @@ void gestionMenuModificarNegocios(sqlite3 *db){
     printf("\nIntroduce el nombre EXACTO del negocio que quieres modificar: ");
     fflush(stdout);
     scanf(" %74[^\n]", nombre_actual);
+    while(getchar() != '\n');
 
     printf("\n--- Introduce los NUEVOS datos ---\n");
 
     printf("Nuevo Municipio: ");
     fflush(stdout);
     scanf(" %49[^\n]", n_nuevo.municipio);
+    while(getchar() != '\n');
 
     printf("Nueva Hora de apertura (ej. 08:00): ");
     fflush(stdout);
@@ -338,10 +340,17 @@ void gestionMenuModificarNegocios(sqlite3 *db){
     printf("Nueva Hora de cierre (ej. 20:00): ");
     fflush(stdout);
     scanf(" %19s", n_nuevo.hora_cierre);
+    while(getchar() != '\n');
 
     printf("Nuevo Tipo de servicio: ");
     fflush(stdout);
     scanf(" %49[^\n]", n_nuevo.tipo);
+    while(getchar() != '\n');
+
+    printf("Nuevos Dias de apertura (introduce el numero): ");
+    fflush(stdout);
+    scanf(" %d", &n_nuevo.fecha);
+    while(getchar() != '\n');
 
     int res = update_negocio(db, nombre_actual, n_nuevo);
 
@@ -353,6 +362,5 @@ void gestionMenuModificarNegocios(sqlite3 *db){
 
     printf("Presione Enter para volver...");
     fflush(stdout);
-    while(getchar() != '\n');
     getchar();
 }

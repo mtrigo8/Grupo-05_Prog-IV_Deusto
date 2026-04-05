@@ -254,8 +254,7 @@ int delete_negocio(sqlite3 *db, char *nombre) {
 
 int update_negocio(sqlite3 *db, char *nombre_actual, Negocio n_nuevo) {
     sqlite3_stmt *stmt;
-    char sql[] = "UPDATE servicio SET municipio = ?, hora_apertura = ?, hora_cierre = ?, tipo_servicio = ? WHERE nombre_servicio = ?";
-
+    char sql[] = "UPDATE servicio SET municipio = ?, hora_apertura = ?, hora_cierre = ?, tipo_servicio = ?, fecha = ? WHERE nombre_servicio = ?";
     int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (result != SQLITE_OK) {
         printf("Error preparando el UPDATE de negocio: %s\n", sqlite3_errmsg(db));
@@ -267,7 +266,9 @@ int update_negocio(sqlite3 *db, char *nombre_actual, Negocio n_nuevo) {
     sqlite3_bind_text(stmt, 3, n_nuevo.hora_cierre, -1, SQLITE_TRANSIENT);
     sqlite3_bind_text(stmt, 4, n_nuevo.tipo, -1, SQLITE_TRANSIENT);
 
-    sqlite3_bind_text(stmt, 5, nombre_actual, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_int(stmt, 5, n_nuevo.fecha);
+
+    sqlite3_bind_text(stmt, 6, nombre_actual, -1, SQLITE_TRANSIENT);
 
     result = sqlite3_step(stmt);
     if (result != SQLITE_DONE) {
