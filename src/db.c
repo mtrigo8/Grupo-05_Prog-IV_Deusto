@@ -6,6 +6,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "sqlite3.h"
 #include <string.h>
 #include  "db.h"
@@ -201,4 +202,78 @@ Negocio* get_negocios(sqlite3 *db, int *total_negocios) {
     *total_negocios = cantidad_exacta;
 
     return lista;
+}
+
+int insert_negocio(sqlite3 *db, Negocio n) {
+	sqlite3_stmt *stmt;
+	char sql[] = "INSERT INTO servicio (nombre_servicio, municipio, hora_apertura, hora_cierre, fecha, tipo_servicio) VALUES (?, ?, ?, ?, ?, ?)";
+
+	int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+	if (result != SQLITE_OK) {
+	    printf("Error preparando el INSERT de negocio: %s\n", sqlite3_errmsg(db));
+	    return result;
+	}
+
+	sqlite3_bind_text(stmt, 1, n.nombre, -1, SQLITE_TRANSIENT);
+	sqlite3_bind_text(stmt, 2, n.municipio, -1, SQLITE_TRANSIENT);
+	sqlite3_bind_text(stmt, 3, n.hora_apertura, -1, SQLITE_TRANSIENT);
+	sqlite3_bind_text(stmt, 4, n.hora_cierre, -1, SQLITE_TRANSIENT);
+	sqlite3_bind_int(stmt, 5, n.fecha);
+	sqlite3_bind_text(stmt, 6, n.tipo, -1, SQLITE_TRANSIENT);
+
+	result = sqlite3_step(stmt);
+	if (result != SQLITE_DONE) {
+		printf("Error al insertar negocio: %s\n", sqlite3_errmsg(db));
+	}
+
+	sqlite3_finalize(stmt);
+	return result;
+}
+
+int delete_negocio(sqlite3 *db, char *nombre) {
+	sqlite3_stmt *stmt;
+	char sql[] = "DELETE FROM servicio WHERE nombre_servicio = ?";
+
+	int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+	if (result != SQLITE_OK) {
+	    printf("Error preparando el DELETE de negocio: %s\n", sqlite3_errmsg(db));
+	    return result;
+	}
+
+	sqlite3_bind_text(stmt, 1, nombre, -1, SQLITE_TRANSIENT);
+
+	result = sqlite3_step(stmt);
+	if (result != SQLITE_DONE) {
+	    printf("Error al borrar negocio: %s\n", sqlite3_errmsg(db));
+	}
+
+	sqlite3_finalize(stmt);
+	return result;
+
+}
+
+int update_negocio(sqlite3 *db, char *nombre_actual, Negocio n_nuevo) {
+    sqlite3_stmt *stmt;
+    char sql[] = "UPDATE servicio SET municipio = ?, hora_apertura = ?, hora_cierre = ?, tipo_servicio = ? WHERE nombre_servicio = ?";
+
+    int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+    if (result != SQLITE_OK) {
+        printf("Error preparando el UPDATE de negocio: %s\n", sqlite3_errmsg(db));
+        return result;
+    }
+
+    sqlite3_bind_text(stmt, 1, n_nuevo.municipio, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 2, n_nuevo.hora_apertura, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 3, n_nuevo.hora_cierre, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 4, n_nuevo.tipo, -1, SQLITE_TRANSIENT);
+
+    sqlite3_bind_text(stmt, 5, nombre_actual, -1, SQLITE_TRANSIENT);
+
+    result = sqlite3_step(stmt);
+    if (result != SQLITE_DONE) {
+        printf("Error al actualizar negocio: %s\n", sqlite3_errmsg(db));
+    }
+
+    sqlite3_finalize(stmt);
+    return result;
 }

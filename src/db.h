@@ -15,6 +15,9 @@ int borrar_reservas(sqlite3 *db);
 int insert_usuario(sqlite3 *db, char *datos[]);
 Usuario login_usuario(sqlite3 *db, char *nombre, char *contrasena);
 Negocio* get_negocios(sqlite3 *db, int *total_negocios);
+int insert_negocio(sqlite3 *db, Negocio n);
+int delete_negocio(sqlite3 *db, char *nombre);
+int update_negocio(sqlite3 *db, char *nombre_actual, Negocio n_nuevo);
 
 
 #endif /* DB_H_ */

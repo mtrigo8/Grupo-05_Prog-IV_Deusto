@@ -204,13 +204,111 @@ void gestionarMenuVerNegocio(sqlite3 *db){
 }
 
 void gestionMenuAnyadirNegocios(sqlite3 *db){
+    Negocio n;
+    memset(&n, 0, sizeof(Negocio));
 
+    crearMenuAnyadirNegocios(n);
+    printf("\nIntroduce los datos del nuevo negocio:\n");
+
+    printf("Nombre del negocio: ");
+    fflush(stdout);
+    scanf(" %74[^\n]", n.nombre);
+
+    printf("Municipio: ");
+    fflush(stdout);
+    scanf(" %49[^\n]", n.municipio);
+
+    printf("Hora de apertura (ej. 08:00): ");
+    fflush(stdout);
+    scanf(" %19s", n.hora_apertura);
+
+    printf("Hora de cierre (ej. 20:00): ");
+    fflush(stdout);
+    scanf(" %19s", n.hora_cierre);
+
+    printf("Tipo de servicio (ej. Taller, Curso...): ");
+    fflush(stdout);
+    scanf(" %49[^\n]", n.tipo);
+
+    n.fecha = 127;
+
+    int res = insert_negocio(db, n);
+
+    if (res == SQLITE_DONE) {
+        printf("\n¡Negocio '%s' añadido con éxito a la base de datos!\n", n.nombre);
+    } else {
+        printf("\nError: No se pudo añadir (¿Quizás ese nombre ya existe?).\n");
+    }
+
+    printf("Presione Enter para volver...");
+    fflush(stdout);
+    while(getchar() != '\n');
+    getchar();
 }
 
 void gestionMenuEliminarNegocios(sqlite3 *db){
+    char nombre[75];
 
+    Negocio n_vacia;
+    memset(&n_vacia, 0, sizeof(Negocio));
+    crearMenuEliminarNegocios(n_vacia);
+    printf("\nIntroduce el nombre EXACTO del negocio a eliminar: ");
+    fflush(stdout);
+    scanf(" %74[^\n]", nombre);
+
+    int res = delete_negocio(db, nombre);
+
+    if (res == SQLITE_DONE) {
+        printf("\n¡Se ha enviado la orden de eliminar el negocio '%s'!\n", nombre);
+    } else {
+        printf("\nHubo un problema al intentar eliminar.\n");
+    }
+
+    printf("Presione Enter para volver...");
+    fflush(stdout);
+    while(getchar() != '\n');
+    getchar();
 }
 
 void gestionMenuModificarNegocios(sqlite3 *db){
+    char nombre_actual[75];
+    Negocio n_nuevo;
+    memset(&n_nuevo, 0, sizeof(Negocio));
 
+    crearMenuModificarNegocios(n_nuevo);
+
+    printf("\nIntroduce el nombre EXACTO del negocio que quieres modificar: ");
+    fflush(stdout);
+    scanf(" %74[^\n]", nombre_actual);
+
+    printf("\n--- Introduce los NUEVOS datos ---\n");
+
+    printf("Nuevo Municipio: ");
+    fflush(stdout);
+    scanf(" %49[^\n]", n_nuevo.municipio);
+
+    printf("Nueva Hora de apertura (ej. 08:00): ");
+    fflush(stdout);
+    scanf(" %19s", n_nuevo.hora_apertura);
+
+    printf("Nueva Hora de cierre (ej. 20:00): ");
+    fflush(stdout);
+    scanf(" %19s", n_nuevo.hora_cierre);
+
+    printf("Nuevo Tipo de servicio: ");
+    fflush(stdout);
+    scanf(" %49[^\n]", n_nuevo.tipo);
+
+    int res = update_negocio(db, nombre_actual, n_nuevo);
+
+    if (res == SQLITE_DONE && sqlite3_changes(db) > 0) {
+        printf("\n¡Negocio '%s' actualizado con éxito!\n", nombre_actual);
+    } else {
+        printf("\nNo se pudo actualizar (¿Seguro que el negocio '%s' existe?).\n", nombre_actual);
+    }
+
+    printf("Presione Enter para volver...");
+    fflush(stdout);
+    while(getchar() != '\n');
+    getchar();
 }
