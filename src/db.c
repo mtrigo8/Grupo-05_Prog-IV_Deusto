@@ -210,7 +210,7 @@ int insert_negocio(sqlite3 *db, Negocio n) {
 
 	int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
 	if (result != SQLITE_OK) {
-	    printf("Error preparando el INSERT de negocio: %s\n", sqlite3_errmsg(db));
+	    printf("Error preparando el INSERT de negocio: %s\n ", sqlite3_errmsg(db));
 	    return result;
 	}
 
