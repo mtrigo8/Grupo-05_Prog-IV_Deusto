@@ -144,13 +144,13 @@ void crearMenuEliminarNegocios(Negocio n){
 	printf("======================= \n");
 }
 
-void crearMenuEliminarNegociosConfirm(char *negocio, char *municipio){
+void crearMenuEliminarNegociosConfirm(char *negocio){
 	printf("======================= \n");
 	printf("Eliminar negocio \n");
-	printf("Seguro que quieros eliminar %s en %s \n", negocio, municipio);
-	printf("[s/n]: \n");
-	printf("Pulse Enter para confirmar \n");
-	printf("======================= \n");
+	printf("Seguro que quieres eliminar el negocio '%s'? \n", negocio);
+	printf("[s/n]: ");
+	fflush(stdout);
+	printf("\n======================= \n");
 }
 
 void crearMenuModificarNegocios(Negocio n){

@@ -184,7 +184,30 @@ void gestionMenuNegocios(sqlite3 *db, Usuario u_final){
 }
 
 void gestionMenuUsuario(sqlite3 *db, Usuario u_final){
+	int opcion = 0;
+	int salir = 0;
 
+	while (!salir){
+			crearMenuUsuario(u_final);
+
+			printf("1. Volver al menu principal\n");
+			printf("======================= \n");
+			printf("Elige una opcion: ");
+			fflush(stdout);
+
+			if (scanf(" %d", &opcion) != 1) {
+				while(getchar() != '\n');
+				opcion = 0;
+			}
+
+			switch (opcion) {
+				case 1:
+					salir = 1;
+					break;
+				default:
+					printf("Opción invalida \n\n");
+			}
+		}
 }
 
 void gestionarMenuVerNegocio(sqlite3 *db){
@@ -230,7 +253,11 @@ void gestionMenuAnyadirNegocios(sqlite3 *db){
     fflush(stdout);
     scanf(" %49[^\n]", n.tipo);
 
-    n.fecha = 127;
+    char dias_temp[256];
+    printf("Dias abierto separado por comas (ej. Lunes, Martes): ");
+    fflush(stdout);
+    scanf(" %255[^\n]", dias_temp);
+    n.fecha = convertirDiasInt(dias_temp);
 
     int res = insert_negocio(db, n);
 
@@ -248,25 +275,42 @@ void gestionMenuAnyadirNegocios(sqlite3 *db){
 
 void gestionMenuEliminarNegocios(sqlite3 *db){
     char nombre[75];
+    char confirmacion;
 
     Negocio n_vacia;
     memset(&n_vacia, 0, sizeof(Negocio));
     crearMenuEliminarNegocios(n_vacia);
+
     printf("\nIntroduce el nombre EXACTO del negocio a eliminar: ");
     fflush(stdout);
     scanf(" %74[^\n]", nombre);
 
-    int res = delete_negocio(db, nombre);
 
-    if (res == SQLITE_DONE) {
-        printf("\n¡Se ha enviado la orden de eliminar el negocio '%s'!\n", nombre);
+    while(getchar() != '\n');
+    crearMenuEliminarNegociosConfirm(nombre);
+
+    scanf(" %c", &confirmacion);
+    while(getchar() != '\n');
+
+    if (confirmacion == 's' || confirmacion == 'S') {
+    	int res = delete_negocio(db, nombre);
+
+    	if (res == SQLITE_DONE) {
+    		if (sqlite3_changes(db) > 0) {
+    			printf("\n¡Se ha eliminado el negocio '%s'!\n", nombre);
+    		} else {
+    			printf("\nNo se encontro ningun negocio llamado '%s'.\n", nombre);
+    		}
+    	} else {
+    		printf("\nHubo un problema al intentar eliminar en la base de datos.\n");
+    	}
     } else {
-        printf("\nHubo un problema al intentar eliminar.\n");
+    	printf("\nOperacion cancelada. El negocio no ha sido borrado.\n");
     }
+
 
     printf("Presione Enter para volver...");
     fflush(stdout);
-    while(getchar() != '\n');
     getchar();
 }
 

@@ -21,7 +21,7 @@ void crearMenuPrincipal();
 void crearMenuNegocios();
 void crearMenuAnyadirNegocios(Negocio n);
 void crearMenuEliminarNegocios(Negocio n);
-void crearMenuEliminarNegociosConfirm(char *negocio, char *municipio);
+void crearMenuEliminarNegociosConfirm(char *negocio);
 void crearMenuModificarNegocios(Negocio n);
 void crearMenuUsuario(Usuario u);
 void mostrarNegocios(Negocio* negocios, int cantidad_total);
