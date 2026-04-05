@@ -258,7 +258,7 @@ int update_negocio(sqlite3 *db, char *nombre_actual, Negocio n_nuevo) {
 
     int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (result != SQLITE_OK) {
-        printf("Error preparando el UPDATE de negocio: %s\n", sqlite3_errmsg(db));
+        printf("Error, preparando el UPDATE de negocio: %s\n", sqlite3_errmsg(db));
         return result;
     }
 
