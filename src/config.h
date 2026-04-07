@@ -8,7 +8,7 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
-#define CONFIG_PATH "cityhub.conf"
+#define CONFIG_PATH "cityhub.config"
 
 typedef struct {
     char db_path[256];

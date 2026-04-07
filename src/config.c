@@ -51,7 +51,6 @@ int config_cargar(Config *cfg) {
     }
 
     fclose(f);
-    printf("[config] Configuración cargada desde '%s'.\n", CONFIG_PATH);
     return 0;
 }
 
