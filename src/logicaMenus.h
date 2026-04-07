@@ -16,5 +16,7 @@ void gestionMenuEliminarNegocios(sqlite3 *db);
 void gestionMenuEliminarNegociosConfirm(sqlite3 *db);
 void gestionMenuModificarNegocios(sqlite3 *db);
 void gestionarMenuVerNegocio(sqlite3 *db);
+void gestionMenuConfig(sqlite3 *db, Config *c);
+void gestionMenuModificarConfig(sqlite3 *db, Config *c);
 
 #endif
