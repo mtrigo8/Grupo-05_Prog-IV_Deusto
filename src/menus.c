@@ -12,6 +12,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "menus.h"
+#include "config.h"
 #include  "estructuras.h"
 
 int convertirDiasInt(char dias[]){
@@ -107,7 +108,7 @@ void crearMenuRegistro(Usuario u){
 void crearMenuPrincipal(){
 	printf("======================= \n");
 	printf("1. Gestionar negocios \n");
-	printf("2. Gestionar usuario \n");
+	printf("2. Gestionar configuracion \n");
 	printf("3. Salir \n");
 	printf("======================= \n");
 }
@@ -144,18 +145,19 @@ void crearMenuEliminarNegocios(Negocio n){
 	printf("======================= \n");
 }
 
-void crearMenuEliminarNegociosConfirm(char *negocio){
+void crearMenuEliminarNegociosConfirm(Negocio n){
 	printf("======================= \n");
 	printf("Eliminar negocio \n");
-	printf("Seguro que quieres eliminar el negocio '%s'? \n", negocio);
+	printf("Seguro que quieres eliminar el negocio '%s' en '%s'? \n", n.nombre, n.municipio);
 	printf("[s/n]: ");
 	fflush(stdout);
 	printf("\n======================= \n");
 }
 
-void crearMenuModificarNegocios(Negocio n){
+void crearMenuModificarNegocios(char * nombreActual, Negocio n){
 	printf("======================= \n");
 	printf("Modificar negocio \n");
+	printf("Nombre actual: %s\n", nombreActual);
 	printf("Negocio: %s\n", n.nombre);
 	printf("Municipio: %s\n",n.municipio);
 	printf("Hora apertura(hh:mm) %s\n", n.hora_apertura);
@@ -164,15 +166,6 @@ void crearMenuModificarNegocios(Negocio n){
 	printf("======================= \n");
 }
 
-void crearMenuUsuario(Usuario u){
-	printf("======================= \n");
-		printf("Modificacion usuario \n");
-		printf("Nombre: %s \n", u.nombre);
-		printf("Apellido: %s \n", u.apellido);
-		printf("Usuario (DNI): %s \n", u.dni);
-		printf("Contraseña: %s \n", u.contrasena);
-		printf("======================= \n");
-}
 
 void mostrarNegocios(Negocio* negocios, int cantidad_total){
     printf("======================= \n");
@@ -191,4 +184,24 @@ void mostrarNegocios(Negocio* negocios, int cantidad_total){
         i++;
     }
     printf("======================= \n");
+}
+
+void crearMenuConfig(){
+		printf("======================= \n");
+		printf("1. Ver configuracion \n");
+		printf("2. Modificar configuracion \n");
+		printf("3. Salir \n");
+		printf("======================= \n");
+}
+
+void crearMenuModificarConfiguracion(Config c){
+	printf("======================= \n");
+	printf("Modificar configuracion \n");
+	printf("DB path: %s", c.db_path);
+	printf("Admin user: %s", c.admin_dni);
+	printf("Admin password: %s", c.admin_password);
+	printf("Log path: %s", c.log_path);
+	printf("Numero maximo de negocios: %d", c.max_negocios);
+	printf("Pulse Enter al finalizar \n");
+	printf("======================= \n");
 }

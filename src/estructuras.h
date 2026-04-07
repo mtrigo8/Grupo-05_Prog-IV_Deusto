@@ -37,4 +37,6 @@ enum Dias {
     DOMINGO   = 1 << 6  // 64
 };
 
+
+
 #endif /* ESTRUCTURAS_H_ */

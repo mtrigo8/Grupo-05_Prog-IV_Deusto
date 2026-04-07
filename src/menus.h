@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include  "estructuras.h"
+#include "config.h"
 
 int convertirDiasInt(char dias[]);
 void convertirIntDias(int mascara, char resultado[]);
@@ -21,10 +22,11 @@ void crearMenuPrincipal();
 void crearMenuNegocios();
 void crearMenuAnyadirNegocios(Negocio n);
 void crearMenuEliminarNegocios(Negocio n);
-void crearMenuEliminarNegociosConfirm(char *negocio);
-void crearMenuModificarNegocios(Negocio n);
-void crearMenuUsuario(Usuario u);
+void crearMenuEliminarNegociosConfirm(Negocio n);
+void crearMenuModificarNegocios(char * nombreActual, Negocio n);
 void mostrarNegocios(Negocio* negocios, int cantidad_total);
+void crearMenuConfig();
+void crearMenuModificarConfiguracion(Config c);
 
 
 

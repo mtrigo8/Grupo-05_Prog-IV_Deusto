@@ -3,18 +3,20 @@
 #include "sqlite3.h"
 #include "logicaMenus.h"
 #include "menus.h"
+#include "config.h"
 
 int main(void) {
-	sqlite3 *db;
-	int rc = sqlite3_open_v2("bd.db", &db, SQLITE_OPEN_READWRITE, NULL);
-	//int rc = sqlite3_open("bd.db", &db); // Asegúrate de que el nombre sea exacto
+    Config cfg;
+    config_cargar(&cfg);
 
-	if (rc != SQLITE_OK) {
-        printf("No se pudo abrir la base de datos\n");
+    sqlite3 *db;
+    int rc = sqlite3_open_v2(cfg.db_path, &db, SQLITE_OPEN_READWRITE, NULL);
+    if (rc != SQLITE_OK) {
+        printf("No se pudo abrir la base de datos: %s\n", cfg.db_path);
         return 1;
     }
 
-    gestionMenuBienvenida(db);
+    gestionMenuBienvenida(db, &cfg);
 
     sqlite3_close(db);
 	return EXIT_SUCCESS;

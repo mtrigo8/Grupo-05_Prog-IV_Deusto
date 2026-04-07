@@ -7,7 +7,7 @@
 #include "db.h"
 #include "logicaMenus.h"
 
-void gestionMenuBienvenida(sqlite3 *db){
+void gestionMenuBienvenida(sqlite3 *db, Config *c){
 	int opcion = 0;
 	int salir = 0;
 
@@ -22,7 +22,7 @@ void gestionMenuBienvenida(sqlite3 *db){
 
 		switch (opcion) {
 			case 1:
-				gestionMenuInicioSesion(db);
+				gestionMenuInicioSesion(db, c);
 				break;
 			case 2:
 				gestionMenuRegistro(db);
@@ -36,7 +36,7 @@ void gestionMenuBienvenida(sqlite3 *db){
 	}
 }
 
-void gestionMenuInicioSesion(sqlite3 *db) {
+void gestionMenuInicioSesion(sqlite3 *db, Config *c) {
     Usuario u_temp;
     // Iniciar el usuario temporal en vacío
     memset(&u_temp, 0, sizeof(Usuario));
@@ -57,7 +57,7 @@ void gestionMenuInicioSesion(sqlite3 *db) {
         // LOGIN CORRECTO
     	if (u_final.rol == 1){ //rol 1 = admin
     		printf("\nAcceso concedido. Bienvenido, %s.\n", u_final.nombre);
-    		gestionMenuPrincipal(db, u_final);
+    		gestionMenuPrincipal(db, u_final, c);
     	}else{
     		printf("\nRegistro completado con éxito.\n");
     		        printf("El apartado de consumidor no esta diseñado aún, intentelo más adelante. \n Presione Enter para volver al inicio...");
@@ -118,7 +118,7 @@ void gestionMenuRegistro(sqlite3 *db) {
     }
 }
 
-void gestionMenuPrincipal(sqlite3 *db, Usuario u_final){
+void gestionMenuPrincipal(sqlite3 *db, Usuario u_final, Config *c){
 	int opcion = 0;
 	int salir = 0;
 
@@ -136,7 +136,7 @@ void gestionMenuPrincipal(sqlite3 *db, Usuario u_final){
 				gestionMenuNegocios(db, u_final);
 				break;
 			case 2:
-				gestionMenuUsuario(db, u_final);
+				//gestionMenuConfiguracion(db, u_final, c);
 				break;
 			case 3:
 				salir = 1;
@@ -183,32 +183,7 @@ void gestionMenuNegocios(sqlite3 *db, Usuario u_final){
 	}
 }
 
-void gestionMenuUsuario(sqlite3 *db, Usuario u_final){
-	int opcion = 0;
-	int salir = 0;
 
-	while (!salir){
-			crearMenuUsuario(u_final);
-
-			printf("1. Volver al menu principal\n");
-			printf("======================= \n");
-			printf("Elige una opcion: ");
-			fflush(stdout);
-
-			if (scanf(" %d", &opcion) != 1) {
-				while(getchar() != '\n');
-				opcion = 0;
-			}
-
-			switch (opcion) {
-				case 1:
-					salir = 1;
-					break;
-				default:
-					printf("Opción invalida \n\n");
-			}
-		}
-}
 
 void gestionarMenuVerNegocio(sqlite3 *db){
     int t = 0;
@@ -231,30 +206,28 @@ void gestionMenuAnyadirNegocios(sqlite3 *db){
     memset(&n, 0, sizeof(Negocio));
 
     crearMenuAnyadirNegocios(n);
-    printf("\nIntroduce los datos del nuevo negocio:\n");
 
-    printf("Nombre del negocio: ");
     fflush(stdout);
     scanf(" %74[^\n]", n.nombre);
 
-    printf("Municipio: ");
+    crearMenuAnyadirNegocios(n);
     fflush(stdout);
     scanf(" %49[^\n]", n.municipio);
 
-    printf("Hora de apertura (ej. 08:00): ");
+    crearMenuAnyadirNegocios(n);
     fflush(stdout);
     scanf(" %19s", n.hora_apertura);
 
-    printf("Hora de cierre (ej. 20:00): ");
+    crearMenuAnyadirNegocios(n);
     fflush(stdout);
     scanf(" %19s", n.hora_cierre);
 
-    printf("Tipo de servicio (ej. Taller, Curso...): ");
+    crearMenuAnyadirNegocios(n);
     fflush(stdout);
     scanf(" %49[^\n]", n.tipo);
 
     char dias_temp[256];
-    printf("Dias abierto separado por comas (ej. Lunes, Martes): ");
+    crearMenuAnyadirNegocios(n);
     fflush(stdout);
     scanf(" %255[^\n]", dias_temp);
     n.fecha = convertirDiasInt(dias_temp);
@@ -267,39 +240,40 @@ void gestionMenuAnyadirNegocios(sqlite3 *db){
         printf("\nError: No se pudo añadir (¿Quizás ese nombre ya existe?).\n");
     }
 
-    printf("Presione Enter para volver...");
+    crearMenuAnyadirNegocios(n);
     fflush(stdout);
     while(getchar() != '\n');
     getchar();
 }
 
 void gestionMenuEliminarNegocios(sqlite3 *db){
-    char nombre[75];
     char confirmacion;
 
     Negocio n_vacia;
     memset(&n_vacia, 0, sizeof(Negocio));
     crearMenuEliminarNegocios(n_vacia);
 
-    printf("\nIntroduce el nombre EXACTO del negocio a eliminar: ");
     fflush(stdout);
-    scanf(" %74[^\n]", nombre);
+    scanf(" %74[^\n]", n_vacia.nombre);
+    crearMenuEliminarNegocios(n_vacia);
+    fflush(stdout);
+    scanf(" %49[^\n]", n_vacia.municipio);
 
 
     while(getchar() != '\n');
-    crearMenuEliminarNegociosConfirm(nombre);
+    crearMenuEliminarNegociosConfirm(n_vacia);
 
     scanf(" %c", &confirmacion);
     while(getchar() != '\n');
 
     if (confirmacion == 's' || confirmacion == 'S') {
-    	int res = delete_negocio(db, nombre);
+    	int res = delete_negocio(db, n_vacia.nombre);
 
     	if (res == SQLITE_DONE) {
     		if (sqlite3_changes(db) > 0) {
-    			printf("\n¡Se ha eliminado el negocio '%s'!\n", nombre);
+    			printf("\n¡Se ha eliminado el negocio '%s'!\n", n_vacia.nombre);
     		} else {
-    			printf("\nNo se encontro ningun negocio llamado '%s'.\n", nombre);
+    			printf("\nNo se encontro ningun negocio llamado '%s'.\n", n_vacia.nombre);
     		}
     	} else {
     		printf("\nHubo un problema al intentar eliminar en la base de datos.\n");
@@ -319,38 +293,42 @@ void gestionMenuModificarNegocios(sqlite3 *db){
     Negocio n_nuevo;
     memset(&n_nuevo, 0, sizeof(Negocio));
 
-    crearMenuModificarNegocios(n_nuevo);
+    crearMenuModificarNegocios(nombre_actual, n_nuevo);
 
-    printf("\nIntroduce el nombre EXACTO del negocio que quieres modificar: ");
     fflush(stdout);
     scanf(" %74[^\n]", nombre_actual);
     while(getchar() != '\n');
 
-    printf("\n--- Introduce los NUEVOS datos ---\n");
+    crearMenuModificarNegocios(nombre_actual, n_nuevo);
 
-    printf("Nuevo Municipio: ");
+    fflush(stdout);
+    scanf(" %74[^\n]", n_nuevo.nombre);
+    fflush(stdout);
+    crearMenuModificarNegocios(nombre_actual, n_nuevo);
     fflush(stdout);
     scanf(" %49[^\n]", n_nuevo.municipio);
     while(getchar() != '\n');
 
-    printf("Nueva Hora de apertura (ej. 08:00): ");
+    crearMenuModificarNegocios(nombre_actual, n_nuevo);
     fflush(stdout);
     scanf(" %19s", n_nuevo.hora_apertura);
 
-    printf("Nueva Hora de cierre (ej. 20:00): ");
+    crearMenuModificarNegocios(nombre_actual, n_nuevo);
     fflush(stdout);
     scanf(" %19s", n_nuevo.hora_cierre);
     while(getchar() != '\n');
 
-    printf("Nuevo Tipo de servicio: ");
+    crearMenuModificarNegocios(nombre_actual, n_nuevo);
     fflush(stdout);
     scanf(" %49[^\n]", n_nuevo.tipo);
     while(getchar() != '\n');
 
-    printf("Nuevos Dias de apertura (introduce el numero): ");
+    crearMenuModificarNegocios(nombre_actual, n_nuevo);
     fflush(stdout);
-    scanf(" %d", &n_nuevo.fecha);
+    scanf(" %255[^\n]", n_nuevo.dias);
     while(getchar() != '\n');
+    n_nuevo.fecha = convertirDiasInt(n_nuevo.dias);
+
 
     int res = update_negocio(db, nombre_actual, n_nuevo);
 
@@ -360,7 +338,6 @@ void gestionMenuModificarNegocios(sqlite3 *db){
         printf("\nNo se pudo actualizar (¿Seguro que el negocio '%s' existe?).\n", nombre_actual);
     }
 
-    printf("Presione Enter para volver...");
     fflush(stdout);
     getchar();
 }
