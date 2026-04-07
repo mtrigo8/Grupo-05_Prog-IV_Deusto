@@ -90,7 +90,7 @@ void crearMenuInicioSesion(Usuario u){
 	printf("======================= \n");
 	printf("Inicio de sesion \n");
 	printf("Usuario (DNI): %s \n", u.dni);
-	printf("Contraseña: %s \n", u.contrasena);
+	printf("Contrasenya: %s \n", u.contrasena);
 	printf("======================= \n");
 }
 
@@ -100,7 +100,7 @@ void crearMenuRegistro(Usuario u){
 	printf("Nombre: %s \n", u.nombre);
 	printf("Apellido: %s \n", u.apellido);
 	printf("Usuario (DNI): %s \n", u.dni);
-	printf("Contraseña: %s \n", u.contrasena);
+	printf("Contrasenya: %s \n", u.contrasena);
 	printf("======================= \n");
 }
 
