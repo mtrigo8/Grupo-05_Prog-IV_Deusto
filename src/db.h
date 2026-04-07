@@ -10,6 +10,7 @@
 #include "sqlite3.h"
 #include "estructuras.h"
 
+void log_init(const char *path);
 int registrar_log(sqlite3 *db, int id_usuario, const char *nivel, const char *mensaje);
 int borrar_reservas(sqlite3 *db);
 int insert_usuario(sqlite3 *db, char *datos[]);

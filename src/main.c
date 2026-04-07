@@ -4,11 +4,12 @@
 #include "logicaMenus.h"
 #include "menus.h"
 #include "config.h"
+#include "db.h"
 
 int main(void) {
     Config cfg;
     config_cargar(&cfg);
-
+    log_init(cfg.log_path);
     sqlite3 *db;
     int rc = sqlite3_open_v2(cfg.db_path, &db, SQLITE_OPEN_READWRITE, NULL);
     if (rc != SQLITE_OK) {

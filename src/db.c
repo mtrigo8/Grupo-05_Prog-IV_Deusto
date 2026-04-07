@@ -7,26 +7,46 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "sqlite3.h"
 #include <string.h>
 #include  "db.h"
 
 
+static char g_log_path[256] = "";
+
+void log_init(const char *path) {
+    if (path != NULL && path[0] != '\0') {
+        strncpy(g_log_path, path, sizeof(g_log_path) - 1);
+    }
+}
+
 int registrar_log(sqlite3 *db, int id_usuario, const char *nivel, const char *mensaje) {
     sqlite3_stmt *stmt;
     const char *sql = "INSERT INTO log (id_usuario, nivel, mensaje, fecha) VALUES (?, ?, ?, datetime('now'));";
 
-    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
         return sqlite3_errcode(db);
-    }
 
     sqlite3_bind_int(stmt, 1, id_usuario);
     sqlite3_bind_text(stmt, 2, nivel, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 3, mensaje, -1, SQLITE_STATIC);
 
     int rc = sqlite3_step(stmt);
-
     sqlite3_finalize(stmt);
+
+
+    FILE *f = fopen(g_log_path, "a");
+    if (f != NULL) {
+        time_t t = time(NULL);
+        struct tm *tm_info = localtime(&t);
+        char fecha[20];
+        strftime(fecha, sizeof(fecha), "%Y-%m-%d %H:%M:%S", tm_info);
+
+        fprintf(f, "[%s] [%-5s] usuario_id=%d | %s\n", fecha, nivel, id_usuario, mensaje);
+        fclose(f);
+    }
+
     return (rc == SQLITE_DONE) ? SQLITE_OK : rc;
 }
 
@@ -48,6 +68,7 @@ int borrar_reservas(sqlite3 *db) {
 	if (result != SQLITE_DONE) {
 		printf("Error deleting data\n");
 		printf("%s\n", sqlite3_errmsg(db));
+		registrar_log(db, 0, "ERROR", "Error al borrar todas las reservas");
 		return result;
 	}
 
@@ -55,10 +76,12 @@ int borrar_reservas(sqlite3 *db) {
 	if (result != SQLITE_OK) {
 		printf("Error finalizing statement (DELETE)\n");
 		printf("%s\n", sqlite3_errmsg(db));
+		registrar_log(db, 0, "ERROR", "Error al finalizar statement en borrar_reservas");
 		return result;
 	}
 
 	printf("Prepared statement finalized (DELETE)\n");
+	registrar_log(db, 0, "INFO", "Todas las reservas han sido eliminadas");
 
 	return SQLITE_OK;
 }
@@ -89,12 +112,19 @@ int insert_usuario(sqlite3 *db, char *datos[]) {
 
     if (result != SQLITE_DONE) {
         printf("Error al insertar usuario: %s\n", sqlite3_errmsg(db));
-        sqlite3_finalize(stmt); // SIEMPRE finalizar, incluso si falla
+        sqlite3_finalize(stmt);
+        char msg[100];
+        snprintf(msg, sizeof(msg), "Error al registrar usuario con DNI: %s", datos[2]);
+        registrar_log(db, 0, "ERROR", msg);
         return result;
     }
 
     sqlite3_finalize(stmt);
     printf("Usuario '%s' insertado con exito.\n", datos[0]);
+
+    char msg[100];
+    snprintf(msg, sizeof(msg), "Nuevo usuario registrado: %s %s (DNI: %s)", datos[0], datos[1], datos[2]);
+    registrar_log(db, 0, "INFO", msg);
 
     return SQLITE_OK;
 }
@@ -126,11 +156,21 @@ Usuario login_usuario(sqlite3 *db, char *dni, char *contrasena) {
         strcpy(u.dni, (char *)sqlite3_column_text(stmt, 2));
         strcpy(u.contrasena, (char *)sqlite3_column_text(stmt, 3));
         u.rol = sqlite3_column_int(stmt, 4);
+
+        sqlite3_finalize(stmt);
+        char msg[100];
+        snprintf(msg, sizeof(msg), "Inicio de sesion exitoso: DNI %s", dni);
+        registrar_log(db, 0, "INFO", msg);
     } else {
     	u.nombre[0] = '\0';
+
+        sqlite3_finalize(stmt);
+        char msg[100];
+        snprintf(msg, sizeof(msg), "Intento de login fallido: DNI %s", dni);
+        registrar_log(db, 0, "WARN", msg);
+        return u;
     }
 
-    sqlite3_finalize(stmt);
     return u;
 }
 
@@ -201,6 +241,10 @@ Negocio* get_negocios(sqlite3 *db, int *total_negocios) {
 
     *total_negocios = cantidad_exacta;
 
+    char msg[100];
+    snprintf(msg, sizeof(msg), "Consulta de negocios: %d registros obtenidos", cantidad_exacta);
+    registrar_log(db, 0, "INFO", msg);
+
     return lista;
 }
 
@@ -224,6 +268,13 @@ int insert_negocio(sqlite3 *db, Negocio n) {
 	result = sqlite3_step(stmt);
 	if (result != SQLITE_DONE) {
 		printf("Error al insertar negocio: %s\n", sqlite3_errmsg(db));
+		char msg[150];
+		snprintf(msg, sizeof(msg), "Error al insertar negocio: %s", n.nombre);
+		registrar_log(db, 0, "ERROR", msg);
+	} else {
+		char msg[150];
+		snprintf(msg, sizeof(msg), "Negocio insertado: %s en %s (tipo: %s)", n.nombre, n.municipio, n.tipo);
+		registrar_log(db, 0, "INFO", msg);
 	}
 
 	sqlite3_finalize(stmt);
@@ -245,6 +296,13 @@ int delete_negocio(sqlite3 *db, char *nombre) {
 	result = sqlite3_step(stmt);
 	if (result != SQLITE_DONE) {
 	    printf("Error al borrar negocio: %s\n", sqlite3_errmsg(db));
+	    char msg[150];
+	    snprintf(msg, sizeof(msg), "Error al eliminar negocio: %s", nombre);
+	    registrar_log(db, 0, "ERROR", msg);
+	} else {
+	    char msg[150];
+	    snprintf(msg, sizeof(msg), "Negocio eliminado: %s", nombre);
+	    registrar_log(db, 0, "INFO", msg);
 	}
 
 	sqlite3_finalize(stmt);
@@ -273,6 +331,13 @@ int update_negocio(sqlite3 *db, char *nombre_actual, Negocio n_nuevo) {
     result = sqlite3_step(stmt);
     if (result != SQLITE_DONE) {
         printf("Error al actualizar negocio: %s\n", sqlite3_errmsg(db));
+        char msg[150];
+        snprintf(msg, sizeof(msg), "Error al actualizar negocio: %s", nombre_actual);
+        registrar_log(db, 0, "ERROR", msg);
+    } else {
+        char msg[150];
+        snprintf(msg, sizeof(msg), "Negocio actualizado: %s -> %s en %s", nombre_actual, n_nuevo.nombre, n_nuevo.municipio);
+        registrar_log(db, 0, "INFO", msg);
     }
 
     sqlite3_finalize(stmt);
