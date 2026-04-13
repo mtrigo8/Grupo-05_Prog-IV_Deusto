@@ -360,10 +360,10 @@ void gestionMenuConfig(sqlite3 *db, Config *c){
 		switch (opcion) {
 			case 1:
 				config_mostrar(c);
-				printf("Presione Enter para volver...");
+				printf("Presione Enter para volver...\n");
 				fflush(stdout);
 				getchar();
-				salir = 1;
+				getchar();
 				break;
 			case 2:
 				gestionMenuModificarConfig(db, c);
