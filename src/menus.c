@@ -197,11 +197,11 @@ void crearMenuConfig(){
 void crearMenuModificarConfiguracion(Config c){
 	printf("======================= \n");
 	printf("Modificar configuracion \n");
-	printf("DB path: %s", c.db_path);
-	printf("Admin user: %s", c.admin_dni);
-	printf("Admin password: %s", c.admin_password);
-	printf("Log path: %s", c.log_path);
-	printf("Numero maximo de negocios: %d", c.max_negocios);
+	printf("DB path: %s\n", c.db_path);
+	printf("Admin user: %s\n", c.admin_dni);
+	printf("Admin password: %s\n", c.admin_password);
+	printf("Log path: %s\n", c.log_path);
+	printf("Numero maximo de negocios: %d\n", c.max_negocios);
 	printf("Pulse Enter al finalizar \n");
 	printf("======================= \n");
 }

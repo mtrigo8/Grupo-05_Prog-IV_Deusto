@@ -184,8 +184,6 @@ void gestionMenuNegocios(sqlite3 *db, Usuario u_final){
 	}
 }
 
-
-
 void gestionarMenuVerNegocio(sqlite3 *db){
     int t = 0;
     Negocio * negocios = get_negocios(db, &t);
@@ -376,6 +374,7 @@ void gestionMenuConfig(sqlite3 *db, Config *c){
 			}
 	}
 }
+
 void gestionMenuModificarConfig(sqlite3 *db, Config *c_actual) {
 	Config c_nueva;
 	// Inicializamos la nueva config con los valores actuales por si el usuario no cambia alguno
@@ -383,34 +382,29 @@ void gestionMenuModificarConfig(sqlite3 *db, Config *c_actual) {
 
 		// 1. Pedir DB Path
 	crearMenuModificarConfiguracion(c_nueva);
-	printf("Nuevo DB path: ");
 	fflush(stdout);
 	scanf(" %255[^\n]", c_nueva.db_path); // Ajusta el tamaño según tu struct
 	while (getchar() != '\n');
 
 		// 2. Pedir Admin User (DNI)
 	crearMenuModificarConfiguracion(c_nueva);
-	printf("Nuevo Admin user (DNI): ");
 	fflush(stdout);
 	scanf(" %19s", c_nueva.admin_dni);
 	while (getchar() != '\n');
 
 		// 3. Pedir Admin Password
 	crearMenuModificarConfiguracion(c_nueva);
-	printf("Nueva Admin password: ");
 	fflush(stdout);
 	scanf(" %49s", c_nueva.admin_password);
 	while (getchar() != '\n');
 
 		// 4. Pedir Log Path
 	crearMenuModificarConfiguracion(c_nueva);
-	printf("Nuevo Log path: ");
 	fflush(stdout);
 	scanf(" %255[^\n]", c_nueva.log_path);
 	while (getchar() != '\n');
 		// 5. Pedir Número máximo de negocios
 	crearMenuModificarConfiguracion(c_nueva);
-	printf("Nuevo numero maximo de negocios: ");
 	fflush(stdout);
 	if (scanf("%d", &c_nueva.max_negocios) != 1) {
 		c_nueva.max_negocios = c_actual->max_negocios; // Backup si falla el input
