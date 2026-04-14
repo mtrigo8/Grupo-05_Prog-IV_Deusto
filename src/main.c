@@ -16,7 +16,7 @@ int main(void) {
         printf("No se pudo abrir la base de datos: %s\n", cfg.db_path);
         return 1;
     }
-
+    sqlite3_exec(db, "PRAGMA foreign_keys = ON;", NULL, NULL, NULL);
     gestionMenuBienvenida(db, &cfg);
 
     sqlite3_close(db);
