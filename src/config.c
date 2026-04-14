@@ -9,14 +9,18 @@
 #include <string.h>
 #include <stdlib.h>
 #include "config.h"
-
+#include "hash.h"
 
 static void config_defaults(Config *cfg) {
-    strncpy(cfg->db_path,        "bd.db",      sizeof(cfg->db_path) - 1);
-    strncpy(cfg->admin_dni,      "admin",  sizeof(cfg->admin_dni) - 1);
-    strncpy(cfg->admin_password, "admin",   sizeof(cfg->admin_password) - 1);
-    strncpy(cfg->log_path,       "cityhub.log",sizeof(cfg->log_path) - 1);
-    cfg->max_negocios = 100;
+		memset(cfg, 0, sizeof(Config));
+	    char hash[65];
+	    sha256_hex("admin", hash);
+	    strncpy(cfg->db_path,   "bd.db",        sizeof(cfg->db_path) - 1);
+	    strncpy(cfg->admin_dni, "admin",        sizeof(cfg->admin_dni) - 1);
+	    strncpy(cfg->log_path,  "cityhub.log",  sizeof(cfg->log_path) - 1);
+	    strncpy(cfg->admin_password, hash,      sizeof(cfg->admin_password) - 1);
+
+	    cfg->max_negocios = 100;
 }
 
 int config_cargar(Config *cfg) {

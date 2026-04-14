@@ -7,6 +7,7 @@
 #include "db.h"
 #include "logicaMenus.h"
 #include "config.h"
+#include "hash.h"
 
 void gestionMenuBienvenida(sqlite3 *db, Config *c){
 	int opcion = 0;
@@ -52,7 +53,9 @@ void gestionMenuInicioSesion(sqlite3 *db, Config *c) {
     fflush(stdout);
     scanf(" %49s", u_temp.contrasena);
 
-    Usuario u_final = login_usuario(db, u_temp.dni, u_temp.contrasena);
+    char hash[65];
+    sha256_hex(u_temp.contrasena, hash);
+    Usuario u_final = login_usuario(db, u_temp.dni, hash);
 
     if (strcmp(u_final.nombre,"") != 0) {
         // LOGIN CORRECTO
@@ -96,11 +99,14 @@ void gestionMenuRegistro(sqlite3 *db) {
     fflush(stdout);
     scanf(" %49s", u_temp.contrasena);
 
+    char hash[65];
+    sha256_hex(u_temp.contrasena, hash);
+
     char *datos[4];
     datos[0] = u_temp.nombre;
     datos[1] = u_temp.apellido;
     datos[2] = u_temp.dni;
-    datos[3] = u_temp.contrasena;
+    datos[3] = hash;
 
     int res = insert_usuario(db, datos);
 
@@ -377,46 +383,42 @@ void gestionMenuConfig(sqlite3 *db, Config *c){
 
 void gestionMenuModificarConfig(sqlite3 *db, Config *c_actual) {
 	Config c_nueva;
-	// Inicializamos la nueva config con los valores actuales por si el usuario no cambia alguno
-	memcpy(&c_nueva, c_actual, sizeof(Config));
 
-		// 1. Pedir DB Path
+	memset(&c_nueva, 0, sizeof(Config));
+
 	crearMenuModificarConfiguracion(c_nueva);
 	fflush(stdout);
 	scanf(" %255[^\n]", c_nueva.db_path); // Ajusta el tamaño según tu struct
 	while (getchar() != '\n');
 
-		// 2. Pedir Admin User (DNI)
 	crearMenuModificarConfiguracion(c_nueva);
 	fflush(stdout);
 	scanf(" %19s", c_nueva.admin_dni);
 	while (getchar() != '\n');
 
-		// 3. Pedir Admin Password
+	char pass_plana[65];
 	crearMenuModificarConfiguracion(c_nueva);
 	fflush(stdout);
-	scanf(" %49s", c_nueva.admin_password);
+	scanf(" %49s", pass_plana);
+	sha256_hex(pass_plana, c_nueva.admin_password);
 	while (getchar() != '\n');
 
-		// 4. Pedir Log Path
 	crearMenuModificarConfiguracion(c_nueva);
 	fflush(stdout);
 	scanf(" %255[^\n]", c_nueva.log_path);
 	while (getchar() != '\n');
-		// 5. Pedir Número máximo de negocios
+
 	crearMenuModificarConfiguracion(c_nueva);
 	fflush(stdout);
 	if (scanf("%d", &c_nueva.max_negocios) != 1) {
-		c_nueva.max_negocios = c_actual->max_negocios; // Backup si falla el input
+		c_nueva.max_negocios = c_actual->max_negocios;
 	}
 	while (getchar() != '\n');
 
-		// Pantalla final antes de guardar
 	crearMenuModificarConfiguracion(c_nueva);
 	printf("\nGuardando cambios...\n");
 
-		// Supongo que tienes una función de actualización en base de datos
-		// Si no necesitas guardarlo en DB y es solo en memoria, omite esta parte
+
 	config_guardar(&c_nueva);
 
 

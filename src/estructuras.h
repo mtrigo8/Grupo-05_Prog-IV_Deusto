@@ -12,7 +12,7 @@ typedef struct {
     char nombre[50];
     char apellido[50];
     char dni[20];
-    char contrasena[50];
+    char contrasena[65];
     int rol; //1 = admin, 2 = usuario
 } Usuario;
 

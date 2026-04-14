@@ -13,7 +13,7 @@
 typedef struct {
     char db_path[256];
     char admin_dni[20];
-    char admin_password[50];
+    char admin_password[65];
     char log_path[256];
     int  max_negocios;
 } Config;
