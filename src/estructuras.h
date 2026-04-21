@@ -20,20 +20,26 @@ typedef struct {
     char municipio[50];
     char hora_apertura[20];
     char hora_cierre[20];
-    int fecha;       // dias en binario
+    int  fecha;           /* dias en mascara de bits */
     char tipo[50];
-    char dias[50];   // dias en string, provisional
+    char dias[50];        /* dias en string, provisional */
     char descripcion[1000];
 } Negocio;
 
 enum Dias {
-    LUNES     = 1 << 0, // 1
-    MARTES    = 1 << 1, // 2
-    MIERCOLES = 1 << 2, // 4
-    JUEVES    = 1 << 3, // 8
-    VIERNES   = 1 << 4, // 16
-    SABADO    = 1 << 5, // 32
-    DOMINGO   = 1 << 6  // 64
+    LUNES     = 1 << 0,  /* 1  */
+    MARTES    = 1 << 1,  /* 2  */
+    MIERCOLES = 1 << 2,  /* 4  */
+    JUEVES    = 1 << 3,  /* 8  */
+    VIERNES   = 1 << 4,  /* 16 */
+    SABADO    = 1 << 5,  /* 32 */
+    DOMINGO   = 1 << 6   /* 64 */
 };
+
+/* Convierte una cadena de dias separados por comas a mascara de bits */
+int  convertirDiasInt(char dias[]);
+
+/* Convierte una mascara de bits a cadena de dias separados por comas */
+void convertirIntDias(int mascara, char resultado[]);
 
 #endif /* ESTRUCTURAS_H_ */
