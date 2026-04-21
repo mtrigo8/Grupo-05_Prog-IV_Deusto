@@ -16,7 +16,7 @@ static void config_defaults(Config *cfg) {
 	    char hash[65];
 	    sha256_hex("admin", hash);
 	    strncpy(cfg->db_path,   "bd.db",        sizeof(cfg->db_path) - 1);
-	    strncpy(cfg->admin_dni, "admin",        sizeof(cfg->admin_dni) - 1);
+	    strncpy(cfg->admin_dni, hash,        sizeof(cfg->admin_dni) - 1);
 	    strncpy(cfg->log_path,  "cityhub.log",  sizeof(cfg->log_path) - 1);
 	    strncpy(cfg->admin_password, hash,      sizeof(cfg->admin_password) - 1);
 

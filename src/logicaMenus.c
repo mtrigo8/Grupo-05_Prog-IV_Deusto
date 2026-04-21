@@ -391,9 +391,11 @@ void gestionMenuModificarConfig(sqlite3 *db, Config *c_actual) {
 	scanf(" %255[^\n]", c_nueva.db_path); // Ajusta el tamaño según tu struct
 	while (getchar() != '\n');
 
+	char dni_admin[20];
 	crearMenuModificarConfiguracion(c_nueva);
 	fflush(stdout);
-	scanf(" %19s", c_nueva.admin_dni);
+	scanf(" %19s", dni_admin);
+	sha256_hex(dni_admin, c_nueva.admin_dni);
 	while (getchar() != '\n');
 
 	char pass_plana[65];
