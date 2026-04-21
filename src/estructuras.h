@@ -13,7 +13,6 @@ typedef struct {
     char apellido[50];
     char dni[20];
     char contrasena[65];
-    int rol; //1 = admin, 2 = usuario
 } Usuario;
 
 typedef struct {
@@ -21,9 +20,9 @@ typedef struct {
     char municipio[50];
     char hora_apertura[20];
     char hora_cierre[20];
-    int fecha;//dias en binario
+    int fecha;       // dias en binario
     char tipo[50];
-    char dias[50];//dias en string, provisional
+    char dias[50];   // dias en string, provisional
     char descripcion[1000];
 } Negocio;
 
@@ -36,7 +35,5 @@ enum Dias {
     SABADO    = 1 << 5, // 32
     DOMINGO   = 1 << 6  // 64
 };
-
-
 
 #endif /* ESTRUCTURAS_H_ */

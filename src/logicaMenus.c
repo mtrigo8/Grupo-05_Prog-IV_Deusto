@@ -56,7 +56,7 @@ void gestionMenuInicioSesion(sqlite3 *db, Config *c) {
         fflush(stdin);
     }
 
-    // 2. Pedir la Contraseña (re-printeamos el menú con el DNI ya puesto)
+    // 2. Pedir contraseña
     crearMenuInicioSesion(u_temp);
     fflush(stdout);
     {
@@ -66,23 +66,41 @@ void gestionMenuInicioSesion(sqlite3 *db, Config *c) {
         fflush(stdin);
     }
 
-    char hash[65];
-    sha256_hex(u_temp.contrasena, hash);
-    Usuario u_final = login_usuario(db, u_temp.dni, hash);
+    /* --- Comprobar credenciales de administrador contra el fichero de config --- */
+    char hash_dni[65];
+    char hash_pass[65];
+    sha256_hex(u_temp.dni,       hash_dni);
+    sha256_hex(u_temp.contrasena, hash_pass);
 
-    if (strcmp(u_final.nombre, "") != 0) {
-        // LOGIN CORRECTO
-        if (u_final.rol == 1){ // rol 1 = admin
-            printf("\nAcceso concedido. Bienvenido, %s.\n", u_final.nombre);
-            gestionMenuPrincipal(db, u_final, c);
-        } else {
-            printf("\nRegistro completado con éxito.\n");
-            printf("El apartado de consumidor no esta diseñado aún, intentelo más adelante. \n Presione Enter para volver al inicio...");
-            fflush(stdout);
-            getchar();
-        }
+    if (strcmp(hash_dni,  c->admin_dni)      == 0 &&
+        strcmp(hash_pass, c->admin_password) == 0) {
+        /* LOGIN DE ADMIN CORRECTO */
+        printf("\nAcceso concedido. Bienvenido, administrador.\n");
+        registrar_log(db, 0, "INFO", "Inicio de sesion de administrador correcto");
+
+        /* Rellenamos un Usuario ficticio para el menú principal */
+        Usuario admin;
+        memset(&admin, 0, sizeof(Usuario));
+        strncpy(admin.nombre,   "Admin", sizeof(admin.nombre)   - 1);
+        strncpy(admin.apellido, "",      sizeof(admin.apellido) - 1);
+        strncpy(admin.dni,      u_temp.dni, sizeof(admin.dni)   - 1);
+
+        gestionMenuPrincipal(db, admin, c);
+        return;
+    }
+
+    /* --- Si no es admin, intentar login de usuario normal en BD --- */
+    Usuario u_final = login_usuario(db, u_temp.dni, hash_pass);
+
+    if (u_final.nombre[0] != '\0') {
+        /* LOGIN DE USUARIO NORMAL CORRECTO */
+        printf("\nBienvenido, %s.\n", u_final.nombre);
+        printf("El apartado de consumidor no esta diseñado aún, intentelo más adelante.\n");
+        printf("Presione Enter para volver al inicio...");
+        fflush(stdout);
+        getchar();
     } else {
-        // LOGIN FALLIDO
+        /* LOGIN FALLIDO */
         printf("\nError: Usuario o contraseña incorrectos.\n");
         printf("Presione Enter para volver...");
         fflush(stdout);
@@ -143,7 +161,8 @@ void gestionMenuRegistro(sqlite3 *db) {
 
     if (res == SQLITE_OK) {
         printf("\nRegistro completado con éxito.\n");
-        printf("El apartado de consumidor no esta diseñado aún, intentelo más adelante. \n Presione Enter para volver al inicio...");
+        printf("El apartado de consumidor no esta diseñado aún, intentelo más adelante.\n");
+        printf("Presione Enter para volver al inicio...");
         fflush(stdout);
         getchar();
     } else {

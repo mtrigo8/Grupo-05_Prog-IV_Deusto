@@ -10,7 +10,7 @@
 #include <time.h>
 #include "sqlite3.h"
 #include <string.h>
-#include  "db.h"
+#include "db.h"
 
 
 static char g_log_path[256] = "";
@@ -35,14 +35,12 @@ int registrar_log(sqlite3 *db, int id_usuario, const char *nivel, const char *me
     int rc = sqlite3_step(stmt);
     sqlite3_finalize(stmt);
 
-
     FILE *f = fopen(g_log_path, "a");
     if (f != NULL) {
         time_t t = time(NULL);
         struct tm *tm_info = localtime(&t);
         char fecha[20];
         strftime(fecha, sizeof(fecha), "%Y-%m-%d %H:%M:%S", tm_info);
-
         fprintf(f, "[%s] [%-5s] usuario_id=%d | %s\n", fecha, nivel, id_usuario, mensaje);
         fclose(f);
     }
@@ -51,57 +49,60 @@ int registrar_log(sqlite3 *db, int id_usuario, const char *nivel, const char *me
 }
 
 int borrar_reservas(sqlite3 *db) {
-	sqlite3_stmt *stmt;
+    sqlite3_stmt *stmt;
 
-	char sql[] = "delete from reserva";
+    char sql[] = "DELETE FROM reserva";
 
-	int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) ;
-	if (result != SQLITE_OK) {
-		printf("Error preparing statement (DELETE)\n");
-		printf("%s\n", sqlite3_errmsg(db));
-		return result;
-	}
+    int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+    if (result != SQLITE_OK) {
+        printf("Error preparing statement (DELETE)\n");
+        printf("%s\n", sqlite3_errmsg(db));
+        return result;
+    }
 
-	printf("SQL query prepared (DELETE)\n");
+    printf("SQL query prepared (DELETE)\n");
 
-	result = sqlite3_step(stmt);
-	if (result != SQLITE_DONE) {
-		printf("Error deleting data\n");
-		printf("%s\n", sqlite3_errmsg(db));
-		registrar_log(db, 0, "ERROR", "Error al borrar todas las reservas");
-		return result;
-	}
+    result = sqlite3_step(stmt);
+    if (result != SQLITE_DONE) {
+        printf("Error deleting data\n");
+        printf("%s\n", sqlite3_errmsg(db));
+        registrar_log(db, 0, "ERROR", "Error al borrar todas las reservas");
+        return result;
+    }
 
-	result = sqlite3_finalize(stmt);
-	if (result != SQLITE_OK) {
-		printf("Error finalizing statement (DELETE)\n");
-		printf("%s\n", sqlite3_errmsg(db));
-		registrar_log(db, 0, "ERROR", "Error al finalizar statement en borrar_reservas");
-		return result;
-	}
+    result = sqlite3_finalize(stmt);
+    if (result != SQLITE_OK) {
+        printf("Error finalizing statement (DELETE)\n");
+        printf("%s\n", sqlite3_errmsg(db));
+        registrar_log(db, 0, "ERROR", "Error al finalizar statement en borrar_reservas");
+        return result;
+    }
 
-	printf("Prepared statement finalized (DELETE)\n");
-	registrar_log(db, 0, "INFO", "Todas las reservas han sido eliminadas");
+    printf("Prepared statement finalized (DELETE)\n");
+    registrar_log(db, 0, "INFO", "Todas las reservas han sido eliminadas");
 
-	return SQLITE_OK;
+    return SQLITE_OK;
 }
 
 int insert_usuario(sqlite3 *db, char *datos[]) {
     sqlite3_stmt *stmt;
-    // 1. Verificación de seguridad de entrada
-    if (db == NULL || datos == NULL || datos[0] == NULL || datos[1] == NULL || datos[2] == NULL || datos[3] == NULL) {
+
+    if (db == NULL || datos == NULL ||
+        datos[0] == NULL || datos[1] == NULL ||
+        datos[2] == NULL || datos[3] == NULL) {
         printf("Error: Datos de entrada nulos.\n");
         return SQLITE_ERROR;
     }
 
-    char sql[] = "INSERT INTO usuario (id_usuario, nombre, apellido, DNI, password_hash, id_rol) VALUES (NULL, ?, ?, ?, ?, 2)";
+    /* Sin id_rol: todos los usuarios en BD son consumidores */
+    char sql[] = "INSERT INTO usuario (id_usuario, nombre, apellido, DNI, password_hash) "
+                 "VALUES (NULL, ?, ?, ?, ?)";
 
     int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (result != SQLITE_OK) {
         printf("Error preparando el INSERT: %s\n", sqlite3_errmsg(db));
         return result;
     }
-
 
     sqlite3_bind_text(stmt, 1, datos[0], -1, SQLITE_TRANSIENT);
     sqlite3_bind_text(stmt, 2, datos[1], -1, SQLITE_TRANSIENT);
@@ -123,7 +124,8 @@ int insert_usuario(sqlite3 *db, char *datos[]) {
     printf("Usuario '%s' insertado con exito.\n", datos[0]);
 
     char msg[100];
-    snprintf(msg, sizeof(msg), "Nuevo usuario registrado: %s %s (DNI: %s)", datos[0], datos[1], datos[2]);
+    snprintf(msg, sizeof(msg), "Nuevo usuario registrado: %s %s (DNI: %s)",
+             datos[0], datos[1], datos[2]);
     registrar_log(db, 0, "INFO", msg);
 
     return SQLITE_OK;
@@ -132,11 +134,11 @@ int insert_usuario(sqlite3 *db, char *datos[]) {
 Usuario login_usuario(sqlite3 *db, char *dni, char *contrasena) {
     sqlite3_stmt *stmt;
     Usuario u;
-
     memset(&u, 0, sizeof(Usuario));
 
-    // SQL: Buscamos por nombre Y contraseña
-    char sql[] = "SELECT nombre, apellido, DNI, password_hash, id_rol FROM usuario WHERE DNI = ? AND password_hash = ?";
+    /* Buscamos por DNI y hash de contraseña — sin columna rol */
+    char sql[] = "SELECT nombre, apellido, DNI, password_hash "
+                 "FROM usuario WHERE DNI = ? AND password_hash = ?";
 
     int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (result != SQLITE_OK) {
@@ -144,31 +146,27 @@ Usuario login_usuario(sqlite3 *db, char *dni, char *contrasena) {
         return u;
     }
 
-
-    sqlite3_bind_text(stmt, 1, dni, -1, SQLITE_TRANSIENT);
-    sqlite3_bind_text(stmt, 2, contrasena, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 1, dni,       -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 2, contrasena,-1, SQLITE_TRANSIENT);
 
     result = sqlite3_step(stmt);
 
     if (result == SQLITE_ROW) {
-        strcpy(u.nombre, (char *)sqlite3_column_text(stmt, 0));
-        strcpy(u.apellido, (char *)sqlite3_column_text(stmt, 1));
-        strcpy(u.dni, (char *)sqlite3_column_text(stmt, 2));
-        strcpy(u.contrasena, (char *)sqlite3_column_text(stmt, 3));
-        u.rol = sqlite3_column_int(stmt, 4);
+        strncpy(u.nombre,    (char *)sqlite3_column_text(stmt, 0), sizeof(u.nombre)    - 1);
+        strncpy(u.apellido,  (char *)sqlite3_column_text(stmt, 1), sizeof(u.apellido)  - 1);
+        strncpy(u.dni,       (char *)sqlite3_column_text(stmt, 2), sizeof(u.dni)       - 1);
+        strncpy(u.contrasena,(char *)sqlite3_column_text(stmt, 3), sizeof(u.contrasena)- 1);
 
         sqlite3_finalize(stmt);
         char msg[100];
-        snprintf(msg, sizeof(msg), "Inicio de sesion exitoso: DNI %s", dni);
+        snprintf(msg, sizeof(msg), "Inicio de sesion exitoso (usuario BD): DNI %s", dni);
         registrar_log(db, 0, "INFO", msg);
     } else {
-    	u.nombre[0] = '\0';
-
+        u.nombre[0] = '\0';
         sqlite3_finalize(stmt);
         char msg[100];
         snprintf(msg, sizeof(msg), "Intento de login fallido: DNI %s", dni);
         registrar_log(db, 0, "WARN", msg);
-        return u;
     }
 
     return u;
@@ -193,9 +191,7 @@ Negocio* get_negocios(sqlite3 *db, int *total_negocios) {
     }
     sqlite3_finalize(stmt);
 
-    if (cantidad_exacta == 0) {
-        return NULL;
-    }
+    if (cantidad_exacta == 0) return NULL;
 
     Negocio *lista = malloc(cantidad_exacta * sizeof(Negocio));
     if (lista == NULL) {
@@ -213,32 +209,30 @@ Negocio* get_negocios(sqlite3 *db, int *total_negocios) {
 
     int i = 0;
     while (sqlite3_step(stmt) == SQLITE_ROW && i < cantidad_exacta) {
-        const char* val;
-
+        const char *val;
         memset(&lista[i], 0, sizeof(Negocio));
 
-        val = (const char*)sqlite3_column_text(stmt, 0);
-        if (val) strncpy(lista[i].nombre, val, sizeof(lista[i].nombre) - 1);
+        val = (const char *)sqlite3_column_text(stmt, 0);
+        if (val) strncpy(lista[i].nombre,       val, sizeof(lista[i].nombre)       - 1);
 
-        val = (const char*)sqlite3_column_text(stmt, 1);
-        if (val) strncpy(lista[i].municipio, val, sizeof(lista[i].municipio) - 1);
+        val = (const char *)sqlite3_column_text(stmt, 1);
+        if (val) strncpy(lista[i].municipio,    val, sizeof(lista[i].municipio)    - 1);
 
-        val = (const char*)sqlite3_column_text(stmt, 2);
-        if (val) strncpy(lista[i].hora_apertura, val, sizeof(lista[i].hora_apertura) - 1);
+        val = (const char *)sqlite3_column_text(stmt, 2);
+        if (val) strncpy(lista[i].hora_apertura,val, sizeof(lista[i].hora_apertura)- 1);
 
-        val = (const char*)sqlite3_column_text(stmt, 3);
-        if (val) strncpy(lista[i].hora_cierre, val, sizeof(lista[i].hora_cierre) - 1);
+        val = (const char *)sqlite3_column_text(stmt, 3);
+        if (val) strncpy(lista[i].hora_cierre,  val, sizeof(lista[i].hora_cierre)  - 1);
 
         lista[i].fecha = sqlite3_column_int(stmt, 4);
 
-        val = (const char*)sqlite3_column_text(stmt, 5);
-        if (val) strncpy(lista[i].tipo, val, sizeof(lista[i].tipo) - 1);
+        val = (const char *)sqlite3_column_text(stmt, 5);
+        if (val) strncpy(lista[i].tipo,         val, sizeof(lista[i].tipo)         - 1);
 
         i++;
     }
 
     sqlite3_finalize(stmt);
-
     *total_negocios = cantidad_exacta;
 
     char msg[100];
@@ -249,84 +243,82 @@ Negocio* get_negocios(sqlite3 *db, int *total_negocios) {
 }
 
 int insert_negocio(sqlite3 *db, Negocio n) {
-	sqlite3_stmt *stmt;
-	char sql[] = "INSERT INTO servicio (nombre_servicio, municipio, hora_apertura, hora_cierre, fecha, tipo_servicio) VALUES (?, ?, ?, ?, ?, ?)";
+    sqlite3_stmt *stmt;
+    char sql[] = "INSERT INTO servicio (nombre_servicio, municipio, hora_apertura, hora_cierre, fecha, tipo_servicio) VALUES (?, ?, ?, ?, ?, ?)";
 
-	int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
-	if (result != SQLITE_OK) {
-	    printf("Error preparando el INSERT de negocio: %s\n ", sqlite3_errmsg(db));
-	    return result;
-	}
+    int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+    if (result != SQLITE_OK) {
+        printf("Error preparando el INSERT de negocio: %s\n", sqlite3_errmsg(db));
+        return result;
+    }
 
-	sqlite3_bind_text(stmt, 1, n.nombre, -1, SQLITE_TRANSIENT);
-	sqlite3_bind_text(stmt, 2, n.municipio, -1, SQLITE_TRANSIENT);
-	sqlite3_bind_text(stmt, 3, n.hora_apertura, -1, SQLITE_TRANSIENT);
-	sqlite3_bind_text(stmt, 4, n.hora_cierre, -1, SQLITE_TRANSIENT);
-	sqlite3_bind_int(stmt, 5, n.fecha);
-	sqlite3_bind_text(stmt, 6, n.tipo, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 1, n.nombre,       -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 2, n.municipio,    -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 3, n.hora_apertura,-1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 4, n.hora_cierre,  -1, SQLITE_TRANSIENT);
+    sqlite3_bind_int (stmt, 5, n.fecha);
+    sqlite3_bind_text(stmt, 6, n.tipo,         -1, SQLITE_TRANSIENT);
 
-	result = sqlite3_step(stmt);
-	if (result != SQLITE_DONE) {
-		printf("Error al insertar negocio: %s\n", sqlite3_errmsg(db));
-		char msg[150];
-		snprintf(msg, sizeof(msg), "Error al insertar negocio: %s", n.nombre);
-		registrar_log(db, 0, "ERROR", msg);
-	} else {
-		char msg[150];
-		snprintf(msg, sizeof(msg), "Negocio insertado: %s en %s (tipo: %s)", n.nombre, n.municipio, n.tipo);
-		registrar_log(db, 0, "INFO", msg);
-	}
+    result = sqlite3_step(stmt);
+    if (result != SQLITE_DONE) {
+        printf("Error al insertar negocio: %s\n", sqlite3_errmsg(db));
+        char msg[150];
+        snprintf(msg, sizeof(msg), "Error al insertar negocio: %s", n.nombre);
+        registrar_log(db, 0, "ERROR", msg);
+    } else {
+        char msg[150];
+        snprintf(msg, sizeof(msg), "Negocio insertado: %s en %s (tipo: %s)", n.nombre, n.municipio, n.tipo);
+        registrar_log(db, 0, "INFO", msg);
+    }
 
-	sqlite3_finalize(stmt);
-	return result;
+    sqlite3_finalize(stmt);
+    return result;
 }
 
 int delete_negocio(sqlite3 *db, char *nombre) {
-	sqlite3_stmt *stmt;
-	char sql[] = "DELETE FROM servicio WHERE nombre_servicio = ?";
+    sqlite3_stmt *stmt;
+    char sql[] = "DELETE FROM servicio WHERE nombre_servicio = ?";
 
-	int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
-	if (result != SQLITE_OK) {
-	    printf("Error preparando el DELETE de negocio: %s\n", sqlite3_errmsg(db));
-	    return result;
-	}
+    int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+    if (result != SQLITE_OK) {
+        printf("Error preparando el DELETE de negocio: %s\n", sqlite3_errmsg(db));
+        return result;
+    }
 
-	sqlite3_bind_text(stmt, 1, nombre, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 1, nombre, -1, SQLITE_TRANSIENT);
 
-	result = sqlite3_step(stmt);
-	if (result != SQLITE_DONE) {
-	    printf("Error al borrar negocio: %s\n", sqlite3_errmsg(db));
-	    char msg[150];
-	    snprintf(msg, sizeof(msg), "Error al eliminar negocio: %s", nombre);
-	    registrar_log(db, 0, "ERROR", msg);
-	} else {
-	    char msg[150];
-	    snprintf(msg, sizeof(msg), "Negocio eliminado: %s", nombre);
-	    registrar_log(db, 0, "INFO", msg);
-	}
+    result = sqlite3_step(stmt);
+    if (result != SQLITE_DONE) {
+        printf("Error al borrar negocio: %s\n", sqlite3_errmsg(db));
+        char msg[150];
+        snprintf(msg, sizeof(msg), "Error al eliminar negocio: %s", nombre);
+        registrar_log(db, 0, "ERROR", msg);
+    } else {
+        char msg[150];
+        snprintf(msg, sizeof(msg), "Negocio eliminado: %s", nombre);
+        registrar_log(db, 0, "INFO", msg);
+    }
 
-	sqlite3_finalize(stmt);
-	return result;
-
+    sqlite3_finalize(stmt);
+    return result;
 }
 
 int update_negocio(sqlite3 *db, char *nombre_actual, Negocio n_nuevo) {
     sqlite3_stmt *stmt;
     char sql[] = "UPDATE servicio SET municipio = ?, hora_apertura = ?, hora_cierre = ?, tipo_servicio = ?, fecha = ? WHERE nombre_servicio = ?";
+
     int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (result != SQLITE_OK) {
         printf("Error preparando el UPDATE de negocio: %s\n", sqlite3_errmsg(db));
         return result;
     }
 
-    sqlite3_bind_text(stmt, 1, n_nuevo.municipio, -1, SQLITE_TRANSIENT);
-    sqlite3_bind_text(stmt, 2, n_nuevo.hora_apertura, -1, SQLITE_TRANSIENT);
-    sqlite3_bind_text(stmt, 3, n_nuevo.hora_cierre, -1, SQLITE_TRANSIENT);
-    sqlite3_bind_text(stmt, 4, n_nuevo.tipo, -1, SQLITE_TRANSIENT);
-
-    sqlite3_bind_int(stmt, 5, n_nuevo.fecha);
-
-    sqlite3_bind_text(stmt, 6, nombre_actual, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 1, n_nuevo.municipio,    -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 2, n_nuevo.hora_apertura,-1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 3, n_nuevo.hora_cierre,  -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 4, n_nuevo.tipo,         -1, SQLITE_TRANSIENT);
+    sqlite3_bind_int (stmt, 5, n_nuevo.fecha);
+    sqlite3_bind_text(stmt, 6, nombre_actual,        -1, SQLITE_TRANSIENT);
 
     result = sqlite3_step(stmt);
     if (result != SQLITE_DONE) {
@@ -336,7 +328,8 @@ int update_negocio(sqlite3 *db, char *nombre_actual, Negocio n_nuevo) {
         registrar_log(db, 0, "ERROR", msg);
     } else {
         char msg[150];
-        snprintf(msg, sizeof(msg), "Negocio actualizado: %s -> %s en %s", nombre_actual, n_nuevo.nombre, n_nuevo.municipio);
+        snprintf(msg, sizeof(msg), "Negocio actualizado: %s -> %s en %s",
+                 nombre_actual, n_nuevo.nombre, n_nuevo.municipio);
         registrar_log(db, 0, "INFO", msg);
     }
 
