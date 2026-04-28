@@ -4,14 +4,14 @@
  * Vista y logica del menu de eliminacion de un negocio.
  */
 
-#include "../server/menu_eliminar_negocios.h"
+#include "menu_eliminar_negocios.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "../server/negocio.h"
-#include "../server/sqlite3.h"
+#include "negocio.h"
+#include "sqlite3.h"
 
 /* ── Vista: formulario de busqueda ── */
 void crearMenuEliminarNegocios(Negocio n) {

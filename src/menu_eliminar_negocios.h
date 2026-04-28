@@ -5,8 +5,8 @@
 #ifndef MENU_ELIMINAR_NEGOCIOS_H_
 #define MENU_ELIMINAR_NEGOCIOS_H_
 
-#include "../server/negocio.h"
-#include "../server/sqlite3.h"
+#include "negocio.h"
+#include "sqlite3.h"
 
 void crearMenuEliminarNegocios(Negocio n);
 void crearMenuEliminarNegociosConfirm(Negocio n);

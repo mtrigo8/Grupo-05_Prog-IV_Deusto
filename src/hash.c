@@ -6,7 +6,7 @@
  * No requiere librerias externas.
  */
 
-#include "../server/hash.h"
+#include "hash.h"
 
 #include <string.h>
 #include <stdio.h>

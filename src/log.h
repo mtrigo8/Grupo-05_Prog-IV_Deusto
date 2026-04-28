@@ -10,7 +10,7 @@
 #ifndef LOG_H_
 #define LOG_H_
 
-#include "../server/sqlite3.h"
+#include "sqlite3.h"
 
 /* Establece la ruta del fichero de log en disco */
 void log_init(const char *path);

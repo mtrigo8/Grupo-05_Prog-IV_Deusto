@@ -4,14 +4,14 @@
  * Vista y logica del menu de alta de un nuevo negocio.
  */
 
-#include "../server/menu_anyadir_negocios.h"
+#include "menu_anyadir_negocios.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "../server/negocio.h"
-#include "../server/sqlite3.h"
+#include "negocio.h"
+#include "sqlite3.h"
 
 /* ── Vista ── */
 void crearMenuAnyadirNegocios(Negocio n) {

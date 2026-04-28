@@ -8,7 +8,7 @@
 #ifndef NEGOCIO_H_
 #define NEGOCIO_H_
 
-#include "../server/sqlite3.h"
+#include "sqlite3.h"
 
 typedef struct {
     char nombre[75];

@@ -4,15 +4,15 @@
  * Vista y logica del menu de registro de nuevos usuarios.
  */
 
-#include "../server/menu_registro.h"
+#include "menu_registro.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "../server/hash.h"
-#include "../server/usuario.h"
-#include "../server/sqlite3.h"
+#include "hash.h"
+#include "usuario.h"
+#include "sqlite3.h"
 
 /* ── Vista ── */
 void crearMenuRegistro(Usuario u) {

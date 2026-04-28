@@ -4,17 +4,17 @@
  * Vista y logica del menu de gestion de negocios (submenu).
  */
 
-#include "../server/menu_negocios.h"
+#include "menu_negocios.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../server/usuario.h"
-#include "../server/menu_anyadir_negocios.h"
-#include "../server/menu_eliminar_negocios.h"
-#include "../server/menu_modificar_negocios.h"
-#include "../server/menu_ver_negocios.h"
-#include "../server/sqlite3.h"
+#include "usuario.h"
+#include "menu_anyadir_negocios.h"
+#include "menu_eliminar_negocios.h"
+#include "menu_modificar_negocios.h"
+#include "menu_ver_negocios.h"
+#include "sqlite3.h"
 
 /* ── Vista ── */
 void crearMenuNegocios(void) {

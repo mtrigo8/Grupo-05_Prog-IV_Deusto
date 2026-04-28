@@ -10,8 +10,8 @@
  *    - update_negocio    : actualiza un servicio existente en la BD
  */
 
-#include "../server/negocio.h"
-#include "../server/log.h"
+#include "negocio.h"
+#include "log.h"
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -5,8 +5,8 @@
  *  estructura Usuario: registro (insert) e inicio de sesion (login).
  */
 
-#include "../server/usuario.h"
-#include "../server/log.h"
+#include "usuario.h"
+#include "log.h"
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -4,18 +4,18 @@
  * Vista y logica del menu de inicio de sesion.
  */
 
-#include "../server/menu_inicio_sesion.h"
+#include "menu_inicio_sesion.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "../server/config.h"
-#include "../server/log.h"
-#include "../server/hash.h"
-#include "../server/menu_principal.h"
-#include "../server/usuario.h"
-#include "../server/sqlite3.h"
+#include "config.h"
+#include "log.h"
+#include "hash.h"
+#include "menu_principal.h"
+#include "usuario.h"
+#include "sqlite3.h"
 
 /* ── Vista ── */
 void crearMenuInicioSesion(Usuario u) {

@@ -8,10 +8,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../server/config.h"
-#include "../server/log.h"
-#include "../server/menu_bienvenida.h"
-#include "../server/sqlite3.h"
+#include "config.h"
+#include "log.h"
+#include "menu_bienvenida.h"
+#include "sqlite3.h"
 
 int main(void) {
     Config cfg;

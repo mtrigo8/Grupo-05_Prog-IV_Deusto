@@ -4,14 +4,14 @@
  * Vista y logica del menu de modificacion de un negocio existente.
  */
 
-#include "../server/menu_modificar_negocios.h"
+#include "menu_modificar_negocios.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "../server/negocio.h"
-#include "../server/sqlite3.h"
+#include "negocio.h"
+#include "sqlite3.h"
 
 /* ── Vista ── */
 void crearMenuModificarNegocios(char *nombreActual, Negocio n) {

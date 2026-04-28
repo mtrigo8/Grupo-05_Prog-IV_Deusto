@@ -7,7 +7,7 @@
  *                      y escribe en el fichero de log en disco
  */
 
-#include "../server/log.h"
+#include "log.h"
 
 #include <stdio.h>
 #include <string.h>

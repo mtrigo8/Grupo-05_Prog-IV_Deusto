@@ -8,7 +8,7 @@
 #ifndef USUARIO_H_
 #define USUARIO_H_
 
-#include "../server/sqlite3.h"
+#include "sqlite3.h"
 
 typedef struct {
     char nombre[50];

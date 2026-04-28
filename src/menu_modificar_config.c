@@ -4,15 +4,15 @@
  * Vista y logica del menu de edicion de la configuracion del sistema.
  */
 
-#include "../server/menu_modificar_config.h"
+#include "menu_modificar_config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "../server/config.h"
-#include "../server/hash.h"
-#include "../server/sqlite3.h"
+#include "config.h"
+#include "hash.h"
+#include "sqlite3.h"
 
 /* ── Vista ── */
 void crearMenuModificarConfiguracion(Config c) {
