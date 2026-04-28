@@ -4,14 +4,15 @@
  * Vista y logica del menu de registro de nuevos usuarios.
  */
 
+#include "../server/menu_registro.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "sqlite3.h"
-#include "estructuras.h"
-#include "db.h"
-#include "hash.h"
-#include "menu_registro.h"
+
+#include "../server/hash.h"
+#include "../server/usuario.h"
+#include "../server/sqlite3.h"
 
 /* ── Vista ── */
 void crearMenuRegistro(Usuario u) {
@@ -31,15 +32,15 @@ void gestionMenuRegistro(sqlite3 *db) {
 
     crearMenuRegistro(u_temp);
     fflush(stdout);
-    { char _buf[64]; fgets(_buf, sizeof(_buf), stdin); sscanf(_buf, "%49s", u_temp.nombre);    fflush(stdin); }
+    { char _buf[64]; fgets(_buf, sizeof(_buf), stdin); sscanf(_buf, "%49s", u_temp.nombre);     fflush(stdin); }
 
     crearMenuRegistro(u_temp);
     fflush(stdout);
-    { char _buf[64]; fgets(_buf, sizeof(_buf), stdin); sscanf(_buf, "%49s", u_temp.apellido);  fflush(stdin); }
+    { char _buf[64]; fgets(_buf, sizeof(_buf), stdin); sscanf(_buf, "%49s", u_temp.apellido);   fflush(stdin); }
 
     crearMenuRegistro(u_temp);
     fflush(stdout);
-    { char _buf[32]; fgets(_buf, sizeof(_buf), stdin); sscanf(_buf, "%19s", u_temp.dni);       fflush(stdin); }
+    { char _buf[32]; fgets(_buf, sizeof(_buf), stdin); sscanf(_buf, "%19s", u_temp.dni);        fflush(stdin); }
 
     crearMenuRegistro(u_temp);
     fflush(stdout);

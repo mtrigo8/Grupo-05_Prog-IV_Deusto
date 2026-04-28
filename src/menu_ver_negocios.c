@@ -4,13 +4,14 @@
  * Vista y logica del menu de visualizacion de negocios.
  */
 
+#include "../server/menu_ver_negocios.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "sqlite3.h"
-#include "estructuras.h"
-#include "db.h"
-#include "menu_ver_negocios.h"
+
+#include "../server/negocio.h"
+#include "../server/sqlite3.h"
 
 /* ── Vista ── */
 void mostrarNegocios(Negocio *negocios, int cantidad_total) {

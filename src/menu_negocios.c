@@ -4,18 +4,20 @@
  * Vista y logica del menu de gestion de negocios (submenu).
  */
 
+#include "../server/menu_negocios.h"
+
 #include <stdio.h>
 #include <stdlib.h>
-#include "sqlite3.h"
-#include "estructuras.h"
-#include "menu_negocios.h"
-#include "menu_ver_negocios.h"
-#include "menu_anyadir_negocios.h"
-#include "menu_eliminar_negocios.h"
-#include "menu_modificar_negocios.h"
+
+#include "../server/usuario.h"
+#include "../server/menu_anyadir_negocios.h"
+#include "../server/menu_eliminar_negocios.h"
+#include "../server/menu_modificar_negocios.h"
+#include "../server/menu_ver_negocios.h"
+#include "../server/sqlite3.h"
 
 /* ── Vista ── */
-void crearMenuNegocios() {
+void crearMenuNegocios(void) {
     printf("======================= \n");
     printf("1. Ver negocios \n");
     printf("2. Anyadir negocios \n");
@@ -29,6 +31,8 @@ void crearMenuNegocios() {
 void gestionMenuNegocios(sqlite3 *db, Usuario u_final) {
     int opcion = 0;
     int salir  = 0;
+
+    (void)u_final; /* reservado para control de permisos futuro */
 
     while (!salir) {
         crearMenuNegocios();

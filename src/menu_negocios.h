@@ -5,10 +5,10 @@
 #ifndef MENU_NEGOCIOS_H_
 #define MENU_NEGOCIOS_H_
 
-#include "sqlite3.h"
-#include "estructuras.h"
+#include "../server/usuario.h"
+#include "../server/sqlite3.h"
 
-void crearMenuNegocios();
+void crearMenuNegocios(void);
 void gestionMenuNegocios(sqlite3 *db, Usuario u_final);
 
 #endif /* MENU_NEGOCIOS_H_ */

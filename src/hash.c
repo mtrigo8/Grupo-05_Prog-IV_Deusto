@@ -6,9 +6,10 @@
  * No requiere librerias externas.
  */
 
+#include "../server/hash.h"
+
 #include <string.h>
 #include <stdio.h>
-#include "hash.h"
 
 /* ── Constantes SHA-256 ── */
 static const uint32_t K[64] = {

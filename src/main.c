@@ -7,10 +7,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "sqlite3.h"
-#include "config.h"
-#include "db.h"
-#include "menu_bienvenida.h"
+
+#include "../server/config.h"
+#include "../server/log.h"
+#include "../server/menu_bienvenida.h"
+#include "../server/sqlite3.h"
 
 int main(void) {
     Config cfg;

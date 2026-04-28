@@ -2,16 +2,16 @@
  * menu_eliminar_negocios.c
  *
  * Vista y logica del menu de eliminacion de un negocio.
- * Incluye la pantalla de confirmacion previa al borrado.
  */
+
+#include "../server/menu_eliminar_negocios.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "sqlite3.h"
-#include "estructuras.h"
-#include "db.h"
-#include "menu_eliminar_negocios.h"
+
+#include "../server/negocio.h"
+#include "../server/sqlite3.h"
 
 /* ── Vista: formulario de busqueda ── */
 void crearMenuEliminarNegocios(Negocio n) {

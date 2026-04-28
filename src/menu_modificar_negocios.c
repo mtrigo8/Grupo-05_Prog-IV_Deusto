@@ -4,13 +4,14 @@
  * Vista y logica del menu de modificacion de un negocio existente.
  */
 
+#include "../server/menu_modificar_negocios.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "sqlite3.h"
-#include "estructuras.h"
-#include "db.h"
-#include "menu_modificar_negocios.h"
+
+#include "../server/negocio.h"
+#include "../server/sqlite3.h"
 
 /* ── Vista ── */
 void crearMenuModificarNegocios(char *nombreActual, Negocio n) {
@@ -36,31 +37,31 @@ void gestionMenuModificarNegocios(sqlite3 *db) {
 
     crearMenuModificarNegocios(nombre_actual, n_nuevo);
     fflush(stdout);
-    { char _buf[80];  fgets(_buf, sizeof(_buf), stdin); sscanf(_buf, "%74[^\n]", nombre_actual);       fflush(stdin); }
+    { char _buf[80];  fgets(_buf, sizeof(_buf), stdin); sscanf(_buf, "%74[^\n]",  nombre_actual);          fflush(stdin); }
 
     crearMenuModificarNegocios(nombre_actual, n_nuevo);
     fflush(stdout);
-    { char _buf[80];  fgets(_buf, sizeof(_buf), stdin); sscanf(_buf, "%74[^\n]", n_nuevo.nombre);      fflush(stdin); }
+    { char _buf[80];  fgets(_buf, sizeof(_buf), stdin); sscanf(_buf, "%74[^\n]",  n_nuevo.nombre);         fflush(stdin); }
 
     crearMenuModificarNegocios(nombre_actual, n_nuevo);
     fflush(stdout);
-    { char _buf[64];  fgets(_buf, sizeof(_buf), stdin); sscanf(_buf, "%49[^\n]", n_nuevo.municipio);   fflush(stdin); }
+    { char _buf[64];  fgets(_buf, sizeof(_buf), stdin); sscanf(_buf, "%49[^\n]",  n_nuevo.municipio);      fflush(stdin); }
 
     crearMenuModificarNegocios(nombre_actual, n_nuevo);
     fflush(stdout);
-    { char _buf[32];  fgets(_buf, sizeof(_buf), stdin); sscanf(_buf, "%19s",     n_nuevo.hora_apertura); fflush(stdin); }
+    { char _buf[32];  fgets(_buf, sizeof(_buf), stdin); sscanf(_buf, "%19s",      n_nuevo.hora_apertura);  fflush(stdin); }
 
     crearMenuModificarNegocios(nombre_actual, n_nuevo);
     fflush(stdout);
-    { char _buf[32];  fgets(_buf, sizeof(_buf), stdin); sscanf(_buf, "%19s",     n_nuevo.hora_cierre);  fflush(stdin); }
+    { char _buf[32];  fgets(_buf, sizeof(_buf), stdin); sscanf(_buf, "%19s",      n_nuevo.hora_cierre);    fflush(stdin); }
 
     crearMenuModificarNegocios(nombre_actual, n_nuevo);
     fflush(stdout);
-    { char _buf[64];  fgets(_buf, sizeof(_buf), stdin); sscanf(_buf, "%49[^\n]", n_nuevo.tipo);         fflush(stdin); }
+    { char _buf[64];  fgets(_buf, sizeof(_buf), stdin); sscanf(_buf, "%49[^\n]",  n_nuevo.tipo);           fflush(stdin); }
 
     crearMenuModificarNegocios(nombre_actual, n_nuevo);
     fflush(stdout);
-    { char _buf[270]; fgets(_buf, sizeof(_buf), stdin); sscanf(_buf, "%255[^\n]", n_nuevo.dias);        fflush(stdin); }
+    { char _buf[270]; fgets(_buf, sizeof(_buf), stdin); sscanf(_buf, "%255[^\n]", n_nuevo.dias);           fflush(stdin); }
     n_nuevo.fecha = convertirDiasInt(n_nuevo.dias);
 
     int res = update_negocio(db, nombre_actual, n_nuevo);

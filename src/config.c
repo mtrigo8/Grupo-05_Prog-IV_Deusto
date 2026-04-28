@@ -5,11 +5,13 @@
  *      Author: markel.trigo
  */
 
+#include "../server/config.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "config.h"
-#include "hash.h"
+
+#include "../server/hash.h"
 
 static void config_defaults(Config *cfg) {
 		memset(cfg, 0, sizeof(Config));

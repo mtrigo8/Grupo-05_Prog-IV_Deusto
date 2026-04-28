@@ -5,11 +5,11 @@
 #ifndef MENU_PRINCIPAL_H_
 #define MENU_PRINCIPAL_H_
 
-#include "sqlite3.h"
-#include "estructuras.h"
-#include "config.h"
+#include "../server/config.h"
+#include "../server/usuario.h"
+#include "../server/sqlite3.h"
 
-void crearMenuPrincipal();
+void crearMenuPrincipal(void);
 void gestionMenuPrincipal(sqlite3 *db, Usuario u_final, Config *c);
 
 #endif /* MENU_PRINCIPAL_H_ */

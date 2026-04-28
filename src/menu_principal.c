@@ -4,17 +4,19 @@
  * Vista y logica del menu principal (post-login de administrador).
  */
 
+#include "../server/menu_principal.h"
+
 #include <stdio.h>
 #include <stdlib.h>
-#include "sqlite3.h"
-#include "estructuras.h"
-#include "config.h"
-#include "menu_principal.h"
-#include "menu_negocios.h"
-#include "menu_config.h"
+
+#include "../server/config.h"
+#include "../server/usuario.h"
+#include "../server/menu_config.h"
+#include "../server/menu_negocios.h"
+#include "../server/sqlite3.h"
 
 /* ── Vista ── */
-void crearMenuPrincipal() {
+void crearMenuPrincipal(void) {
     printf("======================= \n");
     printf("1. Gestionar negocios \n");
     printf("2. Gestionar configuracion \n");

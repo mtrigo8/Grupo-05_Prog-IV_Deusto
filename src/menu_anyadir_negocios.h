@@ -5,8 +5,8 @@
 #ifndef MENU_ANYADIR_NEGOCIOS_H_
 #define MENU_ANYADIR_NEGOCIOS_H_
 
-#include "sqlite3.h"
-#include "estructuras.h"
+#include "../server/negocio.h"
+#include "../server/sqlite3.h"
 
 void crearMenuAnyadirNegocios(Negocio n);
 void gestionMenuAnyadirNegocios(sqlite3 *db);

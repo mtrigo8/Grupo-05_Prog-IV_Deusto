@@ -5,8 +5,8 @@
 #ifndef MENU_MODIFICAR_NEGOCIOS_H_
 #define MENU_MODIFICAR_NEGOCIOS_H_
 
-#include "sqlite3.h"
-#include "estructuras.h"
+#include "../server/negocio.h"
+#include "../server/sqlite3.h"
 
 void crearMenuModificarNegocios(char *nombreActual, Negocio n);
 void gestionMenuModificarNegocios(sqlite3 *db);
