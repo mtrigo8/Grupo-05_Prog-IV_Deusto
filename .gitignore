@@ -1,27 +1,26 @@
-# ─── Carpetas de compilacion (Eclipse CDT) ───────────────────────────────────
-/Debug/
-/Release/
- 
-# ─── Archivos compilados ──────────────────────────────────────────────────────
-*.o
-*.a
-*.so
-*.exe
-*.out
- 
-# ─── Archivos de ejecucion (datos y logs de runtime) ─────────────────────────
-# Estos son distintos en cada maquina; no deben compartirse por git.
-# Crea una copia de cityhub.config.example con tus valores locales.
-bd.db
-*.log
-cityhub.config
- 
-# ─── Eclipse: archivo generado por maquina (contiene rutas absolutas) ─────────
-# language.settings.xml cambia en cada equipo y causa conflictos constantemente.
-.settings/language.settings.xml
- 
-# ─── Sistemas operativos ──────────────────────────────────────────────────────
-.DS_Store
-Thumbs.db
-desktop.ini
- 
+# Ignorar todo por defecto
+*
+
+# Excepciones: permitir el proyecto del grupo
+!Grupo-05_Prog-IV_Deusto_Server/
+!Grupo-05_Prog-IV_Deusto_Server/**
+
+# Ignorar archivos de Eclipse dentro del proyecto del grupo
+Grupo-05_Prog-IV_Deusto_Server/.settings/
+Grupo-05_Prog-IV_Deusto_Server/Debug/
+Grupo-05_Prog-IV_Deusto_Server/Release/
+
+# Ignorar binarios y archivos compilados
+Grupo-05_Prog-IV_Deusto_Server/**/*.o
+Grupo-05_Prog-IV_Deusto_Server/**/*.exe
+Grupo-05_Prog-IV_Deusto_Server/**/*.d
+
+# Cuando crees el cliente C++, añade esto:
+!Grupo-05_Prog-IV_Deusto_Client/
+!Grupo-05_Prog-IV_Deusto_Client/**
+Grupo-05_Prog-IV_Deusto_Client/.settings/
+Grupo-05_Prog-IV_Deusto_Client/Debug/
+Grupo-05_Prog-IV_Deusto_Client/Release/
+Grupo-05_Prog-IV_Deusto_Client/**/*.o
+Grupo-05_Prog-IV_Deusto_Client/**/*.exe
+Grupo-05_Prog-IV_Deusto_Client/**/*.d
