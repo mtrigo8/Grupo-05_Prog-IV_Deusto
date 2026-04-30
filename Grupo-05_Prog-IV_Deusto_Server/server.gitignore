@@ -11,7 +11,6 @@
 *.d
 
 # ─── Eclipse: archivo generado por maquina (contiene rutas absolutas) ────────
-# language.settings.xml cambia en cada equipo y causa conflictos constantemente.
 .settings/language.settings.xml
 
 # ─── Sistemas operativos ──────────────────────────────────────────────────────

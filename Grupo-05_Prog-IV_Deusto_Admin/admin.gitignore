@@ -1,0 +1,27 @@
+# ─── Carpetas de compilacion (Eclipse CDT) ───────────────────────────────────
+/Debug/
+/Release/
+
+# ─── Archivos compilados ──────────────────────────────────────────────────────
+*.o
+*.a
+*.so
+*.exe
+*.out
+*.d
+
+# ─── Archivos de runtime (distintos en cada maquina) ─────────────────────────
+# bd.db        → se genera al ejecutar, no se comparte
+# cityhub.log  → log local de cada máquina
+# cityhub.config → configuracion local (usa cityhub.config.example como plantilla)
+bd.db
+*.log
+cityhub.config
+
+# ─── Eclipse: archivo generado por maquina (contiene rutas absolutas) ────────
+.settings/language.settings.xml
+
+# ─── Sistemas operativos ──────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini

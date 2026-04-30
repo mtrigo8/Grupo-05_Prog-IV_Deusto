@@ -1,0 +1,26 @@
+# CityHub - fichero de configuracion
+# Copia este fichero como "cityhub.config" y edita los valores.
+#
+#   cp cityhub.config.example cityhub.config
+#
+# IMPORTANTE: cityhub.config esta en .gitignore y NO se sube al repo.
+# Este fichero de ejemplo SI esta en el repo; actualízalo si añades nuevas claves.
+
+# Ruta al fichero de base de datos SQLite
+db_path=bd.db
+
+# DNI del administrador (hash SHA-256 del DNI en texto plano)
+admin_dni=HASH_SHA256_DEL_DNI_AQUI
+
+# Contraseña del administrador (hash SHA-256 de la contraseña en texto plano)
+admin_password=HASH_SHA256_DE_LA_PASSWORD_AQUI
+
+# Ruta al fichero de log
+log_path=cityhub.log
+
+# Numero maximo de negocios permitidos
+max_negocios=100
+
+# ── Fase 2: servidor TCP (añadir cuando implementes el servidor) ──────────────
+# ip_servidor=127.0.0.1
+# puerto=8080
