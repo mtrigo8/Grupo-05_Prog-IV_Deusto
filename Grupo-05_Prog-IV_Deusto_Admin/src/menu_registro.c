@@ -18,10 +18,10 @@
 void crearMenuRegistro(Usuario u) {
     printf("======================= \n");
     printf("Registro \n");
-    printf("Nombre: %s \n",        u.nombre);
-    printf("Apellido: %s \n",      u.apellido);
-    printf("Usuario (DNI): %s \n", u.dni);
-    printf("Contrasenya: %s \n",   u.contrasena);
+    printf("Nombre: %s \n",        u.nombre   ? u.nombre   : "");
+    printf("Apellido: %s \n",      u.apellido ? u.apellido : "");
+    printf("Usuario (DNI): %s \n", u.dni      ? u.dni      : "");
+    printf("Contrasenya: %s \n",   u.contrasena[0] != '\0' ? "********" : "");
     printf("======================= \n");
 }
 
@@ -29,23 +29,62 @@ void crearMenuRegistro(Usuario u) {
 void gestionMenuRegistro(sqlite3 *db) {
     Usuario u_temp;
     memset(&u_temp, 0, sizeof(Usuario));
+    /* nombre, apellido, dni son NULL; contrasena[65] a ceros */
 
+    char tmp[128]; /* buffer temporal de lectura */
+
+    /* Nombre */
     crearMenuRegistro(u_temp);
     fflush(stdout);
-    { char _buf[64]; fgets(_buf, sizeof(_buf), stdin); sscanf(_buf, "%49s", u_temp.nombre);     fflush(stdin); }
+    {
+        char _buf[64];
+        fgets(_buf, sizeof(_buf), stdin);
+        tmp[0] = '\0';
+        sscanf(_buf, "%49s", tmp);
+        free(u_temp.nombre);
+        u_temp.nombre = strdup(tmp);
+        fflush(stdin);
+    }
 
+    /* Apellido */
     crearMenuRegistro(u_temp);
     fflush(stdout);
-    { char _buf[64]; fgets(_buf, sizeof(_buf), stdin); sscanf(_buf, "%49s", u_temp.apellido);   fflush(stdin); }
+    {
+        char _buf[64];
+        fgets(_buf, sizeof(_buf), stdin);
+        tmp[0] = '\0';
+        sscanf(_buf, "%49s", tmp);
+        free(u_temp.apellido);
+        u_temp.apellido = strdup(tmp);
+        fflush(stdin);
+    }
 
+    /* DNI */
     crearMenuRegistro(u_temp);
     fflush(stdout);
-    { char _buf[32]; fgets(_buf, sizeof(_buf), stdin); sscanf(_buf, "%19s", u_temp.dni);        fflush(stdin); }
+    {
+        char _buf[32];
+        fgets(_buf, sizeof(_buf), stdin);
+        tmp[0] = '\0';
+        sscanf(_buf, "%19s", tmp);
+        free(u_temp.dni);
+        u_temp.dni = strdup(tmp);
+        fflush(stdin);
+    }
 
+    /* Contrasenya en texto plano → se almacena en el array fijo para hashear */
     crearMenuRegistro(u_temp);
     fflush(stdout);
-    { char _buf[64]; fgets(_buf, sizeof(_buf), stdin); sscanf(_buf, "%49s", u_temp.contrasena); fflush(stdin); }
+    {
+        char _buf[64];
+        fgets(_buf, sizeof(_buf), stdin);
+        tmp[0] = '\0';
+        sscanf(_buf, "%49s", tmp);
+        strncpy(u_temp.contrasena, tmp, sizeof(u_temp.contrasena) - 1);
+        fflush(stdin);
+    }
 
+    /* Hashear la contrasenya antes de insertar */
     char hash[65];
     sha256_hex(u_temp.contrasena, hash);
 
@@ -61,4 +100,7 @@ void gestionMenuRegistro(sqlite3 *db) {
     printf("Presione Enter para volver al inicio...");
     fflush(stdout);
     getchar();
+
+    /* Liberar los campos dinamicos del usuario temporal */
+    usuario_free(&u_temp);
 }

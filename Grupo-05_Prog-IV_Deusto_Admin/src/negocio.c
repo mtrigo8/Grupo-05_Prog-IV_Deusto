@@ -2,12 +2,13 @@
  * negocio.c
  *
  *  Implementacion de:
- *    - convertirDiasInt  : string "LUNES, MARTES, ..." -> mascara de bits
- *    - convertirIntDias  : mascara de bits             -> string "LUNES, MARTES, ..."
- *    - get_negocios      : consulta todos los servicios de la BD
- *    - insert_negocio    : inserta un nuevo servicio en la BD
- *    - delete_negocio    : elimina un servicio de la BD
- *    - update_negocio    : actualiza un servicio existente en la BD
+ *    - negocio_free       : libera los campos dinamicos de un Negocio
+ *    - convertirDiasInt   : string "LUNES, MARTES, ..." -> mascara de bits
+ *    - convertirIntDias   : mascara de bits             -> string "LUNES, MARTES, ..."
+ *    - get_negocios       : consulta todos los servicios de la BD
+ *    - insert_negocio     : inserta un nuevo servicio en la BD
+ *    - delete_negocio     : elimina un servicio de la BD
+ *    - update_negocio     : actualiza un servicio existente en la BD
  */
 
 #include "negocio.h"
@@ -17,6 +18,22 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+
+/* ──────────────────────────────────────────────
+ * Gestion de memoria
+ * ────────────────────────────────────────────── */
+
+void negocio_free(Negocio *n) {
+    if (n == NULL) return;
+    free(n->nombre);        n->nombre        = NULL;
+    free(n->municipio);     n->municipio     = NULL;
+    free(n->hora_apertura); n->hora_apertura = NULL;
+    free(n->hora_cierre);   n->hora_cierre   = NULL;
+    free(n->tipo);          n->tipo          = NULL;
+    free(n->dias);          n->dias          = NULL;
+    free(n->descripcion);   n->descripcion   = NULL;
+    /* fecha es int, no se libera */
+}
 
 /* ──────────────────────────────────────────────
  * Conversion de dias
@@ -94,6 +111,9 @@ Negocio *get_negocios(sqlite3 *db, int *total_negocios) {
         printf("Error: No se pudo asignar memoria para %d servicios.\n", cantidad);
         return NULL;
     }
+    /* Inicializar todos los punteros a NULL para que negocio_free sea seguro
+     * aunque falle strdup a mitad de la inicializacion */
+    memset(lista, 0, cantidad * sizeof(Negocio));
 
     const char sql_datos[] =
         "SELECT nombre_servicio, municipio, hora_apertura, hora_cierre, "
@@ -109,24 +129,25 @@ Negocio *get_negocios(sqlite3 *db, int *total_negocios) {
     int i = 0;
     while (sqlite3_step(stmt) == SQLITE_ROW && i < cantidad) {
         const char *val;
-        memset(&lista[i], 0, sizeof(Negocio));
 
         val = (const char *)sqlite3_column_text(stmt, 0);
-        if (val) strncpy(lista[i].nombre,        val, sizeof(lista[i].nombre)        - 1);
+        lista[i].nombre        = val ? strdup(val) : NULL;
 
         val = (const char *)sqlite3_column_text(stmt, 1);
-        if (val) strncpy(lista[i].municipio,     val, sizeof(lista[i].municipio)     - 1);
+        lista[i].municipio     = val ? strdup(val) : NULL;
 
         val = (const char *)sqlite3_column_text(stmt, 2);
-        if (val) strncpy(lista[i].hora_apertura, val, sizeof(lista[i].hora_apertura) - 1);
+        lista[i].hora_apertura = val ? strdup(val) : NULL;
 
         val = (const char *)sqlite3_column_text(stmt, 3);
-        if (val) strncpy(lista[i].hora_cierre,   val, sizeof(lista[i].hora_cierre)   - 1);
+        lista[i].hora_cierre   = val ? strdup(val) : NULL;
 
         lista[i].fecha = sqlite3_column_int(stmt, 4);
 
         val = (const char *)sqlite3_column_text(stmt, 5);
-        if (val) strncpy(lista[i].tipo,          val, sizeof(lista[i].tipo)          - 1);
+        lista[i].tipo          = val ? strdup(val) : NULL;
+
+        /* descripcion y dias no vienen de esta consulta; quedan NULL */
 
         i++;
     }
@@ -168,11 +189,14 @@ int insert_negocio(sqlite3 *db, Negocio n) {
     char msg[256];
     if (result != SQLITE_DONE) {
         printf("Error al insertar negocio: %s\n", sqlite3_errmsg(db));
-        snprintf(msg, sizeof(msg), "Error al insertar negocio: %s", n.nombre);
+        snprintf(msg, sizeof(msg), "Error al insertar negocio: %s",
+                 n.nombre ? n.nombre : "(sin nombre)");
         registrar_log(db, 0, "ERROR", msg);
     } else {
         snprintf(msg, sizeof(msg), "Negocio insertado: %s en %s (tipo: %s)",
-                 n.nombre, n.municipio, n.tipo);
+                 n.nombre    ? n.nombre    : "",
+                 n.municipio ? n.municipio : "",
+                 n.tipo      ? n.tipo      : "");
         registrar_log(db, 0, "INFO", msg);
     }
 
@@ -198,10 +222,10 @@ int delete_negocio(sqlite3 *db, char *nombre) {
     char msg[256];
     if (result != SQLITE_DONE) {
         printf("Error al borrar negocio: %s\n", sqlite3_errmsg(db));
-        snprintf(msg, sizeof(msg), "Error al eliminar negocio: %s", nombre);
+        snprintf(msg, sizeof(msg), "Error al eliminar negocio: %s", nombre ? nombre : "");
         registrar_log(db, 0, "ERROR", msg);
     } else {
-        snprintf(msg, sizeof(msg), "Negocio eliminado: %s", nombre);
+        snprintf(msg, sizeof(msg), "Negocio eliminado: %s", nombre ? nombre : "");
         registrar_log(db, 0, "INFO", msg);
     }
 
@@ -236,11 +260,14 @@ int update_negocio(sqlite3 *db, char *nombre_actual, Negocio n_nuevo) {
     char msg[256];
     if (result != SQLITE_DONE) {
         printf("Error al actualizar negocio: %s\n", sqlite3_errmsg(db));
-        snprintf(msg, sizeof(msg), "Error al actualizar negocio: %s", nombre_actual);
+        snprintf(msg, sizeof(msg), "Error al actualizar negocio: %s",
+                 nombre_actual ? nombre_actual : "");
         registrar_log(db, 0, "ERROR", msg);
     } else {
         snprintf(msg, sizeof(msg), "Negocio actualizado: %s -> %s en %s",
-                 nombre_actual, n_nuevo.nombre, n_nuevo.municipio);
+                 nombre_actual        ? nombre_actual        : "",
+                 n_nuevo.nombre       ? n_nuevo.nombre       : "",
+                 n_nuevo.municipio    ? n_nuevo.municipio    : "");
         registrar_log(db, 0, "INFO", msg);
     }
 

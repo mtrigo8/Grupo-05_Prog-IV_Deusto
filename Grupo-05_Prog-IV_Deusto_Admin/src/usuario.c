@@ -3,6 +3,10 @@
  *
  *  Implementacion de las operaciones de base de datos para la
  *  estructura Usuario: registro (insert) e inicio de sesion (login).
+ *
+ *  NOTA DE MEMORIA:
+ *    login_usuario() devuelve un Usuario con nombre/apellido/dni asignados
+ *    dinamicamente. El llamador debe llamar a usuario_free() cuando termine.
  */
 
 #include "usuario.h"
@@ -11,6 +15,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+/* ── Gestion de memoria ── */
+
+void usuario_free(Usuario *u) {
+    if (u == NULL) return;
+    free(u->nombre);   u->nombre   = NULL;
+    free(u->apellido); u->apellido = NULL;
+    free(u->dni);      u->dni      = NULL;
+    /* contrasena es array fijo [65], no se libera */
+}
+
+/* ── Operaciones de base de datos ── */
 
 int insert_usuario(sqlite3 *db, char *datos[]) {
     sqlite3_stmt *stmt;
@@ -63,6 +79,7 @@ Usuario login_usuario(sqlite3 *db, char *dni, char *contrasena) {
     sqlite3_stmt *stmt;
     Usuario u;
     memset(&u, 0, sizeof(Usuario));
+    /* Todos los punteros quedan NULL por defecto; contrasena[65] queda a ceros */
 
     const char sql[] =
         "SELECT nombre, apellido, DNI, password_hash "
@@ -80,10 +97,20 @@ Usuario login_usuario(sqlite3 *db, char *dni, char *contrasena) {
     result = sqlite3_step(stmt);
 
     if (result == SQLITE_ROW) {
-        strncpy(u.nombre,    (const char *)sqlite3_column_text(stmt, 0), sizeof(u.nombre)     - 1);
-        strncpy(u.apellido,  (const char *)sqlite3_column_text(stmt, 1), sizeof(u.apellido)   - 1);
-        strncpy(u.dni,       (const char *)sqlite3_column_text(stmt, 2), sizeof(u.dni)        - 1);
-        strncpy(u.contrasena,(const char *)sqlite3_column_text(stmt, 3), sizeof(u.contrasena) - 1);
+        const char *val;
+
+        val = (const char *)sqlite3_column_text(stmt, 0);
+        u.nombre   = val ? strdup(val) : NULL;
+
+        val = (const char *)sqlite3_column_text(stmt, 1);
+        u.apellido = val ? strdup(val) : NULL;
+
+        val = (const char *)sqlite3_column_text(stmt, 2);
+        u.dni      = val ? strdup(val) : NULL;
+
+        /* password_hash se copia al array fijo contrasena[65] */
+        val = (const char *)sqlite3_column_text(stmt, 3);
+        if (val) strncpy(u.contrasena, val, sizeof(u.contrasena) - 1);
 
         sqlite3_finalize(stmt);
 
@@ -91,7 +118,7 @@ Usuario login_usuario(sqlite3 *db, char *dni, char *contrasena) {
         snprintf(msg, sizeof(msg), "Inicio de sesion exitoso: DNI %s", dni);
         registrar_log(db, 0, "INFO", msg);
     } else {
-        u.nombre[0] = '\0';
+        /* u.nombre queda NULL: el llamador lo usa para detectar fallo */
         sqlite3_finalize(stmt);
 
         char msg[256];
