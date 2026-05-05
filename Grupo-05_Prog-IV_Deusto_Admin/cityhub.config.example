@@ -2,12 +2,11 @@
 # Copia este fichero como "cityhub.config" y edita los valores.
 #
 #   cp cityhub.config.example cityhub.config
-#
-# IMPORTANTE: cityhub.config esta en .gitignore y NO se sube al repo.
-# Este fichero de ejemplo SI esta en el repo; actualízalo si añades nuevas claves.
+# Una vez creado actualiza la ruta de database en tu pc (bd.db)
+# Actualiza tambien la del log (cityhub.log)
 
 # Ruta al fichero de base de datos SQLite
-db_path=bd.db
+db_path=tu_ruta_en_el_pc\bd.db
 
 # DNI del administrador (hash SHA-256 del DNI en texto plano)
 admin_dni=HASH_SHA256_DEL_DNI_AQUI
@@ -16,7 +15,7 @@ admin_dni=HASH_SHA256_DEL_DNI_AQUI
 admin_password=HASH_SHA256_DE_LA_PASSWORD_AQUI
 
 # Ruta al fichero de log
-log_path=cityhub.log
+log_path=tu_ruta_en_el_pc\cityhub.log
 
 # Numero maximo de negocios permitidos
 max_negocios=100
