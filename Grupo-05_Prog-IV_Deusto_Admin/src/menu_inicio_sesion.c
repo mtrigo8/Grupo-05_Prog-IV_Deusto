@@ -92,7 +92,7 @@ void gestionMenuInicioSesion(sqlite3 *db, Config *c) {
 
     if (u_final.nombre != NULL) {
         printf("\nBienvenido, %s.\n", u_final.nombre);
-        printf("El apartado de consumidor no esta disenado aun, intentelo mas adelante.\n");
+        printf("El apartado de usuarios es solamente accesible desde la app.\n");
         printf("Presione Enter para volver al inicio...");
         fflush(stdout);
         getchar();
