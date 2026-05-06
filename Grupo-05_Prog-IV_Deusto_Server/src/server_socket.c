@@ -1,22 +1,10 @@
-/*
- * server_socket.c
- *
- *  Implementacion de las funciones de socket del servidor CityHub.
- *  Basado directamente en el ejemplo del profesor (SSC_04_Ejemplo_protocolo_CS).
- *
- *  IMPORTANTE: enlazar la libreria Winsock ("ws2_32") en el proyecto.
- */
 
 #include "server_socket.h"
 
 #include <stdio.h>
 #include <winsock2.h>
 
-/* ─────────────────────────────────────────────────────────────────────────
- * server_init
- * Equivalente al bloque de inicializacion del main.c del profesor,
- * pero extraido a una funcion para poder reutilizarlo.
- * ───────────────────────────────────────────────────────────────────────── */
+
 SOCKET server_init(const char *ip, int port)
 {
     WSADATA wsaData;
@@ -64,11 +52,7 @@ SOCKET server_init(const char *ip, int port)
     return conn_socket;
 }
 
-/* ─────────────────────────────────────────────────────────────────────────
- * server_accept
- * Bloquea hasta que un cliente se conecta y devuelve el socket
- * de comunicacion con ese cliente (comm_socket en el ejemplo del profesor).
- * ───────────────────────────────────────────────────────────────────────── */
+
 SOCKET server_accept(SOCKET conn_socket)
 {
     SOCKET comm_socket;
@@ -95,10 +79,7 @@ SOCKET server_accept(SOCKET conn_socket)
     return comm_socket;
 }
 
-/* ─────────────────────────────────────────────────────────────────────────
- * server_close
- * Cierra sockets y limpia Winsock. Llamar siempre al terminar.
- * ───────────────────────────────────────────────────────────────────────── */
+
 void server_close(SOCKET conn_socket, SOCKET comm_socket)
 {
     if (comm_socket  != INVALID_SOCKET) closesocket(comm_socket);

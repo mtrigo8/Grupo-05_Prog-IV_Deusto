@@ -1,27 +1,12 @@
-/*
- * protocol.h
- *
- *  Definicion del protocolo de comunicacion CityHub.
- *  Incluir este fichero tanto en el Servidor como en el Cliente.
- *
- *  Patron de uso (igual que el ejemplo del profesor):
- *    - Cliente envia un comando  -> send(socket, "LOGIN", ...)
- *    - Cliente envia parametros  -> send(socket, "12345678A|hash...", ...)
- *    - Servidor responde         -> send(socket, "OK|1|Markel|cliente", ...)
- */
+
 
 #ifndef PROTOCOL_H_
 #define PROTOCOL_H_
 
-/* ── Tamano del buffer de envio/recepcion ─────────────────────────────────
- * 1024 bytes es suficiente para la mayoria de mensajes.
- * Para listas largas (GET_SERVICIOS) se usan multiples recv() en un bucle.
- */
+//Tamaño del buffer
 #define BUFF_SIZE 1024
 
-/* ── Separador de parametros dentro de un mensaje ────────────────────────
- * Ejemplo: "12345678A|abc123hash"
- */
+//Separador
 #define SEP "|"
 
 /* =========================================================================
@@ -69,16 +54,7 @@
 #define RES_ERR_NO_AUTORIZADO "ERR|NO_AUTORIZADO"
 #define RES_ERR_GENERICO     "ERR|ERROR"
 
-/* -- Marcadores de lista (para GET_SERVICIOS, GET_RESERVA...) ------------- */
-/*
- * El servidor envia:
- *   LIST_START
- *   "id|nombre|descripcion|fecha|hora|cupos|tipo"   <- un send() por fila
- *   "id|nombre|..."
- *   LIST_END
- *
- * El cliente hace recv() en un bucle hasta recibir LIST_END.
- */
+
 #define RES_LIST_START  "LIST_START"
 #define RES_LIST_END    "LIST_END"
 
