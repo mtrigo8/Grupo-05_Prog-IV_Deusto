@@ -15,7 +15,10 @@ admin_dni=HASH_SHA256_DEL_DNI_AQUI
 admin_password=HASH_SHA256_DE_LA_PASSWORD_AQUI
 
 # Ruta al fichero de log
-log_path=tu_ruta_en_el_pc\cityhub.log
+log_path=tu_ruta_en_el_pc\bd.log
+
+#Ruta al fichero de log del server
+server_log_path=Server.log
 
 # Numero maximo de negocios permitidos
 max_negocios=100
