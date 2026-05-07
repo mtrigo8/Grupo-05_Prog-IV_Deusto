@@ -16,7 +16,7 @@
 # cityhub.config → configuracion local (usa cityhub.config.example como plantilla)
 bd.db
 *.log
-cityhub.config
+admin.config
 
 # ─── Eclipse: archivo generado por maquina (contiene rutas absolutas) ────────
 .settings/language.settings.xml
