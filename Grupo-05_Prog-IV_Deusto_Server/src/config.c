@@ -14,15 +14,17 @@
 #include "hash.h"
 
 static void config_defaults(Config *cfg) {
-		memset(cfg, 0, sizeof(Config));
-	    char hash[65];
-	    sha256_hex("admin", hash);
-	    strncpy(cfg->db_path,   "bd.db",        sizeof(cfg->db_path) - 1);
-	    strncpy(cfg->admin_dni, hash,        sizeof(cfg->admin_dni) - 1);
-	    strncpy(cfg->log_path,  "cityhub.log",  sizeof(cfg->log_path) - 1);
-	    strncpy(cfg->admin_password, hash,      sizeof(cfg->admin_password) - 1);
-
-	    cfg->max_negocios = 100;
+    memset(cfg, 0, sizeof(Config));
+    char hash[65];
+    sha256_hex("admin", hash);
+    strncpy(cfg->db_path,        "bd.db",       sizeof(cfg->db_path) - 1);
+    strncpy(cfg->admin_dni,      hash,           sizeof(cfg->admin_dni) - 1);
+    strncpy(cfg->admin_password, hash,           sizeof(cfg->admin_password) - 1);
+    strncpy(cfg->log_path,       "cityhub.log",  sizeof(cfg->log_path) - 1);
+    strncpy(cfg->server_log_path,"server.log",   sizeof(cfg->server_log_path) - 1);
+    strncpy(cfg->server_ip,      "127.0.0.1",    sizeof(cfg->server_ip) - 1);
+    cfg->max_negocios = 100;
+    cfg->server_port  = 6000;
 }
 
 int config_cargar(Config *cfg) {
@@ -53,7 +55,10 @@ int config_cargar(Config *cfg) {
         else if (strcmp(clave, "admin_dni")       == 0) strncpy(cfg->admin_dni,       valor, sizeof(cfg->admin_dni) - 1);
         else if (strcmp(clave, "admin_password")  == 0) strncpy(cfg->admin_password,  valor, sizeof(cfg->admin_password) - 1);
         else if (strcmp(clave, "log_path")        == 0) strncpy(cfg->log_path,        valor, sizeof(cfg->log_path) - 1);
+        else if (strcmp(clave, "server_log_path") == 0) strncpy(cfg->server_log_path, valor, sizeof(cfg->server_log_path) - 1);
+        else if (strcmp(clave, "ip_servidor")     == 0) strncpy(cfg->server_ip,       valor, sizeof(cfg->server_ip) - 1);
         else if (strcmp(clave, "max_negocios")    == 0) cfg->max_negocios = atoi(valor);
+        else if (strcmp(clave, "puerto")          == 0) cfg->server_port  = atoi(valor);
     }
 
     fclose(f);
@@ -71,11 +76,15 @@ int config_guardar(const Config *cfg) {
 
     fprintf(f, "# CityHub - fichero de configuracion\n");
     fprintf(f, "# Edita este fichero o usa el menu de configuracion del programa.\n\n");
-    fprintf(f, "db_path=%s\n",        cfg->db_path);
-    fprintf(f, "admin_dni=%s\n",      cfg->admin_dni);
-    fprintf(f, "admin_password=%s\n", cfg->admin_password);
-    fprintf(f, "log_path=%s\n",       cfg->log_path);
-    fprintf(f, "max_negocios=%d\n",   cfg->max_negocios);
+    fprintf(f, "db_path=%s\n",         cfg->db_path);
+    fprintf(f, "admin_dni=%s\n",       cfg->admin_dni);
+    fprintf(f, "admin_password=%s\n",  cfg->admin_password);
+    fprintf(f, "log_path=%s\n",        cfg->log_path);
+    fprintf(f, "max_negocios=%d\n",    cfg->max_negocios);
+    fprintf(f, "\n# Servidor TCP\n");
+    fprintf(f, "server_log_path=%s\n", cfg->server_log_path);
+    fprintf(f, "ip_servidor=%s\n",     cfg->server_ip);
+    fprintf(f, "puerto=%d\n",          cfg->server_port);
 
     fclose(f);
     printf("[config] Configuración guardada en '%s'.\n", CONFIG_PATH);
@@ -85,10 +94,14 @@ int config_guardar(const Config *cfg) {
 void config_mostrar(const Config *cfg) {
     printf("======================= \n");
     printf("Configuracion actual \n");
-    printf("Base de datos : %s\n", cfg->db_path);
-    printf("Admin DNI     : %s\n", cfg->admin_dni);
-    printf("Admin password: %s\n", cfg->admin_password);
-    printf("Log path      : %s\n", cfg->log_path);
-    printf("Max negocios  : %d\n", cfg->max_negocios);
+    printf("Base de datos    : %s\n", cfg->db_path);
+    printf("Admin DNI        : %s\n", cfg->admin_dni);
+    printf("Admin password   : %s\n", cfg->admin_password);
+    printf("Log path (admin) : %s\n", cfg->log_path);
+    printf("Max negocios     : %d\n", cfg->max_negocios);
+    printf("--- Servidor TCP ---\n");
+    printf("Server log path  : %s\n", cfg->server_log_path);
+    printf("IP servidor      : %s\n", cfg->server_ip);
+    printf("Puerto           : %d\n", cfg->server_port);
     printf("======================= \n");
 }
