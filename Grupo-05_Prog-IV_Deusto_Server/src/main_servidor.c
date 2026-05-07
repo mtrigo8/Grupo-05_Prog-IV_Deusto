@@ -18,6 +18,7 @@
 #include "config.h"
 #include "sqlite3.h"
 #include "log.h"
+#include "server_log.h"
 
 /* TODO (Bloque 3): cuando estes en ese paso, descomentar estos includes
  * y mover la logica de cada if a su handler correspondiente.
@@ -51,6 +52,8 @@ int main(void)
         sqlite3_close(db);
         return 1;
     }
+    server_log_init("server.log");
+    server_log("INFO", "Servidor arrancado");
 
     //Aceptar cliente
     SOCKET comm_socket = server_accept(conn_socket);
@@ -59,6 +62,7 @@ int main(void)
         WSACleanup();
         return 1;
     }
+    server_log("INFO", "Cliente conectado");
     //Loop de comando -> ejecutar -> respuesta
     char sendBuff[BUFF_SIZE];
     char recvBuff[BUFF_SIZE];
@@ -131,6 +135,7 @@ int main(void)
             strcpy(sendBuff, RES_DESCONECTADO);
             send(comm_socket, sendBuff, sizeof(sendBuff), 0);
             printf("Response sent: %s\n", sendBuff);
+            server_log("INFO", "Cliente desconectado");
             break; /* igual que el EXIT del ejemplo del profesor */
         }
 
