@@ -1,4 +1,4 @@
-/*
+ /*
  * main.c (Servidor CityHub)
  *
  * IMPORTANTE: enlazar ws2_32 y sqlite3 en el proyecto.
