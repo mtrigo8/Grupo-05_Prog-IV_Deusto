@@ -18,7 +18,7 @@
 #include "server_log.h"
 #include "handler_auth.h"
 #include "handler_servicios.h"
-// #include "handler_reservas.h" // Descomentar cuando este listo
+#include "handler_reservas.h"
 
 int main(void)
 {
@@ -134,10 +134,29 @@ int main(void)
         {
             memset(recvBuff, 0, sizeof(recvBuff));
             recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
-            // TODO: handler_reservas_create(comm_socket, db, recvBuff);
-            strncpy(sendBuff, RES_ERR_SIN_CUPOS, sizeof(sendBuff) - 1);
-            send(comm_socket, sendBuff, sizeof(sendBuff), 0);
-            server_log("WARN", "CREATE_RESERVA: sin cupos (placeholder)");
+            handler_create_reserva(comm_socket, db, recvBuff);
+            server_log("INFO", "CREATE_RESERVA procesado");
+        }
+        else if (strcmp(recvBuff, CMD_GET_RESERVA) == 0)
+        {
+            memset(recvBuff, 0, sizeof(recvBuff));
+            recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
+            handler_get_reserva(comm_socket, db, recvBuff);
+            server_log("INFO", "GET_RESERVA procesado");
+        }
+        else if (strcmp(recvBuff, CMD_CANCEL_RESERVA) == 0)
+        {
+            memset(recvBuff, 0, sizeof(recvBuff));
+            recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
+            handler_cancel_reserva(comm_socket, db, recvBuff);
+            server_log("INFO", "CANCEL_RESERVA procesado");
+        }
+        else if (strcmp(recvBuff, CMD_UPDATE_RESERVA) == 0)
+        {
+            memset(recvBuff, 0, sizeof(recvBuff));
+            recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
+            handler_update_reserva(comm_socket, db, recvBuff);
+            server_log("INFO", "UPDATE_RESERVA procesado");
         }
 
         /* --- BLOQUE DE UTILIDADES / CONEXIÓN --- */
