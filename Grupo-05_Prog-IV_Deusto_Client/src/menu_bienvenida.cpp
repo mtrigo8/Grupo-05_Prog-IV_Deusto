@@ -5,6 +5,7 @@
  */
 
 #include "menu_bienvenida.h"
+#include "SocketClient.h"
 
 #include <iostream>
 #include <string>
@@ -32,6 +33,12 @@ void crearMenuBienvenida() {
 
 /* ── Lógica ── */
 void gestionMenuBienvenida() {
+    SocketClient sock;
+    if (!sock.conectar("127.0.0.1", 8080)) {
+        std::cout << "Error: no se pudo conectar al servidor.\n";
+        return;
+    }
+
     int  opcion = 0;
     bool salir  = false;
 
@@ -47,9 +54,9 @@ void gestionMenuBienvenida() {
         }
 
         switch (opcion) {
-            //case 1: gestionMenuInicioSesion(); break;
-            //case 2: gestionMenuRegistro();         break;
-            case 3: salir = true;                    break;
+            //case 1: gestionMenuInicioSesion(sock); break;
+            //case 2: gestionMenuRegistro(sock);     break;
+            case 3: salir = true;                  break;
             default: std::cout << "Opcion invalida\n\n";
         }
     }
