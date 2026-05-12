@@ -1,1 +1,8 @@
+# ─── Eclipse workspace ────────────────────────────────────────────────────────
 /.metadata/
+.recommenders/
+
+# ─── Sistemas operativos ──────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
