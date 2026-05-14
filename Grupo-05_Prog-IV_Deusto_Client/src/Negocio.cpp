@@ -1,3 +1,4 @@
+
 #include "Negocio.h"
 
 #include <iostream>
@@ -18,13 +19,20 @@ NegocioOO::NegocioOO(int                id,
       _horaCierre(horaCierre),
       _capacidad(capacidad)
 {
-    /* cuerpo vacio: la lista de inicializacion ya asigna todos los campos */
 }
 
 /* ── Destructor ─────────────────────────────────────────────────────────── */
 
 NegocioOO::~NegocioOO()
 {
+}
+
+/* ── getTipoEnum ────────────────────────────────────────────────────────── */
+
+TipoNegocio NegocioOO::getTipoEnum() const
+{
+
+    return tipoDesdeString(getTipo());
 }
 
 /* ── Getters ────────────────────────────────────────────────────────────── */
@@ -76,7 +84,7 @@ void NegocioOO::setHoraCierre(const std::string& horaCierre)
     _horaCierre = horaCierre;
 }
 
-/* ── Helper protegido: mostrarComun ─────────────────────────────────────── */
+/* ── mostrarComun ───────────────────────────────────────────────────────── */
 
 void NegocioOO::mostrarComun() const
 {

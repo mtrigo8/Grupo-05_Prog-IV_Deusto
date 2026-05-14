@@ -1,12 +1,48 @@
+/*
+ * Negocio.h
+ *
+ *  Clase abstracta base NegocioOO + enum TipoNegocio.
+ */
 
 #ifndef NEGOCIO_H_
 #define NEGOCIO_H_
 
 #include <string>
 
+enum TipoNegocio
+{
+    TIPO_RESTAURANTE = 0,
+    TIPO_SERVICIO    = 1,
+    TIPO_ACTIVIDAD   = 2,
+    TIPO_DESCONOCIDO = 99
+};
+
+inline TipoNegocio tipoDesdeString(const std::string& tipo)
+{
+    if (tipo == "restaurante") { return TIPO_RESTAURANTE; }
+    if (tipo == "servicio")    { return TIPO_SERVICIO;    }
+    if (tipo == "actividad")   { return TIPO_ACTIVIDAD;   }
+    return TIPO_DESCONOCIDO;
+}
+
+
+inline std::string tipoAString(TipoNegocio tipo)
+{
+    if (tipo == TIPO_RESTAURANTE) { return "restaurante"; }
+    if (tipo == TIPO_SERVICIO)    { return "servicio";    }
+    if (tipo == TIPO_ACTIVIDAD)   { return "actividad";   }
+    return "desconocido";
+}
+
+/* =========================================================================
+ * CLASE ABSTRACTA NegocioOO
+ * ========================================================================= */
+
 class NegocioOO
 {
 public:
+
+    /* ── Constructor ─────────────────────────────────────────────────────── */
 
     NegocioOO(int                id,
               const std::string& nombre,
@@ -16,12 +52,15 @@ public:
               int                capacidad);
 
     /* ── Destructor virtual ──────────────────────────────────────────────── */
+
     virtual ~NegocioOO();
 
     /* ── Metodos virtuales puros ─────────────────────────────────────────── */
-    virtual void mostrar() const = 0;
 
+    virtual void        mostrar() const = 0;
     virtual std::string getTipo() const = 0;
+
+    TipoNegocio getTipoEnum() const;
 
     /* ── Getters ─────────────────────────────────────────────────────────── */
 
@@ -48,6 +87,8 @@ protected:
     std::string _horaApertura;
     std::string _horaCierre;
     int         _capacidad;
+
+    /* ── Helper protegido ────────────────────────────────────────────────── */
 
     void mostrarComun() const;
 };
