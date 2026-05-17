@@ -4,8 +4,8 @@
 #include <limits>
 
 /* Descomentar cuando los menus esten implementados */
-/* #include "menu_inicio_sesion.h" */
-/* #include "menu_registro.h"      */
+#include "menu_inicio_sesion.h"
+#include "menu_registro.h"
 
 /* ── Vista ────────────────────────────────────────────────────────────── */
 
@@ -53,13 +53,11 @@ void gestionMenuBienvenida(SocketClient& sock,
         switch (opcion)
         {
             case 1:
-                /* gestionMenuInicioSesion(sock, sesion, cache); */
-                std::cout << "[ Inicio de sesion — proximamente ]\n\n";
+                gestionMenuInicioSesion(sock, sesion, cache);
                 break;
 
             case 2:
-                /* gestionMenuRegistro(sock, sesion); */
-                std::cout << "[ Registro — proximamente ]\n\n";
+                gestionMenuRegistro(sock, sesion);
                 break;
 
             case 3:
