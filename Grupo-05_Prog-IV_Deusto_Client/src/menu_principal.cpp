@@ -1,6 +1,7 @@
 #include "menu_principal.h"
 #include "Protocol.h"
 #include "menu_negocios.h" // Incluimos el nuevo menu de negocios
+#include "menu_reservas.h"
 
 #include <iostream>
 #include <limits>
