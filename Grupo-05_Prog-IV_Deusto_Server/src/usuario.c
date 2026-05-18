@@ -35,6 +35,7 @@ int insert_usuario(sqlite3 *db, char *datos[]) {
         datos[0] == NULL || datos[1] == NULL ||
         datos[2] == NULL || datos[3] == NULL) {
         printf("Error: Datos de entrada nulos.\n");
+        fflush(stdout);
         return SQLITE_ERROR;
     }
 
@@ -46,6 +47,7 @@ int insert_usuario(sqlite3 *db, char *datos[]) {
     int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (result != SQLITE_OK) {
         printf("Error preparando el INSERT: %s\n", sqlite3_errmsg(db));
+        fflush(stdout);
         return result;
     }
 
@@ -59,6 +61,7 @@ int insert_usuario(sqlite3 *db, char *datos[]) {
 
     if (result != SQLITE_DONE) {
         printf("Error al insertar usuario: %s\n", sqlite3_errmsg(db));
+        fflush(stdout);
         char msg[256];
         snprintf(msg, sizeof(msg), "Error al registrar usuario con DNI: %s", datos[2]);
         registrar_log(db, 0, "ERROR", msg);
@@ -66,6 +69,7 @@ int insert_usuario(sqlite3 *db, char *datos[]) {
     }
 
     printf("Usuario '%s' insertado con exito.\n", datos[0]);
+    fflush(stdout);
 
     char msg[256];
     snprintf(msg, sizeof(msg), "Nuevo usuario registrado: %s %s (DNI: %s)",
@@ -88,6 +92,7 @@ Usuario login_usuario(sqlite3 *db, char *dni, char *contrasena) {
     int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (result != SQLITE_OK) {
         printf("Error al preparar login: %s\n", sqlite3_errmsg(db));
+        fflush(stdout);
         return u;
     }
 

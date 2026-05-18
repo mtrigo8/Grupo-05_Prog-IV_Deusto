@@ -14,6 +14,7 @@ void handler_ping(SOCKET comm_socket)
     strcpy(sendBuff, RES_PONG);
     send(comm_socket, sendBuff, sizeof(sendBuff), 0);
     printf("  -> PING  <- PONG\n");
+    fflush(stdout);
 }
 
 int handler_disconnect(SOCKET comm_socket, sqlite3 *db, char *params)
@@ -23,10 +24,12 @@ int handler_disconnect(SOCKET comm_socket, sqlite3 *db, char *params)
 
     int id_usuario = atoi(params);
     printf("  -> DISCONNECT: id_usuario=%d\n", id_usuario);
+    fflush(stdout);
 
     strcpy(sendBuff, RES_DESCONECTADO);
     send(comm_socket, sendBuff, sizeof(sendBuff), 0);
     printf("  <- %s\n", sendBuff);
+    fflush(stdout);
 
     snprintf(msg, sizeof(msg), "Cliente desconectado: id_usuario=%d", id_usuario);
     registrar_log(db, id_usuario, "INFO", msg);

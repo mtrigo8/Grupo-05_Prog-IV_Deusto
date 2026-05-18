@@ -7,7 +7,7 @@
 #include "Sesion.h"
 #include "Cache.h"
 
-/* Imprime el banner y las opciones del menu de bienvenida */
+
 void crearMenuBienvenida();
 
 

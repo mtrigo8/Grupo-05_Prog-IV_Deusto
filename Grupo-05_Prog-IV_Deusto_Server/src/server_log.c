@@ -43,6 +43,7 @@ void server_log(const char *nivel, const char *mensaje)
 
     /* Imprimir siempre por pantalla */
     printf("[%s] [%-5s] %s\n", fecha, nivel, mensaje);
+    fflush(stdout);
 
     /* Si hay ruta configurada, escribir tambien en el fichero */
     if (g_log_path[0] != '\0') {

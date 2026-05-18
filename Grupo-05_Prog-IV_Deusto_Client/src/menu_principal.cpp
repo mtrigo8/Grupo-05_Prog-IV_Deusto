@@ -1,8 +1,6 @@
-
 #include "menu_principal.h"
 #include "Protocol.h"
 #include "NegocioFactory.h"
-#include "Reserva.h"
 
 #include <iostream>
 #include <limits>
@@ -23,7 +21,6 @@ void crearMenuPrincipal(const SesionOO& sesion)
 }
 
 /* ── Helpers internos ────────────────────────────────────────────────────── */
-
 
 static void cargarNegocios(SocketClient& sock, CacheOO& cache)
 {
@@ -61,50 +58,6 @@ static void cargarNegocios(SocketClient& sock, CacheOO& cache)
     std::cout << cache.getTotalNegocios() << " negocios cargados.\n";
 }
 
-
-static void cargarReservas(SocketClient& sock, CacheOO& cache,
-                           const SesionOO& sesion)
-{
-    cache.limpiarReservas();
-
-    if (!sock.enviar(CMD_GET_RESERVA))
-    {
-        std::cout << "Error: no se pudo enviar el comando al servidor.\n";
-        return;
-    }
-
-    if (!sock.enviar(buildGetReserva(sesion.getId())))
-    {
-        std::cout << "Error: no se pudieron enviar los parametros.\n";
-        return;
-    }
-
-    std::vector<std::string> lineas = recibirLista(sock);
-
-    if (lineas.size() == 1 && esError(lineas[0]))
-    {
-        std::cout << "Error al obtener reservas: " << lineas[0] << "\n";
-        return;
-    }
-
-    std::vector<ParsedReserva> parsed = parseListaReservas(lineas);
-
-    for (int i = 0; i < (int)parsed.size(); i++)
-    {
-        Reserva* r = new Reserva(
-            parsed[i].idReserva,
-            sesion.getId(),
-            parsed[i].idServicio,
-            parsed[i].fecha,
-            parsed[i].nombreServicio,
-            parsed[i].estado
-        );
-        cache.agregarReserva(r);
-    }
-
-    std::cout << cache.getTotalReservas() << " reservas cargadas.\n";
-}
-
 static void gestionVerNegocios(SocketClient& sock, CacheOO& cache)
 {
     std::cout << "\n--- Ver negocios ---\n";
@@ -127,29 +80,6 @@ static void gestionVerNegocios(SocketClient& sock, CacheOO& cache)
     std::cout << "\nPulsa Enter para volver...\n";
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
-
-
-static void gestionMisReservas(SocketClient& sock, CacheOO& cache,
-                               const SesionOO& sesion)
-{
-    std::cout << "\n--- Mis reservas ---\n"
-              << "Cargando reservas del servidor...\n";
-
-    cargarReservas(sock, cache, sesion);
-
-    if (cache.getTotalReservas() == 0)
-    {
-        std::cout << "No tienes reservas activas.\n";
-    }
-    else
-    {
-        cache.mostrarReservas();
-    }
-
-    std::cout << "\nPulsa Enter para volver...\n";
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-}
-
 
 static bool gestionCerrarSesion(SocketClient& sock, SesionOO& sesion,
                                  CacheOO& cache)
@@ -217,7 +147,8 @@ void gestionMenuPrincipal(SocketClient& sock,
                 break;
 
             case 2:
-                gestionMisReservas(sock, cache, sesion);
+                /* Delegar al submenu de reservas */
+                gestionMenuReservas(sock, cache, sesion);
                 break;
 
             case 3:

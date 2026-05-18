@@ -34,6 +34,7 @@ int config_cargar(Config *cfg) {
     FILE *f = fopen(CONFIG_PATH, "r");
     if (f == NULL) {
         printf("[config] Fichero '%s' no encontrado, usando valores por defecto.\n", CONFIG_PATH);
+        fflush(stdout);
         return -1;
     }
 
@@ -71,6 +72,7 @@ int config_guardar(const Config *cfg) {
     FILE *f = fopen(CONFIG_PATH, "w");
     if (f == NULL) {
         printf("[config] Error: no se pudo escribir '%s'.\n", CONFIG_PATH);
+        fflush(stdout);
         return -1;
     }
 
@@ -88,20 +90,33 @@ int config_guardar(const Config *cfg) {
 
     fclose(f);
     printf("[config] Configuración guardada en '%s'.\n", CONFIG_PATH);
+    fflush(stdout);
     return 0;
 }
 
 void config_mostrar(const Config *cfg) {
     printf("======================= \n");
+    fflush(stdout);
     printf("Configuracion actual \n");
+    fflush(stdout);
     printf("Base de datos    : %s\n", cfg->db_path);
+    fflush(stdout);
     printf("Admin DNI        : %s\n", cfg->admin_dni);
+    fflush(stdout);
     printf("Admin password   : %s\n", cfg->admin_password);
+    fflush(stdout);
     printf("Log path (admin) : %s\n", cfg->log_path);
+    fflush(stdout);
     printf("Max negocios     : %d\n", cfg->max_negocios);
+    fflush(stdout);
     printf("--- Servidor TCP ---\n");
+    fflush(stdout);
     printf("Server log path  : %s\n", cfg->server_log_path);
+    fflush(stdout);
     printf("IP servidor      : %s\n", cfg->server_ip);
+    fflush(stdout);
     printf("Puerto           : %d\n", cfg->server_port);
+    fflush(stdout);
     printf("======================= \n");
+    fflush(stdout);
 }

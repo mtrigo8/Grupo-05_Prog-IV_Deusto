@@ -1,10 +1,3 @@
- /*
- * main.c (Servidor CityHub)
- *
- * IMPORTANTE: enlazar ws2_32 y sqlite3 en el proyecto.
- * En Eclipse: Project > Properties > C/C++ Build > Settings >
- * MinGW C Linker > Libraries > añadir "ws2_32" y "sqlite3"
- */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,11 +28,13 @@ int main(void)
     int rc = sqlite3_open_v2(cfg.db_path, &db, SQLITE_OPEN_READWRITE, NULL);
     if (rc != SQLITE_OK) {
         printf("No se pudo abrir la base de datos: %s\n", cfg.db_path);
+        fflush(stdout);
         server_log("ERROR", "No se pudo abrir la base de datos");
         return 1;
     }
     sqlite3_exec(db, "PRAGMA foreign_keys = ON;", NULL, NULL, NULL);
     printf("Base de datos abierta: %s\n", cfg.db_path);
+    fflush(stdout);
 
     /* ── Inicializar socket ───────────────────────────────────────────── */
     SOCKET conn_socket = server_init(cfg.server_ip, cfg.server_port);
@@ -71,6 +66,7 @@ int main(void)
     char recvBuff[BUFF_SIZE];
 
     printf("Waiting for incoming commands from client...\n");
+    fflush(stdout);
     do
     {
         memset(recvBuff, 0, sizeof(recvBuff));
@@ -82,6 +78,7 @@ int main(void)
         }
 
         printf("Command received: %s\n", recvBuff);
+        fflush(stdout);
 
         /* --- BLOQUE DE AUTENTICACIÓN --- */
         if (strcmp(recvBuff, CMD_LOGIN) == 0)
@@ -165,6 +162,7 @@ int main(void)
             strncpy(sendBuff, RES_PONG, sizeof(sendBuff) - 1);
             send(comm_socket, sendBuff, sizeof(sendBuff), 0);
             printf("Response sent: %s\n", sendBuff);
+            fflush(stdout);
         }
         else if (strcmp(recvBuff, CMD_DISCONNECT) == 0)
         {
@@ -178,6 +176,7 @@ int main(void)
             strncpy(sendBuff, RES_ERR_GENERICO, sizeof(sendBuff) - 1);
             send(comm_socket, sendBuff, sizeof(sendBuff), 0);
             printf("Unknown command: %s\n", recvBuff);
+            fflush(stdout);
         }
 
     } while (1);

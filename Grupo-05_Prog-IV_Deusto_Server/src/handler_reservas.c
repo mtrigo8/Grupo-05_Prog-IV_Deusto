@@ -107,13 +107,14 @@ void handler_create_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
 
     printf("  -> CREATE_RESERVA: id_usuario=%d id_servicio=%d\n",
            id_usuario, id_servicio);
-
+    fflush(stdout);
 
     if (ya_reservado(db, id_usuario, id_servicio))
     {
         strcpy(sendBuff, RES_ERR_YA_RESERVADO);
         send(comm_socket, sendBuff, sizeof(sendBuff), 0);
         printf("  <- %s\n", sendBuff);
+        fflush(stdout);
         return;
     }
 
@@ -126,6 +127,7 @@ void handler_create_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
         strcpy(sendBuff, RES_ERR_SIN_CUPOS);
         send(comm_socket, sendBuff, sizeof(sendBuff), 0);
         printf("  <- %s (cap=%d ocupadas=%d)\n", sendBuff, capacidad, ocupadas);
+        fflush(stdout);
         return;
     }
 
@@ -169,6 +171,7 @@ void handler_create_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
              RES_OK, id_reserva, fecha_hoy);
     send(comm_socket, sendBuff, sizeof(sendBuff), 0);
     printf("  <- %s\n", sendBuff);
+    fflush(stdout);
 
     snprintf(msg, sizeof(msg), "Reserva creada: id=%d usuario=%d servicio=%d",
              id_reserva, id_usuario, id_servicio);
@@ -183,6 +186,7 @@ void handler_get_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
 
     int id_usuario = atoi(params);
     printf("  -> GET_RESERVA: id_usuario=%d\n", id_usuario);
+    fflush(stdout);
 
     const char sql[] =
         "SELECT r.id_reserva, s.nombre_servicio, r.fecha_registro "
@@ -225,6 +229,7 @@ void handler_get_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
     send(comm_socket, sendBuff, sizeof(sendBuff), 0);
 
     printf("  <- LIST (%d reservas)\n", count);
+    fflush(stdout);
 }
 
 
@@ -244,6 +249,7 @@ void handler_cancel_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
 
     printf("  -> CANCEL_RESERVA: id_reserva=%d id_usuario=%d\n",
            id_reserva, id_usuario);
+    fflush(stdout);
 
     /* Comprobar que la reserva existe Y pertenece a ese usuario
      * (mismo patron que delete_negocio, pero con comprobacion previa) */
@@ -274,6 +280,7 @@ void handler_cancel_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
         strcpy(sendBuff, RES_ERR_NO_AUTORIZADO);
         send(comm_socket, sendBuff, sizeof(sendBuff), 0);
         printf("  <- %s\n", sendBuff);
+        fflush(stdout);
         return;
     }
 
@@ -305,6 +312,7 @@ void handler_cancel_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
     strcpy(sendBuff, RES_CANCELADA);
     send(comm_socket, sendBuff, sizeof(sendBuff), 0);
     printf("  <- %s\n", sendBuff);
+    fflush(stdout);
 
     snprintf(msg, sizeof(msg), "Reserva cancelada: id=%d usuario=%d",
              id_reserva, id_usuario);
@@ -332,6 +340,7 @@ void handler_update_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
 
     printf("  -> UPDATE_RESERVA: id_reserva=%d id_usuario=%d id_serv_nuevo=%d\n",
            id_reserva, id_usuario, id_serv_nuevo);
+    fflush(stdout);
 
     /* Comprobar que la reserva pertenece al usuario */
     sqlite3_stmt *stmt;
@@ -353,6 +362,7 @@ void handler_update_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
         strcpy(sendBuff, RES_ERR_NO_AUTORIZADO);
         send(comm_socket, sendBuff, sizeof(sendBuff), 0);
         printf("  <- %s\n", sendBuff);
+        fflush(stdout);
         return;
     }
 
@@ -365,6 +375,7 @@ void handler_update_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
         strcpy(sendBuff, RES_ERR_SIN_CUPOS);
         send(comm_socket, sendBuff, sizeof(sendBuff), 0);
         printf("  <- %s\n", sendBuff);
+        fflush(stdout);
         return;
     }
 
@@ -407,6 +418,7 @@ void handler_update_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
              RES_OK, id_reserva, fecha_hoy);
     send(comm_socket, sendBuff, sizeof(sendBuff), 0);
     printf("  <- %s\n", sendBuff);
+    fflush(stdout);
 
     snprintf(msg, sizeof(msg), "Reserva actualizada: id=%d nuevo_servicio=%d usuario=%d",
              id_reserva, id_serv_nuevo, id_usuario);

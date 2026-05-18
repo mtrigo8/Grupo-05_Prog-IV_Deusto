@@ -3,14 +3,13 @@
 #include <iostream>
 #include <limits>
 
-/* Descomentar cuando los menus esten implementados */
+
 #include "menu_inicio_sesion.h"
 #include "menu_registro.h"
 
 /* ── Vista ────────────────────────────────────────────────────────────── */
 
-void crearMenuBienvenida()
-{
+void crearMenuBienvenida() {
     std::cout << "=======================\n"
               << "  ____ _ _         _   _       _      \n"
               << " / ___(_) |_ _   _| | | |_   _| |__   \n"

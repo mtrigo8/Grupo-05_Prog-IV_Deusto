@@ -130,6 +130,7 @@ void handler_servicios_get_all(SOCKET comm_socket, sqlite3 *db,
         svc_send(comm_socket, RES_LIST_END);
         server_log("INFO", "GET_SERVICIOS: lista vacia");
         printf("Response sent: LIST (0 elementos)\n");
+        fflush(stdout);
         return;
     }
 
@@ -138,6 +139,7 @@ void handler_servicios_get_all(SOCKET comm_socket, sqlite3 *db,
         server_log("ERROR", "GET_SERVICIOS: fallo en get_negocios()");
         svc_send(comm_socket, RES_ERR_GENERICO);
         printf("Response sent: %s\n", RES_ERR_GENERICO);
+        fflush(stdout);
         return;
     }
 
@@ -184,6 +186,7 @@ void handler_servicios_get_all(SOCKET comm_socket, sqlite3 *db,
     }
     server_log("INFO", msg);
     printf("Response sent: LIST (%d elementos)\n", enviados);
+    fflush(stdout);
 }
 
 void handler_servicios_get_one(SOCKET comm_socket, sqlite3 *db,
@@ -206,6 +209,7 @@ void handler_servicios_get_one(SOCKET comm_socket, sqlite3 *db,
         server_log("WARN", "GET_SERVICIO: id invalido");
         svc_send(comm_socket, RES_ERR_NO_ENCONTRADO);
         printf("Response sent: %s\n", RES_ERR_NO_ENCONTRADO);
+        fflush(stdout);
         return;
     }
 
@@ -223,6 +227,7 @@ void handler_servicios_get_one(SOCKET comm_socket, sqlite3 *db,
         server_log("ERROR", "GET_SERVICIO: fallo al preparar SELECT por rowid");
         svc_send(comm_socket, RES_ERR_GENERICO);
         printf("Response sent: %s\n", RES_ERR_GENERICO);
+        fflush(stdout);
         return;
     }
 
@@ -234,6 +239,7 @@ void handler_servicios_get_one(SOCKET comm_socket, sqlite3 *db,
         server_log("WARN", "GET_SERVICIO: id no encontrado");
         svc_send(comm_socket, RES_ERR_NO_ENCONTRADO);
         printf("Response sent: %s\n", RES_ERR_NO_ENCONTRADO);
+        fflush(stdout);
         return;
     }
 
@@ -264,6 +270,7 @@ void handler_servicios_get_one(SOCKET comm_socket, sqlite3 *db,
     }
     server_log("INFO", msg);
     printf("Response sent: LIST (1 elemento, id=%lld)\n", rowid);
+    fflush(stdout);
 
     negocio_free(&n);
 }
@@ -323,6 +330,7 @@ void handler_servicios_filter(SOCKET comm_socket, sqlite3 *db,
         server_log("ERROR", "FILTER_SERVICIOS: fallo al preparar SELECT");
         svc_send(comm_socket, RES_ERR_GENERICO);
         printf("Response sent: %s\n", RES_ERR_GENERICO);
+        fflush(stdout);
         return;
     }
 
@@ -387,4 +395,5 @@ void handler_servicios_filter(SOCKET comm_socket, sqlite3 *db,
     }
     server_log("INFO", msg);
     printf("Response sent: LIST (%d elementos)\n", enviados);
+    fflush(stdout);
 }

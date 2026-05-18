@@ -13,19 +13,24 @@ SOCKET server_init(const char *ip, int port)
 
     /* Inicializar Winsock */
     printf("\nInitialising Winsock...\n");
+    fflush(stdout);
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
         printf("Failed. Error Code: %d\n", WSAGetLastError());
+        fflush(stdout);
         return INVALID_SOCKET;
     }
     printf("Initialised.\n");
+    fflush(stdout);
 
     /* Crear socket */
     if ((conn_socket = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) {
         printf("Could not create socket: %d\n", WSAGetLastError());
+        fflush(stdout);
         WSACleanup();
         return INVALID_SOCKET;
     }
     printf("Socket created.\n");
+    fflush(stdout);
 
     /* Configurar direccion y puerto */
     server.sin_addr.s_addr = inet_addr(ip);
@@ -35,15 +40,18 @@ SOCKET server_init(const char *ip, int port)
     /* BIND (asociar IP/puerto al socket) */
     if (bind(conn_socket, (struct sockaddr *) &server, sizeof(server)) == SOCKET_ERROR) {
         printf("Bind failed with error code: %d\n", WSAGetLastError());
+        fflush(stdout);
         closesocket(conn_socket);
         WSACleanup();
         return INVALID_SOCKET;
     }
     printf("Bind done.\n");
+    fflush(stdout);
 
     /* LISTEN (poner el socket en modo escucha, maximo 1 cliente en cola) */
     if (listen(conn_socket, 1) == SOCKET_ERROR) {
         printf("Listen failed with error code: %d\n", WSAGetLastError());
+        fflush(stdout);
         closesocket(conn_socket);
         WSACleanup();
         return INVALID_SOCKET;
@@ -61,16 +69,19 @@ SOCKET server_accept(SOCKET conn_socket)
 
     /* ACCEPT (esperar conexion entrante) */
     printf("Waiting for incoming connections...\n");
+    fflush(stdout);
     comm_socket = accept(conn_socket, (struct sockaddr *) &client, &stsize);
 
     if (comm_socket == INVALID_SOCKET) {
         printf("accept failed with error code: %d\n", WSAGetLastError());
+        fflush(stdout);
         return INVALID_SOCKET;
     }
 
     printf("Incoming connection from: %s (%d)\n",
            inet_ntoa(client.sin_addr),
            ntohs(client.sin_port));
+    fflush(stdout);
 
     /* Cerrar el socket de escucha: ya no se necesita.
      * A partir de aqui toda la comunicacion va por comm_socket. */
@@ -86,4 +97,5 @@ void server_close(SOCKET conn_socket, SOCKET comm_socket)
     if (conn_socket  != INVALID_SOCKET) closesocket(conn_socket);
     WSACleanup();
     printf("Server closed.\n");
+    fflush(stdout);
 }

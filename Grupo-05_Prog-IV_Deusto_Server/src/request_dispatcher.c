@@ -31,6 +31,7 @@ int dispatch(SOCKET comm_socket, sqlite3 *db, char *mensaje)
     }
 
     printf("[DISPATCH] cmd='%s' params='%s'\n", cmd, params);
+    fflush(stdout);
 
     /* ── Autenticacion ────────────────────────────────────────────────── */
     if (strcmp(cmd, CMD_LOGIN)    == 0) {
@@ -67,6 +68,7 @@ int dispatch(SOCKET comm_socket, sqlite3 *db, char *mensaje)
 
     /* Comando desconocido */
     printf("[DISPATCH] Comando desconocido: '%s'\n", cmd);
+    fflush(stdout);
     server_log("WARN", "Comando desconocido recibido");
     return 1;
 }

@@ -67,6 +67,7 @@ void handler_auth_login(SOCKET comm_socket, sqlite3 *db, const char *params)
         server_log("WARN", "LOGIN: credenciales invalidas");
         auth_send(comm_socket, RES_ERR_CREDENCIALES);
         printf("Response sent: %s\n", RES_ERR_CREDENCIALES);
+        fflush(stdout);
         return;
     }
 
@@ -88,6 +89,7 @@ void handler_auth_login(SOCKET comm_socket, sqlite3 *db, const char *params)
 
     auth_send(comm_socket, respuesta);
     printf("Response sent: %s\n", respuesta);
+    fflush(stdout);
 
     {
         char msg[256];
@@ -127,6 +129,7 @@ void handler_auth_register(SOCKET comm_socket, sqlite3 *db, const char *params)
         server_log("WARN", "REGISTER: parametros incompletos");
         auth_send(comm_socket, RES_ERR_GENERICO);
         printf("Response sent: %s\n", RES_ERR_GENERICO);
+        fflush(stdout);
         return;
     }
 
@@ -144,6 +147,7 @@ void handler_auth_register(SOCKET comm_socket, sqlite3 *db, const char *params)
 
         auth_send(comm_socket, respuesta);
         printf("Response sent: %s\n", respuesta);
+        fflush(stdout);
 
         char msg[256];
         snprintf(msg, sizeof(msg),
@@ -156,11 +160,13 @@ void handler_auth_register(SOCKET comm_socket, sqlite3 *db, const char *params)
         server_log("WARN", "REGISTER: DNI ya registrado");
         auth_send(comm_socket, RES_ERR_DNI_DUP);
         printf("Response sent: %s\n", RES_ERR_DNI_DUP);
+        fflush(stdout);
 
     } else {
         server_log("ERROR", "REGISTER: error inesperado en insert_usuario");
         auth_send(comm_socket, RES_ERR_GENERICO);
         printf("Response sent: %s\n", RES_ERR_GENERICO);
+        fflush(stdout);
     }
 }
 
@@ -191,4 +197,5 @@ void handler_auth_logout(SOCKET comm_socket, sqlite3 *db, const char *params)
     //Responder al cliente
     auth_send(comm_socket, RES_SESION_CERRADA);
     printf("Response sent: %s\n", RES_SESION_CERRADA);
+    fflush(stdout);
 }

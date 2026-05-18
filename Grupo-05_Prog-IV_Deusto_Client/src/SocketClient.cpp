@@ -127,7 +127,10 @@ std::string SocketClient::recibir() {
         return "";
     }
 
-    return std::string(buffer, static_cast<size_t>(n));
+    /* El servidor envía buffers de tamaño fijo (BUFF_SIZE) rellenados con \0.
+     * Construir el string con el constructor de C-string para que se detenga
+     * en el primer \0 y las comparaciones de protocolo funcionen correctamente. */
+    return std::string(buffer);
 }
 
 /* ── estaConectado ── */

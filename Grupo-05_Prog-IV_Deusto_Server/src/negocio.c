@@ -96,6 +96,7 @@ Negocio *get_negocios(sqlite3 *db, int *total_negocios) {
     const char sql_count[] = "SELECT COUNT(*) FROM servicio";
     if (sqlite3_prepare_v2(db, sql_count, -1, &stmt, NULL) != SQLITE_OK) {
         printf("Error preparando el COUNT: %s\n", sqlite3_errmsg(db));
+        fflush(stdout);
         return NULL;
     }
 
@@ -109,6 +110,7 @@ Negocio *get_negocios(sqlite3 *db, int *total_negocios) {
     Negocio *lista = malloc(cantidad * sizeof(Negocio));
     if (lista == NULL) {
         printf("Error: No se pudo asignar memoria para %d servicios.\n", cantidad);
+        fflush(stdout);
         return NULL;
     }
     /* Inicializar todos los punteros a NULL para que negocio_free sea seguro
@@ -122,6 +124,7 @@ Negocio *get_negocios(sqlite3 *db, int *total_negocios) {
 
     if (sqlite3_prepare_v2(db, sql_datos, -1, &stmt, NULL) != SQLITE_OK) {
         printf("Error preparando el SELECT: %s\n", sqlite3_errmsg(db));
+        fflush(stdout);
         free(lista);
         return NULL;
     }
@@ -173,6 +176,7 @@ int insert_negocio(sqlite3 *db, Negocio n) {
     int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (result != SQLITE_OK) {
         printf("Error preparando el INSERT de negocio: %s\n", sqlite3_errmsg(db));
+        fflush(stdout);
         return result;
     }
 
@@ -189,6 +193,7 @@ int insert_negocio(sqlite3 *db, Negocio n) {
     char msg[256];
     if (result != SQLITE_DONE) {
         printf("Error al insertar negocio: %s\n", sqlite3_errmsg(db));
+        fflush(stdout);
         snprintf(msg, sizeof(msg), "Error al insertar negocio: %s",
                  n.nombre ? n.nombre : "(sin nombre)");
         registrar_log(db, 0, "ERROR", msg);
@@ -211,6 +216,7 @@ int delete_negocio(sqlite3 *db, char *nombre) {
     int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (result != SQLITE_OK) {
         printf("Error preparando el DELETE de negocio: %s\n", sqlite3_errmsg(db));
+        fflush(stdout);
         return result;
     }
 
@@ -222,6 +228,7 @@ int delete_negocio(sqlite3 *db, char *nombre) {
     char msg[256];
     if (result != SQLITE_DONE) {
         printf("Error al borrar negocio: %s\n", sqlite3_errmsg(db));
+        fflush(stdout);
         snprintf(msg, sizeof(msg), "Error al eliminar negocio: %s", nombre ? nombre : "");
         registrar_log(db, 0, "ERROR", msg);
     } else {
@@ -244,6 +251,7 @@ int update_negocio(sqlite3 *db, char *nombre_actual, Negocio n_nuevo) {
     int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (result != SQLITE_OK) {
         printf("Error preparando el UPDATE de negocio: %s\n", sqlite3_errmsg(db));
+        fflush(stdout);
         return result;
     }
 
@@ -260,6 +268,7 @@ int update_negocio(sqlite3 *db, char *nombre_actual, Negocio n_nuevo) {
     char msg[256];
     if (result != SQLITE_DONE) {
         printf("Error al actualizar negocio: %s\n", sqlite3_errmsg(db));
+        fflush(stdout);
         snprintf(msg, sizeof(msg), "Error al actualizar negocio: %s",
                  nombre_actual ? nombre_actual : "");
         registrar_log(db, 0, "ERROR", msg);
