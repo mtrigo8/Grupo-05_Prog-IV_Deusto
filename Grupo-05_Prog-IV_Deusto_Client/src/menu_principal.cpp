@@ -1,6 +1,6 @@
 #include "menu_principal.h"
 #include "Protocol.h"
-#include "NegocioFactory.h"
+#include "menu_negocios.h" // Incluimos el nuevo menu de negocios
 
 #include <iostream>
 #include <limits>
@@ -21,65 +21,6 @@ void crearMenuPrincipal(const SesionOO& sesion)
 }
 
 /* ── Helpers internos ────────────────────────────────────────────────────── */
-
-static void cargarNegocios(SocketClient& sock, CacheOO& cache)
-{
-    cache.limpiarNegocios();
-
-    if (!sock.enviar(CMD_GET_SERVICIOS))
-    {
-        std::cout << "Error: no se pudo enviar el comando al servidor.\n";
-        return;
-    }
-
-    if (!sock.enviar(buildGetServicios()))
-    {
-        std::cout << "Error: no se pudieron enviar los parametros.\n";
-        return;
-    }
-
-    std::vector<std::string> lineas = recibirLista(sock);
-
-    /* Comprobar si el servidor devolvio un error en lugar de la lista */
-    if (lineas.size() == 1 && esError(lineas[0]))
-    {
-        std::cout << "Error al obtener negocios: " << lineas[0] << "\n";
-        return;
-    }
-
-    std::vector<ParsedServicio> parsed = parseListaServicios(lineas);
-
-    for (int i = 0; i < (int)parsed.size(); i++)
-    {
-        NegocioOO* obj = NegocioFactory::crear(parsed[i]);
-        cache.agregarNegocio(obj);
-    }
-
-    std::cout << cache.getTotalNegocios() << " negocios cargados.\n";
-}
-
-static void gestionVerNegocios(SocketClient& sock, CacheOO& cache)
-{
-    std::cout << "\n--- Ver negocios ---\n";
-
-    /* Solo recargar si la cache esta vacia */
-    if (cache.getTotalNegocios() == 0)
-    {
-        std::cout << "Cargando negocios del servidor...\n";
-        cargarNegocios(sock, cache);
-    }
-
-    if (cache.getTotalNegocios() == 0)
-    {
-        std::cout << "No hay negocios disponibles.\n";
-        return;
-    }
-
-    cache.mostrarNegocios();
-
-    std::cout << "\nPulsa Enter para volver...\n";
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-}
 
 static bool gestionCerrarSesion(SocketClient& sock, SesionOO& sesion,
                                  CacheOO& cache)
@@ -143,7 +84,8 @@ void gestionMenuPrincipal(SocketClient& sock,
         switch (opcion)
         {
             case 1:
-                gestionVerNegocios(sock, cache);
+                /* Delegar al nuevo submenu de negocios */
+                gestionMenuNegocios(sock, cache);
                 break;
 
             case 2:

@@ -28,6 +28,7 @@ public:
     NegocioOO* getNegocio(int indice) const;
     NegocioOO* buscarNegocioPorId(int id) const;
     void mostrarNegocios() const;
+    std::vector<NegocioOO*>& getNegocios() const;
     void mostrarNegociosFiltrados(const std::string& tipo) const;
 
     /* =====================================================================

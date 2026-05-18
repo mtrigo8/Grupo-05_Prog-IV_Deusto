@@ -95,6 +95,12 @@ void CacheOO::mostrarNegocios() const
     }
 }
 
+
+std::vector<NegocioOO*>& CacheOO::getNegocios() const {
+	    return _negocios;
+}
+
+
 /* ── mostrarNegociosFiltrados ───────────────────────────────────────────── */
 
 void CacheOO::mostrarNegociosFiltrados(const std::string& tipo) const

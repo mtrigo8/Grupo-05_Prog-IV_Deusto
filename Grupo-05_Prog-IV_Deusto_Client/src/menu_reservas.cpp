@@ -15,8 +15,9 @@ void crearMenuReservas()
               << "      Mis reservas\n"
               << "=======================\n"
               << "1. Ver mis reservas\n"
-              << "2. Cancelar una reserva\n"
-              << "3. Volver\n"
+              << "2. Hacer una reserva\n"
+              << "3. Cancelar una reserva\n"
+              << "4. Volver\n"
               << "=======================\n";
 }
 
@@ -86,11 +87,12 @@ static void gestionVerReservas(SocketClient&   sock,
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
-static void gestionCancelarReserva(SocketClient&   sock,
-                                   CacheOO&        cache,
-                                   const SesionOO& sesion)
+/* Nota: Mantengo esta función antigua por si necesitas reciclar su lógica
+   dentro de tu nueva clase/función de borrar más adelante. */
+static void gestionCancelarReservaOld(SocketClient&   sock,
+                                      CacheOO&        cache,
+                                      const SesionOO& sesion)
 {
-    /* Recargar siempre para tener datos frescos antes de cancelar */
     std::cout << "\nCargando reservas del servidor...\n";
     cargarReservas(sock, cache, sesion);
 
@@ -104,7 +106,6 @@ static void gestionCancelarReserva(SocketClient&   sock,
 
     cache.mostrarReservas();
 
-    /* Pedir ID de la reserva a cancelar */
     std::cout << "\nIntroduce el numero de reserva a cancelar (0 para volver): ";
     int idReserva = 0;
 
@@ -122,7 +123,6 @@ static void gestionCancelarReserva(SocketClient&   sock,
         return;
     }
 
-    /* Verificar que la reserva existe en cache y pertenece al usuario */
     Reserva* reserva = cache.buscarReservaPorId(idReserva);
 
     if (reserva == nullptr)
@@ -138,7 +138,6 @@ static void gestionCancelarReserva(SocketClient&   sock,
         return;
     }
 
-    /* Enviar CMD_CANCEL_RESERVA */
     if (!sock.enviar(CMD_CANCEL_RESERVA))
     {
         std::cout << "Error: no se pudo enviar el comando al servidor.\n";
@@ -156,8 +155,6 @@ static void gestionCancelarReserva(SocketClient&   sock,
     if (esOk(respuesta))
     {
         std::cout << "Reserva #" << idReserva << " cancelada correctamente.\n";
-
-        /* Forzar recarga la proxima vez */
         cache.limpiarReservas();
     }
     else if (esError(respuesta))
@@ -165,26 +162,10 @@ static void gestionCancelarReserva(SocketClient&   sock,
         std::vector<std::string> campos = splitSEP(respuesta);
         std::string motivo = (campos.size() >= 2) ? campos[1] : respuesta;
 
-        if (motivo == "NO_CANCELABLE")
-        {
-            std::cout << "Error: la reserva no puede cancelarse en este momento.\n";
-        }
-        else if (motivo == "NO_AUTORIZADO")
-        {
-            std::cout << "Error: no tienes permiso para cancelar esta reserva.\n";
-        }
-        else if (motivo == "NO_ENCONTRADO")
-        {
-            std::cout << "Error: la reserva no existe en el servidor.\n";
-        }
-        else
-        {
-            std::cout << "Error al cancelar la reserva: " << motivo << "\n";
-        }
-    }
-    else
-    {
-        std::cout << "Respuesta inesperada del servidor: " << respuesta << "\n";
+        if (motivo == "NO_CANCELABLE") std::cout << "Error: la reserva no puede cancelarse.\n";
+        else if (motivo == "NO_AUTORIZADO") std::cout << "Error: no tienes permiso.\n";
+        else if (motivo == "NO_ENCONTRADO") std::cout << "Error: la reserva no existe.\n";
+        else std::cout << "Error al cancelar la reserva: " << motivo << "\n";
     }
 
     std::cout << "\nPulsa Enter para volver...\n";
@@ -222,15 +203,33 @@ void gestionMenuReservas(SocketClient&   sock,
                 break;
 
             case 2:
-                gestionCancelarReserva(sock, cache, sesion);
+                // =============================================================
+                // DESCOMENTAR CUANDO ESTE CREADA LA CLASE/FUNCIÓN:
+                // menu_hacer_reserva(sock, cache, sesion);
+                // =============================================================
+                std::cout << "\n[Info] La opcion de hacer reserva esta en construccion.\n";
+                std::cout << "Pulsa Enter para continuar...\n";
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 break;
 
             case 3:
+                // =============================================================
+                // DESCOMENTAR CUANDO ESTE CREADA LA CLASE/FUNCIÓN:
+                // menu_borrar_reserva(sock, cache, sesion);
+                // =============================================================
+                std::cout << "\n[Info] La opcion de borrar reserva esta en construccion.\n";
+                std::cout << "Pulsa Enter para continuar...\n";
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                break;
+
+            case 4:
                 salir = true;
                 break;
 
             default:
                 std::cout << "Opcion invalida.\n";
+                std::cout << "Pulsa Enter para continuar...\n";
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 break;
         }
     }
