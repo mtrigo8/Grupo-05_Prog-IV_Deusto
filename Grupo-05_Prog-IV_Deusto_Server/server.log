@@ -170,3 +170,5 @@
 [2026-05-19 13:15:07] [INFO ] CREATE_RESERVA procesado
 [2026-05-19 13:15:15] [INFO ] GET_RESERVA procesado
 >>>>>>> branch 'master' of https://github.com/mtrigo8/Grupo-05_Prog-IV_Deusto
+[2026-05-19 13:31:40] [INFO ] Cargando configuracion...
+[2026-05-19 13:31:40] [INFO ] Servidor arrancado en 127.0.0.1:8080
