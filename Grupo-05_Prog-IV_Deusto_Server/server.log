@@ -93,3 +93,45 @@
 [2026-05-19 11:21:24] [INFO ] LOGOUT procesado
 [2026-05-19 11:21:28] [INFO ] Conexion cerrada por el cliente o error de red
 [2026-05-19 11:21:28] [INFO ] Servidor cerrado correctamente
+[2026-05-19 12:30:15] [INFO ] Cargando configuracion...
+[2026-05-19 12:30:15] [INFO ] Servidor arrancado en 127.0.0.1:6000
+[2026-05-19 12:30:40] [INFO ] Cargando configuracion...
+[2026-05-19 12:30:40] [ERROR] Fallo al inicializar el socket
+[2026-05-19 12:30:45] [INFO ] Cargando configuracion...
+[2026-05-19 12:30:45] [ERROR] Fallo al inicializar el socket
+[2026-05-19 12:31:18] [INFO ] Cargando configuracion...
+[2026-05-19 12:31:18] [ERROR] Fallo al inicializar el socket
+[2026-05-19 12:32:02] [INFO ] Cargando configuracion...
+[2026-05-19 12:32:02] [INFO ] Servidor arrancado en 127.0.0.1:6000
+[2026-05-19 12:33:31] [INFO ] Cargando configuracion...
+[2026-05-19 12:33:31] [INFO ] Servidor arrancado en 127.0.0.1:8080
+[2026-05-19 12:33:35] [INFO ] Cliente conectado
+[2026-05-19 12:34:35] [INFO ] REGISTER exitoso: id=24 nombre=Liberto DNI=123456789A
+[2026-05-19 12:34:35] [INFO ] REGISTER procesado
+[2026-05-19 12:34:51] [INFO ] LOGIN exitoso: id=2 nombre=Liberto DNI=123456789A
+[2026-05-19 12:34:51] [INFO ] LOGIN procesado
+[2026-05-19 12:34:59] [INFO ] GET_SERVICIOS: 50 servicios enviados (todos los tipos)
+[2026-05-19 12:34:59] [INFO ] GET_SERVICIOS procesado
+[2026-05-19 12:35:45] [INFO ] GET_SERVICIOS: 50 servicios enviados (todos los tipos)
+[2026-05-19 12:35:45] [INFO ] GET_SERVICIOS procesado
+[2026-05-19 12:35:55] [INFO ] GET_SERVICIOS: 50 servicios enviados (todos los tipos)
+[2026-05-19 12:35:55] [INFO ] GET_SERVICIOS procesado
+[2026-05-19 12:38:18] [INFO ] GET_SERVICIOS: 50 servicios enviados (todos los tipos)
+[2026-05-19 12:38:18] [INFO ] GET_SERVICIOS procesado
+[2026-05-19 12:39:08] [INFO ] CREATE_RESERVA procesado
+[2026-05-19 12:39:49] [INFO ] GET_RESERVA procesado
+[2026-05-19 12:39:50] [INFO ] Conexion cerrada por el cliente o error de red
+[2026-05-19 12:39:50] [INFO ] Servidor cerrado correctamente
+[2026-05-19 13:19:27] [INFO ] Cargando configuracion...
+[2026-05-19 13:19:27] [INFO ] Servidor arrancado en 127.0.0.1:8080
+[2026-05-19 13:19:43] [INFO ] Cliente conectado
+[2026-05-19 13:19:54] [INFO ] LOGIN exitoso: id=2 nombre=Liberto DNI=123456789A
+[2026-05-19 13:19:54] [INFO ] LOGIN procesado
+[2026-05-19 13:19:57] [INFO ] GET_SERVICIOS: 50 servicios enviados (todos los tipos)
+[2026-05-19 13:19:57] [INFO ] GET_SERVICIOS procesado
+[2026-05-19 13:20:06] [INFO ] GET_SERVICIOS: 50 servicios enviados (todos los tipos)
+[2026-05-19 13:20:06] [INFO ] GET_SERVICIOS procesado
+[2026-05-19 13:20:12] [INFO ] GET_SERVICIOS: 50 servicios enviados (todos los tipos)
+[2026-05-19 13:20:12] [INFO ] GET_SERVICIOS procesado
+[2026-05-19 13:21:13] [INFO ] Conexion cerrada por el cliente o error de red
+[2026-05-19 13:21:13] [INFO ] Servidor cerrado correctamente
