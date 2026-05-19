@@ -172,3 +172,12 @@
 >>>>>>> branch 'master' of https://github.com/mtrigo8/Grupo-05_Prog-IV_Deusto
 [2026-05-19 13:31:40] [INFO ] Cargando configuracion...
 [2026-05-19 13:31:40] [INFO ] Servidor arrancado en 127.0.0.1:8080
+[2026-05-19 14:11:30] [INFO ] Cargando configuracion...
+[2026-05-19 14:11:30] [ERROR] No se pudo abrir la base de datos
+[2026-05-19 14:12:28] [INFO ] Cargando configuracion...
+[2026-05-19 14:12:28] [INFO ] Servidor arrancado en 127.0.0.1:8080
+[2026-05-19 14:12:36] [INFO ] Cliente conectado
+[2026-05-19 14:12:48] [INFO ] LOGIN exitoso: id=1 nombre=Markel DNI=22761560R
+[2026-05-19 14:12:48] [INFO ] LOGIN procesado
+[2026-05-19 14:12:57] [INFO ] GET_SERVICIOS: 50 servicios enviados (todos los tipos)
+[2026-05-19 14:12:57] [INFO ] GET_SERVICIOS procesado

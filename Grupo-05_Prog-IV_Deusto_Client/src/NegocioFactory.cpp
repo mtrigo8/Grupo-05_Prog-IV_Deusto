@@ -21,8 +21,8 @@ NegocioOO* NegocioFactory::crear(const ParsedServicio& parsed, int capacidad)
                 parsed.horaApertura,
                 parsed.horaCierre,
                 capacidad,
-                "",   /* tipoCocina: no en protocolo actual */
-                ""    /* menuDelDia: no en protocolo actual */
+                0,    /* plazasOcupadas: se inicializa a 0 */
+                ""    /* tipoCocina: no en protocolo actual */
             );
 
         case TIPO_ACTIVIDAD:
@@ -34,8 +34,9 @@ NegocioOO* NegocioFactory::crear(const ParsedServicio& parsed, int capacidad)
                 parsed.horaApertura,
                 parsed.horaCierre,
                 capacidad,
+                0,            /* plazasOcupadas: se inicializa a 0 */
                 parsed.dias,  /* fecha/dias de la actividad */
-                0             /* plazasOcupadas: se actualiza tras reservar */
+                ""            /* descripcion: vacía por defecto si no viene en el parseo */
             );
 
         case TIPO_SERVICIO:
@@ -47,6 +48,7 @@ NegocioOO* NegocioFactory::crear(const ParsedServicio& parsed, int capacidad)
                 parsed.horaApertura,
                 parsed.horaCierre,
                 capacidad,
+                0,            /* plazasOcupadas: se inicializa a 0 */
                 "",           /* descripcion: no en protocolo actual */
                 parsed.dias
             );
@@ -65,7 +67,8 @@ NegocioOO* NegocioFactory::crear(const ParsedServicio& parsed, int capacidad)
                 parsed.horaApertura,
                 parsed.horaCierre,
                 capacidad,
-                "",
+                0,            /* plazasOcupadas: se inicializa a 0 */
+                "",           /* descripcion por defecto */
                 parsed.dias
             );
     }
