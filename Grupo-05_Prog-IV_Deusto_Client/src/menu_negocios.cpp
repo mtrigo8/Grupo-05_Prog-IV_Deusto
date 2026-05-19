@@ -71,7 +71,13 @@ static void asegurarCacheCargada(SocketClient& sock, CacheOO& cache)
 
 static void mostrarTodos(SocketClient& sock, CacheOO& cache)
 {
+<<<<<<< HEAD
     asegurarCacheCargada(sock, cache);
+=======
+    std::cout << "\nCargando negocios del servidor...\n";
+    if(cache.getTotalNegocios() == 0){
+    cargarNegocios(sock, cache);
+>>>>>>> branch 'master' of https://github.com/mtrigo8/Grupo-05_Prog-IV_Deusto
 
     if (cache.getTotalNegocios() == 0)
     {
@@ -81,14 +87,21 @@ static void mostrarTodos(SocketClient& sock, CacheOO& cache)
     {
         cache.mostrarNegocios();
     }
-
+    }
+    cache.mostrarNegocios();
     std::cout << "\nPulsa Enter para volver...\n";
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
 static void mostrarPorTipo(SocketClient& sock, CacheOO& cache, TipoNegocio tipo)
 {
+<<<<<<< HEAD
     asegurarCacheCargada(sock, cache);
+=======
+    std::cout << "\nCargando negocios del servidor...\n";
+    if(cache.getTotalNegocios() == 0){
+    cargarNegocios(sock, cache);
+>>>>>>> branch 'master' of https://github.com/mtrigo8/Grupo-05_Prog-IV_Deusto
 
     if (cache.getTotalNegocios() == 0)
     {
@@ -115,7 +128,46 @@ static void mostrarPorTipo(SocketClient& sock, CacheOO& cache, TipoNegocio tipo)
         {
             std::cout << "No se encontraron negocios del tipo \"" << tipoAString(tipo) << "\".\n";
         }
+<<<<<<< HEAD
+=======
+        else
+        {
+            for (NegocioOO* negocio : negociosFiltrados)
+            {
+                negocio->mostrar(); // Llama al método mostrar de cada objeto individual
+            }
+        }
+        return;
+>>>>>>> branch 'master' of https://github.com/mtrigo8/Grupo-05_Prog-IV_Deusto
     }
+    }
+
+    std::cout << "\n--- Mostrando negocios del tipo: " << tipoAString(tipo) << " ---\n";
+
+            // 1. Obtenemos la lista completa de la cache usando el nuevo método público
+            const std::vector<NegocioOO*>& todosLosNegocios = cache.getNegocios();
+
+            // 2. Creamos un vector temporal para guardar los elementos filtrados
+            std::vector<NegocioOO*> negociosFiltrados;
+
+            for(int i = 0; i < todosLosNegocios.size(); i++){
+            	if(tipo == todosLosNegocios[i]->getTipoEnum()){
+            		negociosFiltrados.push_back(todosLosNegocios[i]);
+            	}
+            }
+
+            // 4. Recorremos e imprimimos el resultado de tu filtrado algorítmico
+            if (negociosFiltrados.empty())
+            {
+                std::cout << "No se encontraron negocios del tipo \"" << tipoAString(tipo) << "\".\n";
+            }
+            else
+            {
+                for (NegocioOO* negocio : negociosFiltrados)
+                {
+                    negocio->mostrar(); // Llama al método mostrar de cada objeto individual
+                }
+            }
 
     std::cout << "\nPulsa Enter para volver...\n";
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
