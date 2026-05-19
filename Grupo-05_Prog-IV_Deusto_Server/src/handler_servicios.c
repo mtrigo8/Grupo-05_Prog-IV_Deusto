@@ -17,6 +17,8 @@ static void svc_send(SOCKET sock, const char *msg)
 }
 
 static void svc_format_negocio_con_id(long long id, const Negocio *n,
+                                      int capacidad,
+                                      const char *descripcion,
                                       char *out, size_t out_size)
 {
     char dias_str[128] = {0};
@@ -33,15 +35,19 @@ static void svc_format_negocio_con_id(long long id, const Negocio *n,
     if (n->hora_apertura != NULL) { hora_apertura = n->hora_apertura; }
     if (n->hora_cierre   != NULL) { hora_cierre   = n->hora_cierre;   }
     if (n->tipo          != NULL) { tipo          = n->tipo;          }
+    if (descripcion      == NULL) { descripcion   = "";               }
 
-    snprintf(out, out_size, "%lld%s%s%s%s%s%s%s%s%s%s%s%s",
+    /* Protocolo: id|nombre|municipio|hora_apertura|hora_cierre|dias|tipo|capacidad|descripcion */
+    snprintf(out, out_size, "%lld%s%s%s%s%s%s%s%s%s%s%s%s%s%d%s%s",
              id,            SEP,
              nombre,        SEP,
              municipio,     SEP,
              hora_apertura, SEP,
              hora_cierre,   SEP,
              dias_str,      SEP,
-             tipo);
+             tipo,          SEP,
+             capacidad,     SEP,
+             descripcion);
 }
 
 static long long svc_fill_negocio_from_stmt(sqlite3_stmt *stmt, Negocio *n)
@@ -112,7 +118,7 @@ void handler_servicios_get_all(SOCKET comm_socket, sqlite3 *db,
     {
         snprintf(sql, sizeof(sql),
             "SELECT rowid, nombre_servicio, municipio, hora_apertura, hora_cierre, "
-            "       fecha, tipo_servicio "
+            "       fecha, tipo_servicio, capacidad_maxima, descripcion "
             "FROM servicio "
             "WHERE tipo_servicio = ?");
     }
@@ -120,7 +126,7 @@ void handler_servicios_get_all(SOCKET comm_socket, sqlite3 *db,
     {
         snprintf(sql, sizeof(sql),
             "SELECT rowid, nombre_servicio, municipio, hora_apertura, hora_cierre, "
-            "       fecha, tipo_servicio "
+            "       fecha, tipo_servicio, capacidad_maxima, descripcion "
             "FROM servicio");
     }
 
@@ -151,7 +157,11 @@ void handler_servicios_get_all(SOCKET comm_socket, sqlite3 *db,
 
         long long rowid = svc_fill_negocio_from_stmt(stmt, &n);
 
-        svc_format_negocio_con_id(rowid, &n, linea, sizeof(linea));
+        int         capacidad   = sqlite3_column_int (stmt, 7);
+        const char *descripcion = (const char *)sqlite3_column_text(stmt, 8);
+
+        svc_format_negocio_con_id(rowid, &n, capacidad, descripcion,
+                                  linea, sizeof(linea));
         svc_send(comm_socket, linea);
         enviados++;
 
@@ -205,7 +215,7 @@ void handler_servicios_get_one(SOCKET comm_socket, sqlite3 *db,
     sqlite3_stmt *stmt = NULL;
     const char sql[] =
         "SELECT rowid, nombre_servicio, municipio, hora_apertura, hora_cierre, "
-        "       fecha, tipo_servicio "
+        "       fecha, tipo_servicio, capacidad_maxima, descripcion "
         "FROM servicio "
         "WHERE rowid = ? "
         "LIMIT 1";
@@ -233,12 +243,15 @@ void handler_servicios_get_one(SOCKET comm_socket, sqlite3 *db,
 
     Negocio n;
     memset(&n, 0, sizeof(Negocio));
-    long long rowid = svc_fill_negocio_from_stmt(stmt, &n);
+    long long rowid     = svc_fill_negocio_from_stmt(stmt, &n);
+    int       capacidad = sqlite3_column_int (stmt, 7);
+    const char *descripcion = (const char *)sqlite3_column_text(stmt, 8);
     sqlite3_finalize(stmt);
 
     char linea[BUFF_SIZE];
     svc_send(comm_socket, RES_LIST_START);
-    svc_format_negocio_con_id(rowid, &n, linea, sizeof(linea));
+    svc_format_negocio_con_id(rowid, &n, capacidad, descripcion,
+                              linea, sizeof(linea));
     svc_send(comm_socket, linea);
     svc_send(comm_socket, RES_LIST_END);
 
@@ -292,7 +305,7 @@ void handler_servicios_filter(SOCKET comm_socket, sqlite3 *db,
 
     offset += snprintf(sql + offset, sizeof(sql) - offset,
         "SELECT rowid, nombre_servicio, municipio, hora_apertura, hora_cierre, "
-        "       fecha, tipo_servicio "
+        "       fecha, tipo_servicio, capacidad_maxima, descripcion "
         "FROM servicio "
         "WHERE 1=1 ");
 
@@ -339,9 +352,12 @@ void handler_servicios_filter(SOCKET comm_socket, sqlite3 *db,
         Negocio n;
         memset(&n, 0, sizeof(Negocio));
 
-        long long rowid = svc_fill_negocio_from_stmt(stmt, &n);
+        long long rowid     = svc_fill_negocio_from_stmt(stmt, &n);
+        int       capacidad = sqlite3_column_int (stmt, 7);
+        const char *descripcion = (const char *)sqlite3_column_text(stmt, 8);
 
-        svc_format_negocio_con_id(rowid, &n, linea, sizeof(linea));
+        svc_format_negocio_con_id(rowid, &n, capacidad, descripcion,
+                                  linea, sizeof(linea));
         svc_send(comm_socket, linea);
         enviados++;
 

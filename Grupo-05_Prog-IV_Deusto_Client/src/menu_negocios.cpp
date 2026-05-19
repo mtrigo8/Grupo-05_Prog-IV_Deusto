@@ -6,6 +6,8 @@
 #include <limits>
 #include <vector>
 #include <string>
+#include <algorithm> // Requerido para std::copy_if
+#include <iterator>  // Requerido para std::back_inserter
 
 /* ── Vista ───────────────────────────────────────────────────────────────── */
 
@@ -52,26 +54,17 @@ static void cargarNegocios(SocketClient& sock, CacheOO& cache)
 
     for (int i = 0; i < (int)parsed.size(); i++)
     {
-        NegocioOO* obj = NegocioFactory::crear(parsed[i]);
+        NegocioOO* obj = NegocioFactory::crear(parsed[i], parsed[i].capacidad);
         cache.agregarNegocio(obj);
     }
 
     std::cout << cache.getTotalNegocios() << " negocios cargados desde el servidor.\n";
 }
 
-// NUEVA FUNCIÓN: Se encarga de garantizar que haya datos antes de intentar mostrarlos
-static void asegurarCacheCargada(SocketClient& sock, CacheOO& cache)
-{
-    if (cache.getTotalNegocios() == 0)
-    {
-        std::cout << "\nCargando negocios del servidor...\n";
-        cargarNegocios(sock, cache);
-    }
-}
-
 static void mostrarTodos(SocketClient& sock, CacheOO& cache)
 {
-    asegurarCacheCargada(sock, cache);
+    std::cout << "\nCargando negocios del servidor...\n";
+    cargarNegocios(sock, cache);
 
     if (cache.getTotalNegocios() == 0)
     {
@@ -88,7 +81,8 @@ static void mostrarTodos(SocketClient& sock, CacheOO& cache)
 
 static void mostrarPorTipo(SocketClient& sock, CacheOO& cache, TipoNegocio tipo)
 {
-    asegurarCacheCargada(sock, cache);
+    std::cout << "\nCargando negocios del servidor...\n";
+    cargarNegocios(sock, cache);
 
     if (cache.getTotalNegocios() == 0)
     {
@@ -98,28 +92,36 @@ static void mostrarPorTipo(SocketClient& sock, CacheOO& cache, TipoNegocio tipo)
     {
         std::cout << "\n--- Mostrando negocios del tipo: " << tipoAString(tipo) << " ---\n";
 
+        // 1. Obtenemos la lista completa de la cache usando el nuevo método público
         const std::vector<NegocioOO*>& todosLosNegocios = cache.getNegocios();
-        bool encontrado = false;
 
-        // Optimizacion: Filtramos e imprimimos en un solo bucle, sin crear vectores temporales
-        for (int i = 0; i < todosLosNegocios.size(); i++)
-        {
-            if (tipo == todosLosNegocios[i]->getTipoEnum())
-            {
-                todosLosNegocios[i]->mostrar();
-                encontrado = true;
-            }
+        // 2. Creamos un vector temporal para guardar los elementos filtrados
+        std::vector<NegocioOO*> negociosFiltrados;
+
+        for(int i = 0; i < todosLosNegocios.size(); i++){
+        	if(tipo == todosLosNegocios[i]->getTipoEnum()){
+        		negociosFiltrados.push_back(todosLosNegocios[i]);
+        	}
         }
 
-        if (!encontrado)
+        // 4. Recorremos e imprimimos el resultado de tu filtrado algorítmico
+        if (negociosFiltrados.empty())
         {
             std::cout << "No se encontraron negocios del tipo \"" << tipoAString(tipo) << "\".\n";
+        }
+        else
+        {
+            for (NegocioOO* negocio : negociosFiltrados)
+            {
+                negocio->mostrar(); // Llama al método mostrar de cada objeto individual
+            }
         }
     }
 
     std::cout << "\nPulsa Enter para volver...\n";
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
+
 
 /* ── Logica principal ────────────────────────────────────────────────────── */
 

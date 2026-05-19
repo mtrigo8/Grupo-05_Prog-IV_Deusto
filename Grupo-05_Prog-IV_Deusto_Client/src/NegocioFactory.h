@@ -1,3 +1,4 @@
+
 #ifndef NEGOCIOFACTORY_H_
 #define NEGOCIOFACTORY_H_
 

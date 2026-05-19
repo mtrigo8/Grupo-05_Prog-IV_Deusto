@@ -240,6 +240,8 @@ struct ParsedServicio
     std::string horaCierre;
     std::string dias;
     std::string tipo;
+    int         capacidad;    /* capacidad_maxima de la BD                     */
+    std::string descripcion;  /* campo especial: tipoCocina / descripcion / -  */
 };
 
 /* Resultado de parseReserva (una linea de la lista) */
@@ -315,7 +317,8 @@ inline ParsedAuth parseRegister(const std::string& respuesta)
 inline ParsedServicio parseServicio(const std::string& linea)
 {
     ParsedServicio s;
-    s.id = 0;
+    s.id        = 0;
+    s.capacidad = 0;
 
     std::vector<std::string> campos = splitSEP(linea);
 
@@ -335,6 +338,10 @@ inline ParsedServicio parseServicio(const std::string& linea)
         }
     }
 
+    /* Protocolo con id:
+     *  [0]id | [1]nombre | [2]municipio | [3]horaApertura | [4]horaCierre
+     *  [5]dias | [6]tipo | [7]capacidad | [8]descripcion
+     */
     if (tieneId && campos.size() >= 7)
     {
         s.id           = std::stoi(campos[0]);
@@ -344,6 +351,8 @@ inline ParsedServicio parseServicio(const std::string& linea)
         s.horaCierre   = campos[4];
         s.dias         = campos[5];
         s.tipo         = campos[6];
+        if (campos.size() >= 8) { s.capacidad   = std::stoi(campos[7]); }
+        if (campos.size() >= 9) { s.descripcion = campos[8];             }
     }
     else if (!tieneId && campos.size() >= 6)
     {
@@ -353,6 +362,8 @@ inline ParsedServicio parseServicio(const std::string& linea)
         s.horaCierre   = campos[3];
         s.dias         = campos[4];
         s.tipo         = campos[5];
+        if (campos.size() >= 7) { s.capacidad   = std::stoi(campos[6]); }
+        if (campos.size() >= 8) { s.descripcion = campos[7];             }
     }
 
     return s;

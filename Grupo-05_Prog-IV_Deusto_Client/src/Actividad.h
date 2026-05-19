@@ -1,3 +1,4 @@
+
 #ifndef ACTIVIDAD_H_
 #define ACTIVIDAD_H_
 
@@ -15,9 +16,8 @@ public:
               const std::string& horaApertura,
               const std::string& horaCierre,
               int                capacidad,
-              int                plazasOcupadas = 0,
               const std::string& dias = "",
-              const std::string& descripcion = ""); // Añadida descripcion
+              int                plazasOcupadas = 0);
 
     /* ── Destructor ──────────────────────────────────────────────────────── */
     ~Actividad() override;
@@ -28,17 +28,18 @@ public:
     std::string getTipo() const override;
 
     /* ── Getters propios ─────────────────────────────────────────────────── */
-    const std::string& getDias()        const;
-    const std::string& getDescripcion() const;
+    const std::string& getDias()          const;
+    int                getPlazasOcupadas() const;
+    int                getPlazasLibres()   const;   /* capacidad - ocupadas */
 
     /* ── Setters propios ─────────────────────────────────────────────────── */
     void setDias(const std::string& dias);
-    void setDescripcion(const std::string& descripcion);
+    void setPlazasOcupadas(int plazasOcupadas);
 
 private:
 
     std::string _dias;
-    std::string _descripcion; // Sustituye a _plazasOcupadas
+    int         _plazasOcupadas;
 };
 
 #endif /* ACTIVIDAD_H_ */

@@ -6,7 +6,7 @@
 #pragma comment(lib, "ws2_32.lib")
 
 /* Tamaño del buffer de recepción */
-static const int BUFFER_SIZE = 1025;
+static const int BUFFER_SIZE = 4096;
 
 /* ── Constructor ── */
 SocketClient::SocketClient()
