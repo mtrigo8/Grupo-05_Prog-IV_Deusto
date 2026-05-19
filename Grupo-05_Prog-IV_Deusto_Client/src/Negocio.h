@@ -8,6 +8,7 @@
 #define NEGOCIO_H_
 
 #include <string>
+#include <cctype>    /* tolower */
 
 enum TipoNegocio
 {
@@ -19,9 +20,17 @@ enum TipoNegocio
 
 inline TipoNegocio tipoDesdeString(const std::string& tipo)
 {
-    if (tipo == "restaurante") { return TIPO_RESTAURANTE; }
-    if (tipo == "servicio")    { return TIPO_SERVICIO;    }
-    if (tipo == "actividad")   { return TIPO_ACTIVIDAD;   }
+    /* Convertir a minusculas para que funcione tanto si el servidor
+     * envia "Restaurante" como "restaurante" o "RESTAURANTE" */
+    std::string lower = tipo;
+    for (size_t i = 0; i < lower.size(); i++)
+    {
+        lower[i] = static_cast<char>(tolower(static_cast<unsigned char>(lower[i])));
+    }
+
+    if (lower == "restaurante") { return TIPO_RESTAURANTE; }
+    if (lower == "servicio")    { return TIPO_SERVICIO;    }
+    if (lower == "actividad")   { return TIPO_ACTIVIDAD;   }
     return TIPO_DESCONOCIDO;
 }
 

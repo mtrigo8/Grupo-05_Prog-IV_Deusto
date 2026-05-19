@@ -63,11 +63,8 @@ static void cargarNegocios(SocketClient& sock, CacheOO& cache)
 
 static void mostrarTodos(SocketClient& sock, CacheOO& cache)
 {
-    if (cache.getTotalNegocios() == 0)
-    {
-        std::cout << "\nCargando negocios del servidor...\n";
-        cargarNegocios(sock, cache);
-    }
+    std::cout << "\nCargando negocios del servidor...\n";
+    cargarNegocios(sock, cache);
 
     if (cache.getTotalNegocios() == 0)
     {
@@ -82,14 +79,10 @@ static void mostrarTodos(SocketClient& sock, CacheOO& cache)
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
-static void mostrarPorTipo(SocketClient& sock, CacheOO& cache, const std::string& tipo)
+static void mostrarPorTipo(SocketClient& sock, CacheOO& cache, TipoNegocio tipo)
 {
-    // Aseguramos que los negocios estén cargados desde el servidor
-    if (cache.getTotalNegocios() == 0)
-    {
-        std::cout << "\nCargando negocios del servidor...\n";
-        cargarNegocios(sock, cache);
-    }
+    std::cout << "\nCargando negocios del servidor...\n";
+    cargarNegocios(sock, cache);
 
     if (cache.getTotalNegocios() == 0)
     {
@@ -97,7 +90,7 @@ static void mostrarPorTipo(SocketClient& sock, CacheOO& cache, const std::string
     }
     else
     {
-        std::cout << "\n--- Mostrando negocios del tipo: " << tipo << " ---\n";
+        std::cout << "\n--- Mostrando negocios del tipo: " << tipoAString(tipo) << " ---\n";
 
         // 1. Obtenemos la lista completa de la cache usando el nuevo método público
         const std::vector<NegocioOO*>& todosLosNegocios = cache.getNegocios();
@@ -105,17 +98,16 @@ static void mostrarPorTipo(SocketClient& sock, CacheOO& cache, const std::string
         // 2. Creamos un vector temporal para guardar los elementos filtrados
         std::vector<NegocioOO*> negociosFiltrados;
 
-        // 3. Utilizamos std::copy_if para filtrar dinámicamente con una función lambda
-        std::copy_if(todosLosNegocios.begin(), todosLosNegocios.end(),
-                     std::back_inserter(negociosFiltrados),
-                     [&tipo](NegocioOO* negocio) {
-                         return negocio->getTipo() == tipo;
-                     });
+        for(int i = 0; i < todosLosNegocios.size(); i++){
+        	if(tipo == todosLosNegocios[i]->getTipoEnum()){
+        		negociosFiltrados.push_back(todosLosNegocios[i]);
+        	}
+        }
 
         // 4. Recorremos e imprimimos el resultado de tu filtrado algorítmico
         if (negociosFiltrados.empty())
         {
-            std::cout << "No se encontraron negocios del tipo \"" << tipo << "\".\n";
+            std::cout << "No se encontraron negocios del tipo \"" << tipoAString(tipo) << "\".\n";
         }
         else
         {
@@ -156,13 +148,13 @@ void gestionMenuNegocios(SocketClient& sock, CacheOO& cache)
         switch (opcion)
         {
             case 1:
-                mostrarPorTipo(sock, cache, "actividad");
+                mostrarPorTipo(sock, cache, TIPO_ACTIVIDAD);
                 break;
             case 2:
-                mostrarPorTipo(sock, cache, "restaurante");
+                mostrarPorTipo(sock, cache, TIPO_RESTAURANTE);
                 break;
             case 3:
-                mostrarPorTipo(sock, cache, "servicio");
+                mostrarPorTipo(sock, cache, TIPO_SERVICIO);
                 break;
             case 4:
                 mostrarTodos(sock, cache);

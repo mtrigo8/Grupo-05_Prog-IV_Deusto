@@ -16,32 +16,6 @@ static void svc_send(SOCKET sock, const char *msg)
     send(sock, buf, sizeof(buf), 0);
 }
 
-static void svc_format_negocio(const Negocio *n, char *out, size_t out_size)
-{
-    char dias_str[128] = {0};
-    convertirIntDias(n->fecha, dias_str);
-
-    const char *nombre        = "";
-    const char *municipio     = "";
-    const char *hora_apertura = "";
-    const char *hora_cierre   = "";
-    const char *tipo          = "";
-
-    if (n->nombre        != NULL) { nombre        = n->nombre;        }
-    if (n->municipio     != NULL) { municipio     = n->municipio;     }
-    if (n->hora_apertura != NULL) { hora_apertura = n->hora_apertura; }
-    if (n->hora_cierre   != NULL) { hora_cierre   = n->hora_cierre;   }
-    if (n->tipo          != NULL) { tipo          = n->tipo;          }
-
-    snprintf(out, out_size, "%s%s%s%s%s%s%s%s%s%s%s",
-             nombre,        SEP,
-             municipio,     SEP,
-             hora_apertura, SEP,
-             hora_cierre,   SEP,
-             dias_str,      SEP,
-             tipo);
-}
-
 static void svc_format_negocio_con_id(long long id, const Negocio *n,
                                       char *out, size_t out_size)
 {
@@ -72,8 +46,8 @@ static void svc_format_negocio_con_id(long long id, const Negocio *n,
 
 static long long svc_fill_negocio_from_stmt(sqlite3_stmt *stmt, Negocio *n)
 {
-    long long rowid  = sqlite3_column_int64(stmt, 0);
-    const char *val  = NULL;
+    long long rowid = sqlite3_column_int64(stmt, 0);
+    const char *val = NULL;
 
     val = (const char *)sqlite3_column_text(stmt, 1);
     if (val != NULL) { n->nombre        = strdup(val); }
@@ -100,10 +74,22 @@ static long long svc_fill_negocio_from_stmt(sqlite3_stmt *stmt, Negocio *n)
     return rowid;
 }
 
+/*
+ * BUG FIX: la implementacion original llamaba a get_negocios() que hace
+ * "SELECT nombre_servicio, municipio, ..." SIN el rowid, y luego formateaba
+ * cada negocio con svc_format_negocio() (sin id).
+ *
+ * El cliente necesita el id del servicio para poder crear reservas.
+ * Sin el id el cliente guardaba idServicio=0 en todos los negocios
+ * y las reservas fallaban con ERR|SIN_CUPOS porque el servicio con
+ * id=0 no existe en la BD.
+ *
+ * Fix: hacer la query directamente con rowid, igual que
+ * handler_servicios_filter, y formatear con svc_format_negocio_con_id.
+ */
 void handler_servicios_get_all(SOCKET comm_socket, sqlite3 *db,
                                const char *params)
 {
-    //Parsear tipo
     char tipo_filtro[64] = {0};
     strncpy(tipo_filtro, params, sizeof(tipo_filtro) - 1);
 
@@ -120,57 +106,61 @@ void handler_servicios_get_all(SOCKET comm_socket, sqlite3 *db,
         filtrar_tipo = 1;
     }
 
-    //Obtener todos los negocios de la BD
-    int total = 0;
-    Negocio *lista = get_negocios(db, &total);
-
-    if (lista == NULL && total == 0)
+    /* Query con rowid para que el cliente pueda identificar cada servicio */
+    char sql[512];
+    if (filtrar_tipo)
     {
-        svc_send(comm_socket, RES_LIST_START);
-        svc_send(comm_socket, RES_LIST_END);
-        server_log("INFO", "GET_SERVICIOS: lista vacia");
-        printf("Response sent: LIST (0 elementos)\n");
-        fflush(stdout);
-        return;
+        snprintf(sql, sizeof(sql),
+            "SELECT rowid, nombre_servicio, municipio, hora_apertura, hora_cierre, "
+            "       fecha, tipo_servicio "
+            "FROM servicio "
+            "WHERE tipo_servicio = ?");
+    }
+    else
+    {
+        snprintf(sql, sizeof(sql),
+            "SELECT rowid, nombre_servicio, municipio, hora_apertura, hora_cierre, "
+            "       fecha, tipo_servicio "
+            "FROM servicio");
     }
 
-    if (lista == NULL)
+    sqlite3_stmt *stmt = NULL;
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
     {
-        server_log("ERROR", "GET_SERVICIOS: fallo en get_negocios()");
+        server_log("ERROR", "GET_SERVICIOS: fallo al preparar SELECT");
         svc_send(comm_socket, RES_ERR_GENERICO);
         printf("Response sent: %s\n", RES_ERR_GENERICO);
         fflush(stdout);
         return;
     }
 
-    //Enviar lista con el protocolo LIST_START ... LIST_END
+    if (filtrar_tipo)
+    {
+        sqlite3_bind_text(stmt, 1, tipo_filtro, -1, SQLITE_TRANSIENT);
+    }
+
     svc_send(comm_socket, RES_LIST_START);
 
     int enviados = 0;
     char linea[BUFF_SIZE];
 
-    for (int i = 0; i < total; i++)
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        if (filtrar_tipo)
-        {
-            if (lista[i].tipo == NULL || strcmp(lista[i].tipo, tipo_filtro) != 0)
-            {
-                negocio_free(&lista[i]);
-                continue;
-            }
-        }
+        Negocio n;
+        memset(&n, 0, sizeof(Negocio));
 
-        svc_format_negocio(&lista[i], linea, sizeof(linea));
+        long long rowid = svc_fill_negocio_from_stmt(stmt, &n);
+
+        svc_format_negocio_con_id(rowid, &n, linea, sizeof(linea));
         svc_send(comm_socket, linea);
         enviados++;
 
-        negocio_free(&lista[i]);
+        negocio_free(&n);
     }
-    free(lista);
 
+    sqlite3_finalize(stmt);
     svc_send(comm_socket, RES_LIST_END);
 
-    // Log
     char msg[128];
     if (filtrar_tipo)
     {
@@ -192,7 +182,6 @@ void handler_servicios_get_all(SOCKET comm_socket, sqlite3 *db,
 void handler_servicios_get_one(SOCKET comm_socket, sqlite3 *db,
                                const char *params)
 {
-    //Parsear id_servicio
     char id_str[32] = {0};
     strncpy(id_str, params, sizeof(id_str) - 1);
 
@@ -213,7 +202,6 @@ void handler_servicios_get_one(SOCKET comm_socket, sqlite3 *db,
         return;
     }
 
-    //2. Query directa por rowid
     sqlite3_stmt *stmt = NULL;
     const char sql[] =
         "SELECT rowid, nombre_servicio, municipio, hora_apertura, hora_cierre, "
@@ -243,20 +231,17 @@ void handler_servicios_get_one(SOCKET comm_socket, sqlite3 *db,
         return;
     }
 
-    //Rellenar Negocio desde la fila
     Negocio n;
     memset(&n, 0, sizeof(Negocio));
     long long rowid = svc_fill_negocio_from_stmt(stmt, &n);
     sqlite3_finalize(stmt);
 
-    //Enviar lista de un solo elemento
     char linea[BUFF_SIZE];
     svc_send(comm_socket, RES_LIST_START);
     svc_format_negocio_con_id(rowid, &n, linea, sizeof(linea));
     svc_send(comm_socket, linea);
     svc_send(comm_socket, RES_LIST_END);
 
-    //Log y limpieza
     char msg[128];
     if (n.nombre != NULL)
     {
@@ -278,7 +263,6 @@ void handler_servicios_get_one(SOCKET comm_socket, sqlite3 *db,
 void handler_servicios_filter(SOCKET comm_socket, sqlite3 *db,
                               const char *params)
 {
-    // Parsear tipo|fecha_mascara
     char buf[BUFF_SIZE];
     strncpy(buf, params, sizeof(buf) - 1);
     buf[sizeof(buf) - 1] = '\0';
@@ -303,7 +287,6 @@ void handler_servicios_filter(SOCKET comm_socket, sqlite3 *db,
         filtrar_fecha = 1;
     }
 
-    // Construir query dinamica
     char sql[512];
     int  offset = 0;
 
@@ -346,7 +329,6 @@ void handler_servicios_filter(SOCKET comm_socket, sqlite3 *db,
         bind_idx++;
     }
 
-    // Enviar resultados en formato LIST_START ... LIST_END
     svc_send(comm_socket, RES_LIST_START);
 
     int enviados = 0;
@@ -369,7 +351,6 @@ void handler_servicios_filter(SOCKET comm_socket, sqlite3 *db,
     sqlite3_finalize(stmt);
     svc_send(comm_socket, RES_LIST_END);
 
-    // Log
     char dias_str[128] = {0};
     if (filtrar_fecha)
     {

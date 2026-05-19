@@ -96,7 +96,7 @@ void CacheOO::mostrarNegocios() const
 }
 
 
-std::vector<NegocioOO*>& CacheOO::getNegocios() const {
+std::vector<NegocioOO*>& CacheOO::getNegocios() {
 	    return _negocios;
 }
 
