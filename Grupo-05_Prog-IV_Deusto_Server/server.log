@@ -1,0 +1,95 @@
+[2026-05-19 09:52:39] [INFO ] Cargando configuracion...
+[2026-05-19 09:52:39] [ERROR] No se pudo abrir la base de datos
+[2026-05-19 09:54:22] [INFO ] Cargando configuracion...
+[2026-05-19 09:54:22] [INFO ] Servidor arrancado en 127.0.0.1:6000
+[2026-05-19 09:54:29] [INFO ] Cliente conectado
+[2026-05-19 09:54:29] [INFO ] GET_SERVICIOS: 51 servicios enviados (todos los tipos)
+[2026-05-19 09:54:29] [INFO ] GET_SERVICIOS procesado
+[2026-05-19 09:54:29] [INFO ] Conexion cerrada por el cliente o error de red
+[2026-05-19 09:54:29] [INFO ] Servidor cerrado correctamente
+[2026-05-19 09:55:07] [INFO ] Cargando configuracion...
+[2026-05-19 09:55:07] [INFO ] Servidor arrancado en 127.0.0.1:6000
+[2026-05-19 09:55:12] [INFO ] Cliente conectado
+[2026-05-19 09:57:27] [INFO ] Cargando configuracion...
+[2026-05-19 09:57:27] [INFO ] Servidor arrancado en 127.0.0.1:6000
+[2026-05-19 09:57:32] [INFO ] Cliente conectado
+[2026-05-19 09:58:13] [INFO ] REGISTER exitoso: id=16 nombre=Markel DNI=22761560R
+[2026-05-19 09:58:13] [INFO ] REGISTER procesado
+[2026-05-19 09:58:31] [INFO ] LOGIN exitoso: id=1 nombre=Markel DNI=22761560R
+[2026-05-19 09:58:31] [INFO ] LOGIN procesado
+[2026-05-19 09:58:36] [INFO ] GET_SERVICIOS: 51 servicios enviados (todos los tipos)
+[2026-05-19 09:58:36] [INFO ] GET_SERVICIOS procesado
+[2026-05-19 10:00:05] [INFO ] Conexion cerrada por el cliente o error de red
+[2026-05-19 10:00:05] [INFO ] Servidor cerrado correctamente
+[2026-05-19 10:00:05] [INFO ] Conexion cerrada por el cliente o error de red
+[2026-05-19 10:00:05] [INFO ] Servidor cerrado correctamente
+[2026-05-19 10:11:45] [INFO ] Cargando configuracion...
+[2026-05-19 10:11:45] [INFO ] Servidor arrancado en 127.0.0.1:6000
+[2026-05-19 10:11:50] [INFO ] Cliente conectado
+[2026-05-19 10:12:03] [INFO ] LOGIN exitoso: id=1 nombre=Markel DNI=22761560R
+[2026-05-19 10:12:03] [INFO ] LOGIN procesado
+[2026-05-19 10:12:11] [INFO ] GET_SERVICIOS: 51 servicios enviados (todos los tipos)
+[2026-05-19 10:12:11] [INFO ] GET_SERVICIOS procesado
+[2026-05-19 10:28:39] [INFO ] Cargando configuracion...
+[2026-05-19 10:28:39] [INFO ] Servidor arrancado en 127.0.0.1:6000
+[2026-05-19 10:30:25] [INFO ] Cargando configuracion...
+[2026-05-19 10:30:25] [INFO ] Servidor arrancado en 127.0.0.1:6000
+[2026-05-19 10:30:30] [INFO ] Cliente conectado
+[2026-05-19 10:30:39] [INFO ] Conexion cerrada por el cliente o error de red
+[2026-05-19 10:30:39] [INFO ] Servidor cerrado correctamente
+[2026-05-19 10:30:46] [INFO ] Cargando configuracion...
+[2026-05-19 10:30:46] [INFO ] Servidor arrancado en 127.0.0.1:6000
+[2026-05-19 10:30:51] [INFO ] Cliente conectado
+[2026-05-19 10:33:16] [INFO ] Conexion cerrada por el cliente o error de red
+[2026-05-19 10:33:16] [INFO ] Servidor cerrado correctamente
+[2026-05-19 10:33:47] [INFO ] Cargando configuracion...
+[2026-05-19 10:33:47] [INFO ] Servidor arrancado en 127.0.0.1:6000
+[2026-05-19 10:33:52] [INFO ] Cargando configuracion...
+[2026-05-19 10:33:52] [ERROR] Fallo al inicializar el socket
+[2026-05-19 10:34:00] [INFO ] Cargando configuracion...
+[2026-05-19 10:34:00] [INFO ] Servidor arrancado en 127.0.0.1:6000
+[2026-05-19 10:34:07] [INFO ] Cargando configuracion...
+[2026-05-19 10:34:07] [INFO ] Servidor arrancado en 127.0.0.1:6000
+[2026-05-19 10:34:07] [INFO ] Cargando configuracion...
+[2026-05-19 10:34:07] [ERROR] Fallo al inicializar el socket
+[2026-05-19 10:34:07] [INFO ] Cargando configuracion...
+[2026-05-19 10:34:07] [ERROR] Fallo al inicializar el socket
+[2026-05-19 10:34:07] [INFO ] Cargando configuracion...
+[2026-05-19 10:34:07] [INFO ] Cargando configuracion...
+[2026-05-19 10:34:07] [INFO ] Cargando configuracion...
+[2026-05-19 10:34:07] [ERROR] Fallo al inicializar el socket
+[2026-05-19 10:34:07] [ERROR] Fallo al inicializar el socket
+[2026-05-19 10:34:07] [ERROR] Fallo al inicializar el socket
+[2026-05-19 10:35:02] [INFO ] Cargando configuracion...
+[2026-05-19 10:35:02] [INFO ] Servidor arrancado en 127.0.0.1:6000
+[2026-05-19 10:35:07] [INFO ] Cargando configuracion...
+[2026-05-19 10:35:07] [ERROR] Fallo al inicializar el socket
+[2026-05-19 10:37:53] [INFO ] Cargando configuracion...
+[2026-05-19 10:37:53] [INFO ] Servidor arrancado en 127.0.0.1:6000
+[2026-05-19 10:38:18] [INFO ] Cargando configuracion...
+[2026-05-19 10:38:18] [ERROR] Fallo al inicializar el socket
+[2026-05-19 10:38:29] [INFO ] Cargando configuracion...
+[2026-05-19 10:38:29] [ERROR] Fallo al inicializar el socket
+[2026-05-19 10:38:50] [INFO ] Cargando configuracion...
+[2026-05-19 10:38:50] [INFO ] Servidor arrancado en 127.0.0.1:6000
+[2026-05-19 10:39:07] [INFO ] Cliente conectado
+[2026-05-19 10:56:29] [INFO ] LOGIN exitoso: id=1 nombre=Markel DNI=22761560R
+[2026-05-19 10:56:29] [INFO ] LOGIN procesado
+[2026-05-19 10:56:33] [INFO ] GET_SERVICIOS: 50 servicios enviados (todos los tipos)
+[2026-05-19 10:56:33] [INFO ] GET_SERVICIOS procesado
+[2026-05-19 11:16:05] [INFO ] Conexion cerrada por el cliente o error de red
+[2026-05-19 11:16:05] [INFO ] Servidor cerrado correctamente
+[2026-05-19 11:18:17] [INFO ] Cargando configuracion...
+[2026-05-19 11:18:17] [INFO ] Servidor arrancado en 127.0.0.1:6000
+[2026-05-19 11:18:24] [INFO ] Cargando configuracion...
+[2026-05-19 11:18:24] [ERROR] Fallo al inicializar el socket
+[2026-05-19 11:18:42] [INFO ] Cliente conectado
+[2026-05-19 11:18:55] [INFO ] LOGIN exitoso: id=1 nombre=Markel DNI=22761560R
+[2026-05-19 11:18:55] [INFO ] LOGIN procesado
+[2026-05-19 11:18:59] [INFO ] GET_SERVICIOS: 50 servicios enviados (todos los tipos)
+[2026-05-19 11:18:59] [INFO ] GET_SERVICIOS procesado
+[2026-05-19 11:21:12] [INFO ] GET_RESERVA procesado
+[2026-05-19 11:21:24] [INFO ] LOGOUT: sesion cerrada para id_usuario=1
+[2026-05-19 11:21:24] [INFO ] LOGOUT procesado
+[2026-05-19 11:21:28] [INFO ] Conexion cerrada por el cliente o error de red
+[2026-05-19 11:21:28] [INFO ] Servidor cerrado correctamente

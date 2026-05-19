@@ -89,7 +89,8 @@ void NegocioOO::setHoraCierre(const std::string& horaCierre)
 void NegocioOO::mostrarComun() const
 {
     std::cout << "-------------------------\n"
-              << "[" << getTipo() << "] " << _nombre << "\n"
+              << "[" << getTipo() << "] " << _nombre
+              << "  (ID: " << _id << ")\n"
               << "Municipio  : " << _municipio    << "\n"
               << "Horario    : " << _horaApertura << " - " << _horaCierre << "\n"
               << "Capacidad  : " << _capacidad    << " plazas\n"

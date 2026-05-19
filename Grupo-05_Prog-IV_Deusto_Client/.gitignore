@@ -10,10 +10,6 @@
 *.out
 *.d
 
-# ─── Archivos de runtime (distintos en cada maquina) ─────────────────────────
-# client.config → configuracion local (usa client.config.example como plantilla)
-*.log
-client.config
 
 # ─── Eclipse: archivos generados por maquina (contienen rutas absolutas) ─────
 .settings/language.settings.xml

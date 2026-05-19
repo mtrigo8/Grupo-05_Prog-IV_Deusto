@@ -13,11 +13,47 @@
 #include "handler_servicios.h"
 #include "handler_reservas.h"
 
-int main(void)
+static void mostrarUsoServidor(const char* nombre)
 {
+    printf("Uso: %s [ip] [puerto]\n\n"
+           "  ip      IP en la que escucha el servidor (sobreescribe server.config)\n"
+           "  puerto  Puerto TCP del servidor           (sobreescribe server.config)\n\n"
+           "Ejemplos:\n"
+           "  %s\n"
+           "  %s 0.0.0.0\n"
+           "  %s 0.0.0.0 8080\n",
+           nombre, nombre, nombre, nombre);
+}
+
+int main(int argc, char* argv[])
+{
+    /* ── Ayuda ────────────────────────────────────────────────────────── */
+    if (argc >= 2 &&
+        (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0))
+    {
+        mostrarUsoServidor(argv[0]);
+        return 0;
+    }
+
     /* ── Cargar configuración ─────────────────────────────────────────── */
     Config cfg;
     config_cargar(&cfg);
+
+    /* Los argumentos de línea de comandos tienen prioridad sobre el config */
+    if (argc >= 2) {
+        strncpy(cfg.server_ip, argv[1], sizeof(cfg.server_ip) - 1);
+        cfg.server_ip[sizeof(cfg.server_ip) - 1] = '\0';
+    }
+    if (argc >= 3) {
+        int puerto = atoi(argv[2]);
+        if (puerto > 0 && puerto <= 65535) {
+            cfg.server_port = puerto;
+        } else {
+            fprintf(stderr, "Error: puerto invalido '%s'.\n", argv[2]);
+            mostrarUsoServidor(argv[0]);
+            return 1;
+        }
+    }
 
     /* ── Inicializar log de servidor ─────────────────────────────────── */
     server_log_init(cfg.server_log_path);

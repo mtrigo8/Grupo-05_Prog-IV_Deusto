@@ -7,167 +7,68 @@
 #include <iostream>
 #include <string>
 #include <cstring>
+#include <cstdlib>
 
-/* ── Configuracion del servidor ─────────────────────────────────────────── */
+/* ── Configuracion por defecto ──────────────────────────────────────────── */
 
-static const char* SERVER_IP   = "127.0.0.1";
-static const int   SERVER_PORT = 6000;
+static const char* DEFAULT_IP   = "127.0.0.1";
+static const int   DEFAULT_PORT = 8080;
 
-/* ── Modo test ───────────────────────────────────────────────────────────── */
+/* ── Uso ────────────────────────────────────────────────────────────────── */
 
-
-static int runTestMode(const std::string& ip, int puerto)
+static void mostrarUso(const char* nombreEjecutable)
 {
-    std::cout << "========================================\n"
-              << "  CityHub Client -- MODO TEST\n"
-              << "========================================\n"
-              << "Servidor: " << ip << ":" << puerto << "\n\n";
-
-    int  passed = 0;
-    int  failed = 0;
-    bool ok;
-
-    SocketClient sock;
-
-    /* ── Test 1: Conexion TCP ─────────────────────────────────────────── */
-
-    std::cout << "[TEST 1] Conexion TCP... ";
-
-    ok = sock.conectar(ip, puerto);
-
-    if (ok)
-    {
-        std::cout << "OK\n";
-        passed++;
-    }
-    else
-    {
-        std::cout << "FALLO\n"
-                  << "  -> No se pudo conectar. Comprueba que el servidor este activo.\n";
-        failed++;
-        goto resultado;   /* Sin conexion no tiene sentido seguir */
-    }
-
-    /* ── Test 2: PING / PONG ─────────────────────────────────────────── */
-
-    std::cout << "[TEST 2] PING -> PONG... ";
-
-    ok = sock.enviar(CMD_PING);
-
-    if (!ok)
-    {
-        std::cout << "FALLO (envio fallido)\n";
-        failed++;
-        goto desconectar;
-    }
-
-    {
-        std::string respPing = sock.recibir();
-
-        if (respPing == RES_PONG)
-        {
-            std::cout << "OK\n";
-            passed++;
-        }
-        else
-        {
-            std::cout << "FALLO\n"
-                      << "  -> Respuesta recibida: \"" << respPing << "\"\n"
-                      << "  -> Se esperaba:        \"" << RES_PONG << "\"\n";
-            failed++;
-        }
-    }
-
-    /* ── Test 3: GET_SERVICIOS (protocolo de lista) ───────────────────── */
-
-    std::cout << "[TEST 3] GET_SERVICIOS (protocolo lista)... ";
-
-    ok = sock.enviar(CMD_GET_SERVICIOS) && sock.enviar(buildGetServicios());
-
-    if (!ok)
-    {
-        std::cout << "FALLO (envio fallido)\n";
-        failed++;
-        goto desconectar;
-    }
-
-    {
-        std::vector<std::string> lineas = recibirLista(sock);
-
-        /* La respuesta valida empieza con LIST_START y termina con LIST_END */
-        bool listaOk = !lineas.empty()
-                       && lineas.front() == RES_LIST_START
-                       && lineas.back()  == RES_LIST_END;
-
-        if (listaOk)
-        {
-            int nServicios = (int)lineas.size() - 2;   /* sin START ni END */
-            std::cout << "OK (" << nServicios << " servicio(s) recibido(s))\n";
-            passed++;
-        }
-        else if (lineas.size() == 1 && esError(lineas[0]))
-        {
-            /* El servidor devolvio un ERR: no es un fallo del cliente */
-            std::cout << "OK (servidor respondio ERR: " << lineas[0] << ")\n";
-            passed++;
-        }
-        else
-        {
-            std::cout << "FALLO\n"
-                      << "  -> Respuesta inesperada: \""
-                      << (lineas.empty() ? "<vacio>" : lineas[0]) << "\"\n";
-            failed++;
-        }
-    }
-
-desconectar:
-    sock.desconectar();
-
-resultado:
-    std::cout << "\n----------------------------------------\n"
-              << "  Resultado: " << passed << " OK  |  " << failed << " FALLO(S)\n"
-              << "----------------------------------------\n";
-
-    return (failed == 0) ? 0 : 1;
+    std::cout << "Uso: " << nombreEjecutable
+              << " [ip_servidor] [puerto]\n\n"
+              << "  ip_servidor  IP del servidor CityHub (por defecto: "
+              << DEFAULT_IP   << ")\n"
+              << "  puerto       Puerto TCP del servidor  (por defecto: "
+              << DEFAULT_PORT << ")\n\n"
+              << "Ejemplos:\n"
+              << "  " << nombreEjecutable << "\n"
+              << "  " << nombreEjecutable << " 192.168.1.10\n"
+              << "  " << nombreEjecutable << " 192.168.1.10 8080\n";
 }
 
 /* ── main ───────────────────────────────────────────────────────────────── */
 
 int main(int argc, char* argv[])
 {
-    /* ── Detectar modo test ───────────────────────────────────────────── */
+    /* ── Parsear argumentos opcionales ───────────────────────────────── */
 
-    bool modoTest = false;
-    std::string testIp   = SERVER_IP;
-    int         testPort = SERVER_PORT;
-
-    for (int i = 1; i < argc; i++)
+    /* Aceptamos: programa [ip] [puerto]
+     * Si el primer argumento es -h o --help mostramos la ayuda. */
+    if (argc >= 2 &&
+        (std::strcmp(argv[1], "-h") == 0 ||
+         std::strcmp(argv[1], "--help") == 0))
     {
-        if (std::strcmp(argv[i], "--test") == 0)
-        {
-            modoTest = true;
-            /* Los dos argumentos opcionales siguientes son IP y puerto */
-            if (i + 1 < argc) { testIp   = argv[++i]; }
-            if (i + 1 < argc) { testPort = std::atoi(argv[++i]); }
-            break;
-        }
+        mostrarUso(argv[0]);
+        return 0;
     }
 
-    if (modoTest)
+    std::string serverIp   = DEFAULT_IP;
+    int         serverPort = DEFAULT_PORT;
+
+    if (argc >= 2) { serverIp   = argv[1]; }
+    if (argc >= 3) { serverPort = std::atoi(argv[2]); }
+
+    if (serverPort <= 0 || serverPort > 65535)
     {
-        return runTestMode(testIp, testPort);
+        std::cerr << "Error: puerto invalido '" << argv[2] << "'.\n";
+        mostrarUso(argv[0]);
+        return 1;
     }
 
-    /* ── Modo normal ─────────────────────────────────────────────────── */
+    /* ── Conectar al servidor ─────────────────────────────────────────── */
 
     SocketClient sock;
     SesionOO     sesion;
     CacheOO      cache;
 
-    std::cout << "Conectando con el servidor " << SERVER_IP
-              << ":" << SERVER_PORT << "...\n";
+    std::cout << "Conectando con el servidor " << serverIp
+              << ":" << serverPort << "...\n";
 
-    if (!sock.conectar(SERVER_IP, SERVER_PORT))
+    if (!sock.conectar(serverIp, serverPort))
     {
         std::cerr << "Error: no se pudo conectar al servidor.\n"
                   << "Comprueba que el servidor este en ejecucion y vuelve a intentarlo.\n";
@@ -176,7 +77,11 @@ int main(int argc, char* argv[])
 
     std::cout << "Conexion establecida.\n\n";
 
+    /* ── Bucle principal de la aplicacion ────────────────────────────── */
+
     gestionMenuBienvenida(sock, sesion, cache);
+
+    /* ── Limpieza ─────────────────────────────────────────────────────── */
 
     cache.limpiarTodo();
 

@@ -10,13 +10,7 @@
 *.out
 *.d
 
-# ─── Archivos de runtime (distintos en cada maquina) ─────────────────────────
-# bd.db        → se genera al ejecutar, no se comparte
-# cityhub.log  → log local de cada máquina
-# admin.config → configuracion local (usa admin.config.example como plantilla)
-bd.db
-*.log
-admin.config
+
 
 # ─── Eclipse: archivos generados por maquina (contienen rutas absolutas) ─────
 .settings/language.settings.xml
