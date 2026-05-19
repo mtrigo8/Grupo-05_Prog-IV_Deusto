@@ -1,4 +1,3 @@
-
 #include "Restaurante.h"
 
 #include <iostream>
@@ -12,20 +11,17 @@ Restaurante::Restaurante(int                id,
                          const std::string& horaApertura,
                          const std::string& horaCierre,
                          int                capacidad,
-                         const std::string& tipoCocina,
-                         const std::string& menuDelDia)
-    : NegocioOO(id, nombre, municipio, horaApertura, horaCierre, capacidad),
-      _tipoCocina(tipoCocina),
-      _menuDelDia(menuDelDia)
+                         int                plazasOcupadas,
+                         const std::string& tipoCocina)
+    : NegocioOO(id, nombre, municipio, horaApertura, horaCierre, capacidad, plazasOcupadas),
+      _tipoCocina(tipoCocina)
 {
-    /* cuerpo vacio: la lista de inicializacion asigna todos los campos */
 }
 
 /* ── Destructor ─────────────────────────────────────────────────────────── */
 
 Restaurante::~Restaurante()
 {
-    /* sin recursos dinamicos propios: cuerpo vacio */
 }
 
 /* ── Override: getTipo ──────────────────────────────────────────────────── */
@@ -39,44 +35,19 @@ std::string Restaurante::getTipo() const
 
 void Restaurante::mostrar() const
 {
-    /* Bloque comun: [restaurante] nombre / municipio / horario / capacidad */
+    /* Bloque comun: [restaurante] nombre / municipio / horario / plazas */
     mostrarComun();
 
     /* Campos propios del restaurante */
     std::cout << "Tipo cocina: " << _tipoCocina << "\n";
-
-    if (!_menuDelDia.empty())
-    {
-        std::cout << "Menu del dia: " << _menuDelDia << "\n";
-    }
-    else
-    {
-        std::cout << "Menu del dia: no disponible\n";
-    }
 
     std::cout << "-------------------------\n";
 }
 
 /* ── Getters propios ────────────────────────────────────────────────────── */
 
-const std::string& Restaurante::getTipoCocina() const
-{
-    return _tipoCocina;
-}
-
-const std::string& Restaurante::getMenuDelDia() const
-{
-    return _menuDelDia;
-}
+const std::string& Restaurante::getTipoCocina() const { return _tipoCocina; }
 
 /* ── Setters propios ────────────────────────────────────────────────────── */
 
-void Restaurante::setTipoCocina(const std::string& tipoCocina)
-{
-    _tipoCocina = tipoCocina;
-}
-
-void Restaurante::setMenuDelDia(const std::string& menuDelDia)
-{
-    _menuDelDia = menuDelDia;
-}
+void Restaurante::setTipoCocina(const std::string& tipoCocina) { _tipoCocina = tipoCocina; }

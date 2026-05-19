@@ -1,4 +1,3 @@
-
 #include "ServicioMunicipal.h"
 
 #include <iostream>
@@ -12,20 +11,19 @@ ServicioMunicipal::ServicioMunicipal(int                id,
                                      const std::string& horaApertura,
                                      const std::string& horaCierre,
                                      int                capacidad,
+                                     int                plazasOcupadas,
                                      const std::string& descripcion,
                                      const std::string& dias)
-    : NegocioOO(id, nombre, municipio, horaApertura, horaCierre, capacidad),
+    : NegocioOO(id, nombre, municipio, horaApertura, horaCierre, capacidad, plazasOcupadas),
       _descripcion(descripcion),
       _dias(dias)
 {
-    /* cuerpo vacio: la lista de inicializacion asigna todos los campos */
 }
 
 /* ── Destructor ─────────────────────────────────────────────────────────── */
 
 ServicioMunicipal::~ServicioMunicipal()
 {
-    /* sin recursos dinamicos propios: cuerpo vacio */
 }
 
 /* ── Override: getTipo ──────────────────────────────────────────────────── */
@@ -39,7 +37,7 @@ std::string ServicioMunicipal::getTipo() const
 
 void ServicioMunicipal::mostrar() const
 {
-    /* Bloque comun: [servicio] nombre / municipio / horario / capacidad */
+    /* Bloque comun: [servicio] nombre / municipio / horario / plazas */
     mostrarComun();
 
     /* Campos propios del servicio municipal */
@@ -59,24 +57,10 @@ void ServicioMunicipal::mostrar() const
 
 /* ── Getters propios ────────────────────────────────────────────────────── */
 
-const std::string& ServicioMunicipal::getDescripcion() const
-{
-    return _descripcion;
-}
-
-const std::string& ServicioMunicipal::getDias() const
-{
-    return _dias;
-}
+const std::string& ServicioMunicipal::getDescripcion() const { return _descripcion; }
+const std::string& ServicioMunicipal::getDias() const { return _dias; }
 
 /* ── Setters propios ────────────────────────────────────────────────────── */
 
-void ServicioMunicipal::setDescripcion(const std::string& descripcion)
-{
-    _descripcion = descripcion;
-}
-
-void ServicioMunicipal::setDias(const std::string& dias)
-{
-    _dias = dias;
-}
+void ServicioMunicipal::setDescripcion(const std::string& descripcion) { _descripcion = descripcion; }
+void ServicioMunicipal::setDias(const std::string& dias) { _dias = dias; }

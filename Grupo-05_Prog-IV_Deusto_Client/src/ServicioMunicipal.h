@@ -1,4 +1,3 @@
-
 #ifndef SERVICIOMUNICIPAL_H_
 #define SERVICIOMUNICIPAL_H_
 
@@ -16,6 +15,7 @@ public:
                       const std::string& horaApertura,
                       const std::string& horaCierre,
                       int                capacidad,
+                      int                plazasOcupadas,
                       const std::string& descripcion,
                       const std::string& dias = "");
 

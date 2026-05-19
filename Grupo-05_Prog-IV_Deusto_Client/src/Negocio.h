@@ -1,7 +1,7 @@
 /*
  * Negocio.h
  *
- *  Clase abstracta base NegocioOO + enum TipoNegocio.
+ * Clase abstracta base NegocioOO + enum TipoNegocio.
  */
 
 #ifndef NEGOCIO_H_
@@ -20,8 +20,6 @@ enum TipoNegocio
 
 inline TipoNegocio tipoDesdeString(const std::string& tipo)
 {
-    /* Convertir a minusculas para que funcione tanto si el servidor
-     * envia "Restaurante" como "restaurante" o "RESTAURANTE" */
     std::string lower = tipo;
     for (size_t i = 0; i < lower.size(); i++)
     {
@@ -58,7 +56,8 @@ public:
               const std::string& municipio,
               const std::string& horaApertura,
               const std::string& horaCierre,
-              int                capacidad);
+              int                capacidad,
+              int                plazasOcupadas = 0); // Añadido plazasOcupadas
 
     /* ── Destructor virtual ──────────────────────────────────────────────── */
 
@@ -73,18 +72,21 @@ public:
 
     /* ── Getters ─────────────────────────────────────────────────────────── */
 
-    int                getId()           const;
-    const std::string& getNombre()       const;
-    const std::string& getMunicipio()    const;
-    const std::string& getHoraApertura() const;
-    const std::string& getHoraCierre()   const;
-    int                getCapacidad()    const;
+    int                getId()             const;
+    const std::string& getNombre()         const;
+    const std::string& getMunicipio()      const;
+    const std::string& getHoraApertura()   const;
+    const std::string& getHoraCierre()     const;
+    int                getCapacidad()      const;
+    int                getPlazasOcupadas() const; // Movido de Actividad
+    int                getPlazasLibres()   const; // Movido de Actividad
 
     /* ── Setters ─────────────────────────────────────────────────────────── */
 
     void setCapacidad(int capacidad);
     void setHoraApertura(const std::string& horaApertura);
     void setHoraCierre(const std::string& horaCierre);
+    void setPlazasOcupadas(int plazasOcupadas);   // Movido de Actividad
 
 protected:
 
@@ -96,6 +98,7 @@ protected:
     std::string _horaApertura;
     std::string _horaCierre;
     int         _capacidad;
+    int         _plazasOcupadas; // Movido de Actividad
 
     /* ── Helper protegido ────────────────────────────────────────────────── */
 

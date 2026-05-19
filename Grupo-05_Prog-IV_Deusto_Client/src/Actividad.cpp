@@ -1,4 +1,3 @@
-
 #include "Actividad.h"
 
 #include <iostream>
@@ -12,20 +11,19 @@ Actividad::Actividad(int                id,
                      const std::string& horaApertura,
                      const std::string& horaCierre,
                      int                capacidad,
+                     int                plazasOcupadas,
                      const std::string& dias,
-                     int                plazasOcupadas)
-    : NegocioOO(id, nombre, municipio, horaApertura, horaCierre, capacidad),
+                     const std::string& descripcion)
+    : NegocioOO(id, nombre, municipio, horaApertura, horaCierre, capacidad, plazasOcupadas),
       _dias(dias),
-      _plazasOcupadas(plazasOcupadas)
+      _descripcion(descripcion)
 {
-    /* cuerpo vacio: la lista de inicializacion asigna todos los campos */
 }
 
 /* ── Destructor ─────────────────────────────────────────────────────────── */
 
 Actividad::~Actividad()
 {
-    /* sin recursos dinamicos propios: cuerpo vacio */
 }
 
 /* ── Override: getTipo ──────────────────────────────────────────────────── */
@@ -39,8 +37,18 @@ std::string Actividad::getTipo() const
 
 void Actividad::mostrar() const
 {
-    /* Bloque comun: [actividad] nombre / municipio / horario / capacidad */
+    /* Bloque comun: [actividad] nombre / municipio / horario / plazas */
     mostrarComun();
+
+    /* Descripcion de la actividad */
+    if (!_descripcion.empty())
+    {
+        std::cout << "Descripcion : " << _descripcion << "\n";
+    }
+    else
+    {
+        std::cout << "Descripcion : no especificada\n";
+    }
 
     /* Dias en que se celebra la actividad */
     if (!_dias.empty())
@@ -52,38 +60,15 @@ void Actividad::mostrar() const
         std::cout << "Dias        : no especificados\n";
     }
 
-    /* Plazas disponibles */
-    std::cout << "Plazas      : " << getPlazasLibres()
-              << " libres / " << _capacidad << " totales\n";
-
     std::cout << "-------------------------\n";
 }
 
 /* ── Getters propios ────────────────────────────────────────────────────── */
 
-const std::string& Actividad::getDias() const
-{
-    return _dias;
-}
-
-int Actividad::getPlazasOcupadas() const
-{
-    return _plazasOcupadas;
-}
-
-int Actividad::getPlazasLibres() const
-{
-    return _capacidad - _plazasOcupadas;
-}
+const std::string& Actividad::getDias() const { return _dias; }
+const std::string& Actividad::getDescripcion() const { return _descripcion; }
 
 /* ── Setters propios ────────────────────────────────────────────────────── */
 
-void Actividad::setDias(const std::string& dias)
-{
-    _dias = dias;
-}
-
-void Actividad::setPlazasOcupadas(int plazasOcupadas)
-{
-    _plazasOcupadas = plazasOcupadas;
-}
+void Actividad::setDias(const std::string& dias) { _dias = dias; }
+void Actividad::setDescripcion(const std::string& descripcion) { _descripcion = descripcion; }
