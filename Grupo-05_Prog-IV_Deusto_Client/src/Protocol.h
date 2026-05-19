@@ -335,7 +335,7 @@ inline ParsedServicio parseServicio(const std::string& linea)
         }
     }
 
-    if (tieneId)
+    if (tieneId && campos.size() >= 7)
     {
         s.id           = std::stoi(campos[0]);
         s.nombre       = campos[1];
@@ -345,7 +345,7 @@ inline ParsedServicio parseServicio(const std::string& linea)
         s.dias         = campos[5];
         s.tipo         = campos[6];
     }
-    else if (!tieneId )
+    else if (!tieneId && campos.size() >= 6)
     {
         s.nombre       = campos[0];
         s.municipio    = campos[1];
@@ -354,8 +354,6 @@ inline ParsedServicio parseServicio(const std::string& linea)
         s.dias         = campos[4];
         s.tipo         = campos[5];
     }
-
-
 
     return s;
 }
