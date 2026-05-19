@@ -72,6 +72,14 @@ int main(int argc, char* argv[])
     printf("Base de datos abierta: %s\n", cfg.db_path);
     fflush(stdout);
 
+    /* ── Migracion automatica ─────────────────────────────────────────── */
+    /* Anade la columna 'descripcion' a 'servicio' si no existia todavia.
+     * SQLite devuelve error si la columna ya existe; lo ignoramos. */
+    sqlite3_exec(db,
+        "ALTER TABLE servicio ADD COLUMN descripcion TEXT DEFAULT ''",
+        NULL, NULL, NULL);
+    server_log("INFO", "Migracion DB: columna 'descripcion' verificada");
+
     /* ── Inicializar socket ───────────────────────────────────────────── */
     SOCKET conn_socket = server_init(cfg.server_ip, cfg.server_port);
     if (conn_socket == INVALID_SOCKET) {

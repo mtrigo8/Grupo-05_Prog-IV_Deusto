@@ -181,3 +181,81 @@
 [2026-05-19 14:12:48] [INFO ] LOGIN procesado
 [2026-05-19 14:12:57] [INFO ] GET_SERVICIOS: 50 servicios enviados (todos los tipos)
 [2026-05-19 14:12:57] [INFO ] GET_SERVICIOS procesado
+[2026-05-19 22:52:13] [INFO ] Cargando configuracion...
+[2026-05-19 22:52:13] [INFO ] Servidor arrancado en 127.0.0.1:8080
+[2026-05-19 22:52:18] [INFO ] Cliente conectado
+[2026-05-19 22:52:28] [INFO ] LOGIN exitoso: id=1 nombre=Markel DNI=22761560R
+[2026-05-19 22:52:28] [INFO ] LOGIN procesado
+[2026-05-19 22:52:35] [ERROR] GET_SERVICIOS: fallo al preparar SELECT
+[2026-05-19 22:52:35] [INFO ] GET_SERVICIOS procesado
+[2026-05-19 22:53:06] [ERROR] GET_SERVICIOS: fallo al preparar SELECT
+[2026-05-19 22:53:06] [INFO ] GET_SERVICIOS procesado
+[2026-05-19 22:53:40] [INFO ] LOGOUT: sesion cerrada para id_usuario=1
+[2026-05-19 22:53:40] [INFO ] LOGOUT procesado
+[2026-05-19 22:53:40] [INFO ] Conexion cerrada por el cliente o error de red
+[2026-05-19 22:53:40] [INFO ] Servidor cerrado correctamente
+[2026-05-19 22:55:59] [INFO ] Cargando configuracion...
+[2026-05-19 22:55:59] [INFO ] Servidor arrancado en 127.0.0.1:8080
+[2026-05-19 22:56:05] [INFO ] Cliente conectado
+[2026-05-19 22:56:20] [INFO ] LOGIN exitoso: id=1 nombre=Markel DNI=22761560R
+[2026-05-19 22:56:20] [INFO ] LOGIN procesado
+[2026-05-19 22:56:24] [ERROR] GET_SERVICIOS: fallo al preparar SELECT
+[2026-05-19 22:56:24] [INFO ] GET_SERVICIOS procesado
+[2026-05-19 23:04:51] [INFO ] Cargando configuracion...
+[2026-05-19 23:04:51] [INFO ] Migracion DB: columna 'descripcion' verificada
+[2026-05-19 23:04:51] [INFO ] Servidor arrancado en 127.0.0.1:8080
+[2026-05-19 23:04:56] [INFO ] Cliente conectado
+[2026-05-19 23:05:08] [INFO ] LOGIN exitoso: id=1 nombre=Markel DNI=22761560R
+[2026-05-19 23:05:08] [INFO ] LOGIN procesado
+[2026-05-19 23:05:13] [INFO ] GET_SERVICIOS: 50 servicios enviados (todos los tipos)
+[2026-05-19 23:05:13] [INFO ] GET_SERVICIOS procesado
+[2026-05-19 23:05:29] [INFO ] GET_SERVICIOS: 50 servicios enviados (todos los tipos)
+[2026-05-19 23:05:29] [INFO ] GET_SERVICIOS procesado
+[2026-05-19 23:06:38] [INFO ] Cargando configuracion...
+[2026-05-19 23:06:38] [INFO ] Migracion DB: columna 'descripcion' verificada
+[2026-05-19 23:06:38] [INFO ] Servidor arrancado en 127.0.0.1:8080
+[2026-05-19 23:06:44] [INFO ] Cliente conectado
+[2026-05-19 23:06:59] [INFO ] LOGIN exitoso: id=1 nombre=Markel DNI=22761560R
+[2026-05-19 23:06:59] [INFO ] LOGIN procesado
+[2026-05-19 23:07:02] [INFO ] GET_SERVICIOS: 50 servicios enviados (todos los tipos)
+[2026-05-19 23:07:02] [INFO ] GET_SERVICIOS procesado
+[2026-05-19 23:09:33] [INFO ] Conexion cerrada por el cliente o error de red
+[2026-05-19 23:09:33] [INFO ] Servidor cerrado correctamente
+[2026-05-19 23:09:50] [INFO ] Cargando configuracion...
+[2026-05-19 23:09:50] [INFO ] Migracion DB: columna 'descripcion' verificada
+[2026-05-19 23:09:50] [INFO ] Servidor arrancado en 127.0.0.1:8080
+[2026-05-19 23:09:55] [INFO ] Cliente conectado
+[2026-05-19 23:10:05] [INFO ] LOGIN exitoso: id=1 nombre=Markel DNI=22761560R
+[2026-05-19 23:10:05] [INFO ] LOGIN procesado
+[2026-05-19 23:11:36] [INFO ] Cargando configuracion...
+[2026-05-19 23:11:36] [INFO ] Migracion DB: columna 'descripcion' verificada
+[2026-05-19 23:11:36] [INFO ] Servidor arrancado en 127.0.0.1:8080
+[2026-05-19 23:11:41] [INFO ] Cliente conectado
+[2026-05-19 23:11:51] [INFO ] LOGIN exitoso: id=1 nombre=Markel DNI=22761560R
+[2026-05-19 23:11:51] [INFO ] LOGIN procesado
+[2026-05-19 23:11:55] [INFO ] GET_SERVICIOS: 50 servicios enviados (todos los tipos)
+[2026-05-19 23:11:55] [INFO ] GET_SERVICIOS procesado
+[2026-05-19 23:12:39] [INFO ] GET_SERVICIOS: 50 servicios enviados (todos los tipos)
+[2026-05-19 23:12:39] [INFO ] GET_SERVICIOS procesado
+[2026-05-19 23:13:41] [INFO ] GET_SERVICIOS: 50 servicios enviados (todos los tipos)
+[2026-05-19 23:13:41] [INFO ] GET_SERVICIOS procesado
+[2026-05-19 23:13:48] [INFO ] GET_SERVICIOS: 50 servicios enviados (todos los tipos)
+[2026-05-19 23:13:48] [INFO ] GET_SERVICIOS procesado
+[2026-05-19 23:22:57] [INFO ] Conexion cerrada por el cliente o error de red
+[2026-05-19 23:22:57] [INFO ] Servidor cerrado correctamente
+[2026-05-19 23:23:17] [INFO ] Cargando configuracion...
+[2026-05-19 23:23:17] [INFO ] Migracion DB: columna 'descripcion' verificada
+[2026-05-19 23:23:17] [INFO ] Servidor arrancado en 127.0.0.1:8080
+[2026-05-19 23:23:22] [INFO ] Cliente conectado
+[2026-05-19 23:23:35] [INFO ] LOGIN exitoso: id=1 nombre=Markel DNI=22761560R
+[2026-05-19 23:23:35] [INFO ] LOGIN procesado
+[2026-05-19 23:23:41] [INFO ] GET_SERVICIOS: 50 servicios enviados (todos los tipos)
+[2026-05-19 23:23:41] [INFO ] GET_SERVICIOS procesado
+[2026-05-19 23:23:53] [INFO ] GET_SERVICIOS: 50 servicios enviados (todos los tipos)
+[2026-05-19 23:23:53] [INFO ] GET_SERVICIOS procesado
+[2026-05-19 23:24:02] [INFO ] GET_SERVICIOS: 50 servicios enviados (todos los tipos)
+[2026-05-19 23:24:02] [INFO ] GET_SERVICIOS procesado
+[2026-05-19 23:24:09] [INFO ] GET_SERVICIOS: 50 servicios enviados (todos los tipos)
+[2026-05-19 23:24:09] [INFO ] GET_SERVICIOS procesado
+[2026-05-19 23:25:26] [INFO ] GET_RESERVA procesado
+[2026-05-19 23:25:35] [INFO ] CREATE_RESERVA procesado

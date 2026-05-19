@@ -38,14 +38,14 @@ static int contar_reservas_servicio(sqlite3 *db, int id_servicio)
 }
 
 
-static int get_capacidad_maxima(sqlite3 *db, int id_servicio)
+static int get_capacidad_max(sqlite3 *db, int id_servicio)
 {
     sqlite3_stmt *stmt;
     int capacidad = -1;
 
     /* BUG FIX: usar rowid en lugar de id_servicio para ser coherente
      * con el resto de handlers (handler_servicios usa rowid como clave) */
-    const char sql[] = "SELECT capacidad_maxima FROM servicio WHERE rowid = ?";
+    const char sql[] = "SELECT capacidad_max FROM servicio WHERE id_servicio = ?";
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
         return -1;
@@ -109,7 +109,7 @@ void handler_create_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
         return;
     }
 
-    int capacidad = get_capacidad_maxima(db, id_servicio);
+    int capacidad = get_capacidad_max(db, id_servicio);
     int ocupadas  = contar_reservas_servicio(db, id_servicio);
 
     if (capacidad < 0 || ocupadas < 0 || ocupadas >= capacidad)
@@ -189,7 +189,7 @@ void handler_get_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
     const char sql[] =
         "SELECT r.id_reserva, r.id_servicio, s.nombre_servicio, r.fecha_registro "
         "FROM reserva r "
-        "JOIN servicio s ON r.id_servicio = s.rowid "
+        "JOIN servicio s ON r.id_servicio = s.id_servicio "
         "WHERE r.id_usuario = ?";
 
     sqlite3_stmt *stmt;
@@ -371,7 +371,7 @@ void handler_update_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
         return;
     }
 
-    int capacidad = get_capacidad_maxima(db, id_serv_nuevo);
+    int capacidad = get_capacidad_max(db, id_serv_nuevo);
     int ocupadas  = contar_reservas_servicio(db, id_serv_nuevo);
 
     if (capacidad < 0)

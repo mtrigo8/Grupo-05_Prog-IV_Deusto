@@ -109,27 +109,46 @@ std::string SocketClient::recibir() {
         return "";
     }
 
-    char buffer[BUFFER_SIZE];
+    /* El servidor envía mensajes de tamaño fijo BUFF_SIZE (1024 bytes).
+     * Hay que leer exactamente ese número de bytes por mensaje para no
+     * consumir datos de mensajes posteriores ni perder bytes del actual.
+     * TCP puede entregar varios mensajes juntos (coalescing), por lo que
+     * un recv() con buffer > BUFF_SIZE haría que std::string(buffer)
+     * descartara silenciosamente todo lo que viene después del primer \0. */
+    static const int FRAME_SIZE = 1024;   /* debe coincidir con BUFF_SIZE del servidor */
+
+    char    buffer[FRAME_SIZE];
+    int     leido = 0;
+
     std::memset(buffer, 0, sizeof(buffer));
 
-    int n = recv(_sockfd, buffer, BUFFER_SIZE - 1, 0);
+    /* Bucle hasta completar el frame completo (igual que enviar()) */
+    while (leido < FRAME_SIZE)
+    {
+        int n = recv(_sockfd,
+                     buffer + leido,
+                     FRAME_SIZE - leido,
+                     0);
 
-    if (n == SOCKET_ERROR) {
-        std::cerr << "[SocketClient] Error al recibir: "
-                  << WSAGetLastError() << "\n";
-        desconectar();
-        return "";
+        if (n == SOCKET_ERROR) {
+            std::cerr << "[SocketClient] Error al recibir: "
+                      << WSAGetLastError() << "\n";
+            desconectar();
+            return "";
+        }
+
+        if (n == 0) {
+            /* El servidor cerró la conexión */
+            desconectar();
+            return "";
+        }
+
+        leido += n;
     }
 
-    if (n == 0) {
-        // El servidor cerró la conexión
-        desconectar();
-        return "";
-    }
-
-    /* El servidor envía buffers de tamaño fijo (BUFF_SIZE) rellenados con \0.
-     * Construir el string con el constructor de C-string para que se detenga
-     * en el primer \0 y las comparaciones de protocolo funcionen correctamente. */
+    /* Construir el string como C-string para que se detenga en el primer \0
+     * y las comparaciones de protocolo ("LIST_START", "LIST_END", etc.)
+     * funcionen correctamente. */
     return std::string(buffer);
 }
 

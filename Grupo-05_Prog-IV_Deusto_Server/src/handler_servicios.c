@@ -117,16 +117,16 @@ void handler_servicios_get_all(SOCKET comm_socket, sqlite3 *db,
     if (filtrar_tipo)
     {
         snprintf(sql, sizeof(sql),
-            "SELECT rowid, nombre_servicio, municipio, hora_apertura, hora_cierre, "
-            "       fecha, tipo_servicio, capacidad_maxima, descripcion "
+            "SELECT id_servicio, nombre_servicio, municipio, hora_apertura, hora_cierre, "
+            "       fecha, tipo_servicio, capacidad_max, descripcion "
             "FROM servicio "
             "WHERE tipo_servicio = ?");
     }
     else
     {
         snprintf(sql, sizeof(sql),
-            "SELECT rowid, nombre_servicio, municipio, hora_apertura, hora_cierre, "
-            "       fecha, tipo_servicio, capacidad_maxima, descripcion "
+            "SELECT id_servicio, nombre_servicio, municipio, hora_apertura, hora_cierre, "
+            "       fecha, tipo_servicio, capacidad_max, descripcion "
             "FROM servicio");
     }
 
@@ -214,10 +214,10 @@ void handler_servicios_get_one(SOCKET comm_socket, sqlite3 *db,
 
     sqlite3_stmt *stmt = NULL;
     const char sql[] =
-        "SELECT rowid, nombre_servicio, municipio, hora_apertura, hora_cierre, "
-        "       fecha, tipo_servicio, capacidad_maxima, descripcion "
+        "SELECT id_servicio, nombre_servicio, municipio, hora_apertura, hora_cierre, "
+        "       fecha, tipo_servicio, capacidad_max, descripcion "
         "FROM servicio "
-        "WHERE rowid = ? "
+        "WHERE id_servicio = ? "
         "LIMIT 1";
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
@@ -304,8 +304,8 @@ void handler_servicios_filter(SOCKET comm_socket, sqlite3 *db,
     int  offset = 0;
 
     offset += snprintf(sql + offset, sizeof(sql) - offset,
-        "SELECT rowid, nombre_servicio, municipio, hora_apertura, hora_cierre, "
-        "       fecha, tipo_servicio, capacidad_maxima, descripcion "
+        "SELECT id_servicio, nombre_servicio, municipio, hora_apertura, hora_cierre, "
+        "       fecha, tipo_servicio, capacidad_max, descripcion "
         "FROM servicio "
         "WHERE 1=1 ");
 
