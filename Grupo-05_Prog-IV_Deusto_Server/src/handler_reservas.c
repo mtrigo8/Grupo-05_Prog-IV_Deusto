@@ -126,7 +126,7 @@ void handler_create_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
     get_fecha_hoy(fecha_hoy, sizeof(fecha_hoy));
 
     const char sql[] =
-        "INSERT INTO reserva (id_usuario, id_servicio, fecha_registro) "
+        "INSERT INTO reserva (id_usuario, id_servicio, fecha_reserva) "
         "VALUES (?, ?, ?)";
 
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
@@ -179,7 +179,7 @@ void handler_get_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
 
     /*
      * BUG FIX: la query anterior solo devolvía 3 campos
-     * (id_reserva | nombre_servicio | fecha_registro) pero el cliente
+     * (id_reserva | nombre_servicio | fecha_reserva) pero el cliente
      * espera 5 campos:
      *   idReserva | idServicio | nombreServicio | fecha | estado
      *
@@ -187,7 +187,7 @@ void handler_get_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
      * como estado (la tabla reserva no tiene columna de estado).
      */
     const char sql[] =
-        "SELECT r.id_reserva, r.id_servicio, s.nombre_servicio, r.fecha_registro "
+        "SELECT r.id_reserva, r.id_servicio, s.nombre_servicio, r.fecha_reserva "
         "FROM reserva r "
         "JOIN servicio s ON r.id_servicio = s.id_servicio "
         "WHERE r.id_usuario = ?";
@@ -398,7 +398,7 @@ void handler_update_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
 
     const char sql_upd[] =
         "UPDATE reserva "
-        "SET id_servicio = ?, fecha_registro = ? "
+        "SET id_servicio = ?, fecha_reserva = ? "
         "WHERE id_reserva = ?";
 
     int rc = sqlite3_prepare_v2(db, sql_upd, -1, &stmt, NULL);

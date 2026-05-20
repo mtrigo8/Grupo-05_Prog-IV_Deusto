@@ -343,6 +343,7 @@ static void gestionModificarReserva(SocketClient&   sock,
     {
         std::cout << "Reserva #" << idReserva << " actualizada correctamente.\n";
 
+
         /* Recargar cache para reflejar el cambio */
         cargarReservas(sock, cache, sesion);
     }

@@ -259,3 +259,38 @@
 [2026-05-19 23:24:09] [INFO ] GET_SERVICIOS procesado
 [2026-05-19 23:25:26] [INFO ] GET_RESERVA procesado
 [2026-05-19 23:25:35] [INFO ] CREATE_RESERVA procesado
+[2026-05-20 08:08:26] [INFO ] Cargando configuracion...
+[2026-05-20 08:08:26] [INFO ] Migracion DB: columna 'descripcion' verificada
+[2026-05-20 08:08:26] [INFO ] Servidor arrancado en 127.0.0.1:8080
+[2026-05-20 08:08:31] [INFO ] Cliente conectado
+[2026-05-20 08:08:44] [INFO ] LOGIN exitoso: id=1 nombre=Markel DNI=22761560R
+[2026-05-20 08:08:44] [INFO ] LOGIN procesado
+[2026-05-20 08:08:50] [INFO ] GET_SERVICIOS: 50 servicios enviados (todos los tipos)
+[2026-05-20 08:08:50] [INFO ] GET_SERVICIOS procesado
+[2026-05-20 08:13:40] [INFO ] Cargando configuracion...
+[2026-05-20 08:13:40] [INFO ] Migracion DB: columna 'descripcion' verificada
+[2026-05-20 08:13:40] [INFO ] Servidor arrancado en 127.0.0.1:8080
+[2026-05-20 08:13:44] [INFO ] Cliente conectado
+[2026-05-20 08:13:54] [INFO ] LOGIN exitoso: id=1 nombre=Markel DNI=22761560R
+[2026-05-20 08:13:54] [INFO ] LOGIN procesado
+[2026-05-20 08:13:58] [INFO ] GET_SERVICIOS: 50 servicios enviados (todos los tipos)
+[2026-05-20 08:13:58] [INFO ] GET_SERVICIOS procesado
+[2026-05-20 08:14:21] [INFO ] Reserva creada: id=1 usuario=1 servicio=1
+[2026-05-20 08:14:21] [INFO ] CREATE_RESERVA procesado
+[2026-05-20 08:18:59] [INFO ] GET_RESERVA procesado
+[2026-05-20 08:19:56] [INFO ] GET_RESERVA procesado
+[2026-05-20 08:20:09] [INFO ] Reserva actualizada: id=1 nuevo_servicio=4 usuario=1
+[2026-05-20 08:20:09] [INFO ] UPDATE_RESERVA procesado
+[2026-05-20 08:20:16] [INFO ] GET_RESERVA procesado
+[2026-05-20 08:20:27] [INFO ] GET_RESERVA procesado
+[2026-05-20 08:20:30] [INFO ] Reserva cancelada: id=1 usuario=1
+[2026-05-20 08:20:30] [INFO ] CANCEL_RESERVA procesado
+[2026-05-20 08:20:37] [INFO ] Reserva creada: id=2 usuario=1 servicio=1
+[2026-05-20 08:20:37] [INFO ] CREATE_RESERVA procesado
+[2026-05-20 08:20:41] [INFO ] Reserva creada: id=3 usuario=1 servicio=3
+[2026-05-20 08:20:41] [INFO ] CREATE_RESERVA procesado
+[2026-05-20 08:20:45] [INFO ] GET_RESERVA procesado
+[2026-05-20 08:20:53] [INFO ] Reserva cancelada: id=3 usuario=1
+[2026-05-20 08:20:53] [INFO ] CANCEL_RESERVA procesado
+[2026-05-20 08:21:09] [INFO ] GET_SERVICIOS: 50 servicios enviados (todos los tipos)
+[2026-05-20 08:21:09] [INFO ] GET_SERVICIOS procesado
