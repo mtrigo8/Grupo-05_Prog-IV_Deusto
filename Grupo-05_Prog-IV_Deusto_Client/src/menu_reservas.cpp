@@ -214,7 +214,7 @@ static void gestionCancelarReserva(SocketClient&   sock,
         return;
     }
 
-    /* Enviar comando y parametros */
+    /* Enviar comando y parametros. */
     if (!sock.enviar(CMD_CANCEL_RESERVA))
     {
         std::cout << "Error: no se pudo enviar el comando al servidor.\n";
