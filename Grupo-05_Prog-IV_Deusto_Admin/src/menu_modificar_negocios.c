@@ -17,29 +17,28 @@
 void crearMenuModificarNegocios(char *nombreActual, Negocio n) {
     printf("======================= \n");
     printf("Modificar negocio \n");
-    printf("Nombre actual: %s\n",          nombreActual            ? nombreActual            : "");
-    printf("Nuevo nombre: %s\n",           n.nombre                ? n.nombre                : "");
-    printf("Municipio: %s\n",             n.municipio             ? n.municipio             : "");
-    printf("Hora apertura (hh:mm): %s\n", n.hora_apertura         ? n.hora_apertura         : "");
-    printf("Hora cierre  (hh:mm): %s\n",  n.hora_cierre           ? n.hora_cierre           : "");
-    printf("Tipo de negocio: %s\n",        n.tipo                  ? n.tipo                  : "");
-    printf("Dias abierto: %s\n",           n.dias                  ? n.dias                  : "");
+    printf("Nombre actual: %s\n",          nombreActual      ? nombreActual      : "");
+    printf("Nuevo nombre: %s\n",           n.nombre          ? n.nombre          : "");
+    printf("Municipio: %s\n",              n.municipio       ? n.municipio       : "");
+    printf("Hora apertura (hh:mm): %s\n",  n.hora_apertura   ? n.hora_apertura   : "");
+    printf("Hora cierre  (hh:mm): %s\n",   n.hora_cierre     ? n.hora_cierre     : "");
+    printf("Tipo de negocio: %s\n",        n.tipo            ? n.tipo            : "");
+    printf("Dias abierto: %s\n",           n.dias            ? n.dias            : "");
+    /* FIX: mostrar capacidad en la vista */
+    printf("Capacidad maxima: %d\n",       n.capacidad_max);
     printf("Pulse Enter al finalizar \n");
     printf("======================= \n");
 }
 
 /* ── Logica ── */
 void gestionMenuModificarNegocios(sqlite3 *db) {
-    /* nombre_actual es un buffer local de pila: solo se usa para leer
-     * el nombre de busqueda y pasarlo como char* a las funciones. */
     char nombre_actual[75];
     nombre_actual[0] = '\0';
 
     Negocio n_nuevo;
     memset(&n_nuevo, 0, sizeof(Negocio));
-    /* Todos los punteros son NULL */
 
-    char tmp[1024]; /* buffer temporal de lectura */
+    char tmp[1024];
 
     /* Nombre actual (clave de busqueda en BD) */
     crearMenuModificarNegocios(nombre_actual, n_nuevo);
@@ -130,10 +129,27 @@ void gestionMenuModificarNegocios(sqlite3 *db) {
         fflush(stdin);
     }
 
+    /*
+     * FIX: pedir capacidad maxima al usuario.
+     * Antes nunca se recogía este campo, por lo que update_negocio
+     * no podía actualizarlo aunque se lo hubieramos pasado.
+     */
+    crearMenuModificarNegocios(nombre_actual, n_nuevo);
+    fflush(stdout);
+    {
+        char _buf[32];
+        fgets(_buf, sizeof(_buf), stdin);
+        int cap = 0;
+        sscanf(_buf, "%d", &cap);
+        n_nuevo.capacidad_max = (cap > 0) ? cap : 1;
+        fflush(stdin);
+    }
+
     int res = update_negocio(db, nombre_actual, n_nuevo);
 
     if (res == SQLITE_DONE && sqlite3_changes(db) > 0)
-        printf("\n¡Negocio '%s' actualizado con exito!\n", nombre_actual);
+        printf("\n¡Negocio '%s' actualizado con exito (nuevo nombre: '%s', capacidad: %d)!\n",
+               nombre_actual, n_nuevo.nombre ? n_nuevo.nombre : "", n_nuevo.capacidad_max);
     else
         printf("\nNo se pudo actualizar (¿Seguro que el negocio '%s' existe?).\n",
                nombre_actual);
@@ -141,6 +157,5 @@ void gestionMenuModificarNegocios(sqlite3 *db) {
     fflush(stdout);
     getchar();
 
-    /* Liberar todos los campos dinamicos del negocio nuevo */
     negocio_free(&n_nuevo);
 }

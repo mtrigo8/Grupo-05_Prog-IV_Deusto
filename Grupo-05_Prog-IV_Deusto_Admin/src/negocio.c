@@ -242,10 +242,16 @@ int delete_negocio(sqlite3 *db, char *nombre) {
 int update_negocio(sqlite3 *db, char *nombre_actual, Negocio n_nuevo) {
     sqlite3_stmt *stmt;
 
+    /*
+     * FIX: la version anterior no actualizaba nombre_servicio ni capacidad_max.
+     * Ahora el UPDATE incluye ambos campos:
+     *   - nombre_servicio: permite renombrar el negocio desde el Admin.
+     *   - capacidad_max:   permite corregir la capacidad sin borrar y reinsertar.
+     */
     const char sql[] =
         "UPDATE servicio "
-        "SET municipio = ?, hora_apertura = ?, hora_cierre = ?, "
-        "    tipo_servicio = ?, fecha = ? "
+        "SET nombre_servicio = ?, municipio = ?, hora_apertura = ?, hora_cierre = ?, "
+        "    tipo_servicio = ?, fecha = ?, capacidad_max = ? "
         "WHERE nombre_servicio = ?";
 
     int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
@@ -255,12 +261,14 @@ int update_negocio(sqlite3 *db, char *nombre_actual, Negocio n_nuevo) {
         return result;
     }
 
-    sqlite3_bind_text(stmt, 1, n_nuevo.municipio,     -1, SQLITE_TRANSIENT);
-    sqlite3_bind_text(stmt, 2, n_nuevo.hora_apertura, -1, SQLITE_TRANSIENT);
-    sqlite3_bind_text(stmt, 3, n_nuevo.hora_cierre,   -1, SQLITE_TRANSIENT);
-    sqlite3_bind_text(stmt, 4, n_nuevo.tipo,          -1, SQLITE_TRANSIENT);
-    sqlite3_bind_int (stmt, 5, n_nuevo.fecha);
-    sqlite3_bind_text(stmt, 6, nombre_actual,         -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 1, n_nuevo.nombre,        -1, SQLITE_TRANSIENT); /* FIX: nuevo nombre */
+    sqlite3_bind_text(stmt, 2, n_nuevo.municipio,     -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 3, n_nuevo.hora_apertura, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 4, n_nuevo.hora_cierre,   -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 5, n_nuevo.tipo,          -1, SQLITE_TRANSIENT);
+    sqlite3_bind_int (stmt, 6, n_nuevo.fecha);
+    sqlite3_bind_int (stmt, 7, n_nuevo.capacidad_max);                        /* FIX: capacidad */
+    sqlite3_bind_text(stmt, 8, nombre_actual,         -1, SQLITE_TRANSIENT); /* WHERE */
 
     result = sqlite3_step(stmt);
     sqlite3_finalize(stmt);
@@ -273,10 +281,11 @@ int update_negocio(sqlite3 *db, char *nombre_actual, Negocio n_nuevo) {
                  nombre_actual ? nombre_actual : "");
         registrar_log(db, 0, "ERROR", msg);
     } else {
-        snprintf(msg, sizeof(msg), "Negocio actualizado: %s -> %s en %s",
+        snprintf(msg, sizeof(msg), "Negocio actualizado: %s -> %s en %s (capacidad: %d)",
                  nombre_actual        ? nombre_actual        : "",
                  n_nuevo.nombre       ? n_nuevo.nombre       : "",
-                 n_nuevo.municipio    ? n_nuevo.municipio    : "");
+                 n_nuevo.municipio    ? n_nuevo.municipio    : "",
+                 n_nuevo.capacidad_max);
         registrar_log(db, 0, "INFO", msg);
     }
 
