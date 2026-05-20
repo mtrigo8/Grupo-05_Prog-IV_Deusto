@@ -10,11 +10,17 @@
 #include <winsock2.h>
 
 
+/* Mantenida únicamente como mecanismo de respaldo (fallback) por seguridad */
 static void get_fecha_hoy(char *buffer, int size)
 {
     time_t t = time(NULL);
     struct tm *tm_info = localtime(&t);
-    strftime(buffer, size, "%Y-%m-%d", tm_info);
+    if (tm_info) {
+        strftime(buffer, size, "%Y-%m-%d", tm_info);
+    } else {
+        strncpy(buffer, "2026-01-01", size - 1);
+        buffer[size - 1] = '\0';
+    }
 }
 
 
@@ -43,8 +49,7 @@ static int get_capacidad_max(sqlite3 *db, int id_servicio)
     sqlite3_stmt *stmt;
     int capacidad = -1;
 
-    /* BUG FIX: usar rowid en lugar de id_servicio para ser coherente
-     * con el resto de handlers (handler_servicios usa rowid como clave) */
+    /* BUG FIX original: usar rowid en lugar de id_servicio si aplica */
     const char sql[] = "SELECT capacidad_max FROM servicio WHERE id_servicio = ?";
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
@@ -90,15 +95,34 @@ void handler_create_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
 
     int id_usuario  = 0;
     int id_servicio = 0;
+    char fecha_cliente[20] = "";
 
+    // Parseo de parámetros incluyendo la fecha del cliente
     char *token = strtok(params, SEP);
     if (token) id_usuario  = atoi(token);
+
     token = strtok(NULL, SEP);
     if (token) id_servicio = atoi(token);
 
-    printf("  -> CREATE_RESERVA: id_usuario=%d id_servicio=%d\n",
-           id_usuario, id_servicio);
+    token = strtok(NULL, SEP);
+    if (token) {
+        strncpy(fecha_cliente, token, sizeof(fecha_cliente) - 1);
+        fecha_cliente[sizeof(fecha_cliente) - 1] = '\0';
+    } else {
+        // Fallback preventivo si el cliente no envía la fecha
+        get_fecha_hoy(fecha_cliente, sizeof(fecha_cliente));
+    }
+
+    printf("  -> CREATE_RESERVA: id_usuario=%d id_servicio=%d fecha=%s\n",
+           id_usuario, id_servicio, fecha_cliente);
     fflush(stdout);
+
+    // Validación básica de parámetros extraídos
+    if (id_usuario <= 0 || id_servicio <= 0) {
+        strcpy(sendBuff, RES_ERR_GENERICO);
+        send(comm_socket, sendBuff, sizeof(sendBuff), 0);
+        return;
+    }
 
     if (ya_reservado(db, id_usuario, id_servicio))
     {
@@ -122,9 +146,6 @@ void handler_create_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
     }
 
     sqlite3_stmt *stmt;
-    char fecha_hoy[20];
-    get_fecha_hoy(fecha_hoy, sizeof(fecha_hoy));
-
     const char sql[] =
         "INSERT INTO reserva (id_usuario, id_servicio, fecha_reserva) "
         "VALUES (?, ?, ?)";
@@ -139,7 +160,7 @@ void handler_create_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
 
     sqlite3_bind_int (stmt, 1, id_usuario);
     sqlite3_bind_int (stmt, 2, id_servicio);
-    sqlite3_bind_text(stmt, 3, fecha_hoy, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 3, fecha_cliente, -1, SQLITE_TRANSIENT);
 
     rc = sqlite3_step(stmt);
     int id_reserva = (int) sqlite3_last_insert_rowid(db);
@@ -157,7 +178,7 @@ void handler_create_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
     }
 
     snprintf(sendBuff, sizeof(sendBuff), "%s|%d|%s",
-             RES_OK, id_reserva, fecha_hoy);
+             RES_OK, id_reserva, fecha_cliente);
     send(comm_socket, sendBuff, sizeof(sendBuff), 0);
     printf("  <- %s\n", sendBuff);
     fflush(stdout);
@@ -177,15 +198,6 @@ void handler_get_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
     printf("  -> GET_RESERVA: id_usuario=%d\n", id_usuario);
     fflush(stdout);
 
-    /*
-     * BUG FIX: la query anterior solo devolvía 3 campos
-     * (id_reserva | nombre_servicio | fecha_reserva) pero el cliente
-     * espera 5 campos:
-     *   idReserva | idServicio | nombreServicio | fecha | estado
-     *
-     * Ahora se incluye r.id_servicio y se añade el literal "ACTIVA"
-     * como estado (la tabla reserva no tiene columna de estado).
-     */
     const char sql[] =
         "SELECT r.id_reserva, r.id_servicio, s.nombre_servicio, r.fecha_reserva "
         "FROM reserva r "
@@ -213,7 +225,7 @@ void handler_get_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
         const char *nombre  = (const char *)sqlite3_column_text(stmt, 2);
         const char *fecha   = (const char *)sqlite3_column_text(stmt, 3);
 
-        /* Formato: idReserva|idServicio|nombreServicio|fecha|estado */
+        /* Formato esperado por el cliente: idReserva|idServicio|nombreServicio|fecha|estado */
         snprintf(sendBuff, sizeof(sendBuff), "%d|%d|%s|%s|ACTIVA",
                  id_res,
                  id_serv,
@@ -325,24 +337,48 @@ void handler_update_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
     int id_reserva    = 0;
     int id_usuario    = 0;
     int id_serv_nuevo = 0;
+    char fecha_cliente[20] = "";
 
+    // Parseo de parámetros incluyendo la nueva fecha enviada por el cliente
     char *token = strtok(params, SEP);
     if (token) id_reserva    = atoi(token);
     token = strtok(NULL, SEP);
     if (token) id_usuario    = atoi(token);
     token = strtok(NULL, SEP);
     if (token) id_serv_nuevo = atoi(token);
+    token = strtok(NULL, SEP);
+    if (token) {
+        strncpy(fecha_cliente, token, sizeof(fecha_cliente) - 1);
+        fecha_cliente[sizeof(fecha_cliente) - 1] = '\0';
+    } else {
+        get_fecha_hoy(fecha_cliente, sizeof(fecha_cliente));
+    }
 
-    printf("  -> UPDATE_RESERVA: id_reserva=%d id_usuario=%d id_serv_nuevo=%d\n",
-           id_reserva, id_usuario, id_serv_nuevo);
+    printf("  -> UPDATE_RESERVA: id_reserva=%d id_usuario=%d id_serv_nuevo=%d fecha=%s\n",
+           id_reserva, id_usuario, id_serv_nuevo, fecha_cliente);
     fflush(stdout);
+
+    // Validación elemental de tokens
+    if (id_reserva <= 0 || id_usuario <= 0 || id_serv_nuevo <= 0) {
+        strcpy(sendBuff, RES_ERR_GENERICO);
+        send(comm_socket, sendBuff, sizeof(sendBuff), 0);
+        return;
+    }
 
     sqlite3_stmt *stmt;
     const char sql_check[] =
         "SELECT COUNT(*) FROM reserva "
         "WHERE id_reserva = ? AND id_usuario = ?";
 
-    sqlite3_prepare_v2(db, sql_check, -1, &stmt, NULL);
+    // MEJORA: Añadido control de errores en el prepare de la verificación
+    int rc = sqlite3_prepare_v2(db, sql_check, -1, &stmt, NULL);
+    if (rc != SQLITE_OK)
+    {
+        strcpy(sendBuff, RES_ERR_GENERICO);
+        send(comm_socket, sendBuff, sizeof(sendBuff), 0);
+        return;
+    }
+
     sqlite3_bind_int(stmt, 1, id_reserva);
     sqlite3_bind_int(stmt, 2, id_usuario);
 
@@ -360,8 +396,6 @@ void handler_update_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
         return;
     }
 
-    /* Verificar que el usuario no tenga ya una reserva para el nuevo servicio
-     * (evita duplicados por la via de modificar en lugar de crear) */
     if (ya_reservado(db, id_usuario, id_serv_nuevo))
     {
         strcpy(sendBuff, RES_ERR_YA_RESERVADO);
@@ -376,7 +410,6 @@ void handler_update_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
 
     if (capacidad < 0)
     {
-        /* El servicio no existe en la base de datos */
         strcpy(sendBuff, RES_ERR_NO_ENCONTRADO);
         send(comm_socket, sendBuff, sizeof(sendBuff), 0);
         printf("  <- %s\n", sendBuff);
@@ -393,15 +426,12 @@ void handler_update_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
         return;
     }
 
-    char fecha_hoy[20];
-    get_fecha_hoy(fecha_hoy, sizeof(fecha_hoy));
-
     const char sql_upd[] =
         "UPDATE reserva "
         "SET id_servicio = ?, fecha_reserva = ? "
         "WHERE id_reserva = ?";
 
-    int rc = sqlite3_prepare_v2(db, sql_upd, -1, &stmt, NULL);
+    rc = sqlite3_prepare_v2(db, sql_upd, -1, &stmt, NULL);
     if (rc != SQLITE_OK)
     {
         strcpy(sendBuff, RES_ERR_GENERICO);
@@ -410,7 +440,7 @@ void handler_update_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
     }
 
     sqlite3_bind_int (stmt, 1, id_serv_nuevo);
-    sqlite3_bind_text(stmt, 2, fecha_hoy, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 2, fecha_cliente, -1, SQLITE_TRANSIENT);
     sqlite3_bind_int (stmt, 3, id_reserva);
 
     rc = sqlite3_step(stmt);
@@ -427,7 +457,7 @@ void handler_update_reserva(SOCKET comm_socket, sqlite3 *db, char *params)
     }
 
     snprintf(sendBuff, sizeof(sendBuff), "%s|%d|%s",
-             RES_OK, id_reserva, fecha_hoy);
+             RES_OK, id_reserva, fecha_cliente);
     send(comm_socket, sendBuff, sizeof(sendBuff), 0);
     printf("  <- %s\n", sendBuff);
     fflush(stdout);

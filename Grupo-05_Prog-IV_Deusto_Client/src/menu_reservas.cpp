@@ -29,9 +29,9 @@ void crearMenuReservas()
  * ========================================================================= */
 
 /* ── cargarReservas ────────────────────────────────────────────────────── */
-void cargarReservas(SocketClient&   sock,
-                    CacheOO&        cache,
-                    const SesionOO& sesion)
+ void cargarReservas(SocketClient&   sock,
+                           CacheOO&        cache,
+                           const SesionOO& sesion)
 {
     cache.limpiarReservas();
 
@@ -71,14 +71,6 @@ void cargarReservas(SocketClient&   sock,
     }
 
     std::cout << cache.getTotalReservas() << " reservas cargadas.\n";
-
-    /* Sincronizar plazas ocupadas en los negocios que esten en cache */
-    for (int i = 0; i < cache.getTotalNegocios(); i++)
-    {
-        NegocioOO* n = cache.getNegocio(i);
-        int ocupadas = cache.contarReservasPorServicio(n->getId());
-        n->setPlazasOcupadas(ocupadas);
-    }
 }
 
 /* ── gestionVerReservas ───────────────────────────────────────────────────
@@ -104,16 +96,43 @@ static void gestionVerReservas(SocketClient&   sock,
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
+/* ── validarFecha ──────────────────────────────────────────────────────────
+ * Comprueba que la cadena tenga formato yyyy-mm-dd con digitos validos.
+ * ------------------------------------------------------------------------- */
+static bool validarFecha(const std::string& f)
+{
+    if (f.size() != 10) return false;
+    if (f[4] != '-' || f[7] != '-') return false;
+    for (int i : {0,1,2,3,5,6,8,9})
+        if (f[i] < '0' || f[i] > '9') return false;
+    int mes = std::stoi(f.substr(5, 2));
+    int dia = std::stoi(f.substr(8, 2));
+    return mes >= 1 && mes <= 12 && dia >= 1 && dia <= 31;
+}
+
+/* ── pedirFecha ────────────────────────────────────────────────────────────
+ * Solicita una fecha al usuario con reintentos. Devuelve "" si cancela.
+ * ------------------------------------------------------------------------- */
+static std::string pedirFecha()
+{
+    std::string fecha;
+    for (int intento = 0; intento < 3; intento++)
+    {
+        std::cout << "Introduce la fecha de la reserva (yyyy-mm-dd, 0 para volver): ";
+        std::getline(std::cin, fecha);
+
+        if (fecha == "0") return "";
+
+        if (validarFecha(fecha)) return fecha;
+
+        std::cout << "Formato incorrecto. Usa yyyy-mm-dd (ej: 2026-06-15).\n";
+    }
+    std::cout << "Demasiados intentos fallidos.\n";
+    return "";
+}
 /* ── gestionHacerReserva ──────────────────────────────────────────────────
- * CREATE_RESERVA: pide un id de servicio y crea la reserva.
- *
- * FIX: Se eliminó la llamada a cargarReservas() tras el OK. Esa recarga
- * inmediata enviaba GET_RESERVA justo después de recibir el OK de
- * CREATE_RESERVA, provocando que el servidor recibiera dos comandos
- * seguidos sin tiempo de procesar el estado intermedio, y que el cliente
- * confundiera la respuesta de uno con la del otro.
- * La caché se actualiza manualmente (incrementando plazasOcupadas) y
- * se recargará completamente la próxima vez que el usuario entre al menú.
+ * CREATE_RESERVA: pide id de servicio y fecha, luego crea la reserva.
+ * Actualiza la cache recargandola tras el exito.
  * ------------------------------------------------------------------------- */
 static void gestionHacerReserva(SocketClient&   sock,
                                 CacheOO&        cache,
@@ -138,6 +157,10 @@ static void gestionHacerReserva(SocketClient&   sock,
         return;
     }
 
+    /* Pedir fecha de la reserva */
+    std::string fecha = pedirFecha();
+    if (fecha.empty()) return;
+
     /* Enviar comando y parametros */
     if (!sock.enviar(CMD_CREATE_RESERVA))
     {
@@ -145,7 +168,7 @@ static void gestionHacerReserva(SocketClient&   sock,
         return;
     }
 
-    if (!sock.enviar(buildCreateReserva(sesion.getId(), idServicio)))
+    if (!sock.enviar(buildCreateReserva(sesion.getId(), idServicio, fecha)))
     {
         std::cout << "Error: no se pudieron enviar los parametros.\n";
         return;
@@ -155,21 +178,10 @@ static void gestionHacerReserva(SocketClient&   sock,
 
     if (esOk(respuesta))
     {
-        std::cout << "Reserva creada correctamente.\n";
+        std::cout << "Reserva creada correctamente para el " << fecha << ".\n";
 
-        /* Actualizar cache local sin hacer una nueva peticion al servidor.
-         * FIX: antes se llamaba cargarReservas() aqui, lo que enviaba
-         * GET_RESERVA inmediatamente tras el OK y mezclaba los frames. */
-        NegocioOO* negocio = cache.buscarNegocioPorId(idServicio);
-        if (negocio != nullptr)
-        {
-            negocio->setPlazasOcupadas(negocio->getPlazasOcupadas() + 1);
-        }
-
-        /* Marcar cache de reservas como sucia para forzar recarga la
-         * proxima vez (limpiar es suficiente: getTotalReservas() == 0
-         * no causa problemas de visualizacion aqui). */
-        cache.limpiarReservas();
+        /* Recargar cache para reflejar la nueva reserva */
+        cargarReservas(sock, cache, sesion);
     }
     else if (esError(respuesta))
     {
@@ -179,6 +191,7 @@ static void gestionHacerReserva(SocketClient&   sock,
         if      (motivo == "SIN_CUPOS")     std::cout << "Error: el servicio no tiene cupos disponibles.\n";
         else if (motivo == "YA_RESERVADO")  std::cout << "Error: ya tienes una reserva para ese servicio.\n";
         else if (motivo == "NO_ENCONTRADO") std::cout << "Error: el servicio no existe.\n";
+        else if (motivo == "FECHA_INVALIDA") std::cout << "Error: la fecha indicada no es valida.\n";
         else                                std::cout << "Error al crear la reserva: " << motivo << "\n";
     }
 
@@ -188,7 +201,7 @@ static void gestionHacerReserva(SocketClient&   sock,
 
 /* ── gestionCancelarReserva ───────────────────────────────────────────────
  * CANCEL_RESERVA: muestra reservas, pide id y cancela la elegida.
- * Libera una plaza en el negocio correspondiente y limpia la cache.
+ * Limpia la cache tras el exito.
  * ------------------------------------------------------------------------- */
 static void gestionCancelarReserva(SocketClient&   sock,
                                    CacheOO&        cache,
@@ -240,9 +253,6 @@ static void gestionCancelarReserva(SocketClient&   sock,
         return;
     }
 
-    /* Guardar idServicio antes de limpiar la cache */
-    int idServicio = reserva->getIdServicio();
-
     /* Enviar comando y parametros */
     if (!sock.enviar(CMD_CANCEL_RESERVA))
     {
@@ -262,14 +272,7 @@ static void gestionCancelarReserva(SocketClient&   sock,
     {
         std::cout << "Reserva #" << idReserva << " cancelada correctamente.\n";
 
-        /* Liberar una plaza en el negocio si esta en cache */
-        NegocioOO* negocio = cache.buscarNegocioPorId(idServicio);
-        if (negocio != nullptr)
-        {
-            negocio->setPlazasOcupadas(negocio->getPlazasOcupadas() - 1);
-        }
-
-        /* Limpiar cache de reservas: ya no esta activa */
+        /* Limpiar cache: ya no esta activa */
         cache.limpiarReservas();
     }
     else if (esError(respuesta))
@@ -289,13 +292,7 @@ static void gestionCancelarReserva(SocketClient&   sock,
 
 /* ── gestionModificarReserva ──────────────────────────────────────────────
  * UPDATE_RESERVA: muestra reservas, pide id de reserva e id de nuevo
- * servicio, y actualiza.
- *
- * FIX: Se eliminó la llamada a cargarReservas() tras el OK. Misma razón
- * que en gestionHacerReserva: enviaba GET_RESERVA inmediatamente después
- * del OK de UPDATE_RESERVA, mezclando los frames en el buffer TCP.
- * La caché se actualiza manualmente y se recargará en la próxima entrada
- * al menú de reservas o negocios.
+ * servicio, y actualiza. Recarga la cache tras el exito.
  * ------------------------------------------------------------------------- */
 static void gestionModificarReserva(SocketClient&   sock,
                                     CacheOO&        cache,
@@ -348,9 +345,6 @@ static void gestionModificarReserva(SocketClient&   sock,
         return;
     }
 
-    /* Guardar el servicio antiguo antes de modificar */
-    int idServicioAntiguo = reserva->getIdServicio();
-
     /* Pedir el nuevo servicio */
     std::cout << "Introduce el ID del nuevo servicio (0 para volver): ";
     int idNuevoServicio = 0;
@@ -375,8 +369,10 @@ static void gestionModificarReserva(SocketClient&   sock,
         std::cout << "Error: no se pudo enviar el comando al servidor.\n";
         return;
     }
+    std::string fecha = pedirFecha();
+        if (fecha.empty()) return;
 
-    if (!sock.enviar(buildUpdateReserva(idReserva, sesion.getId(), idNuevoServicio)))
+    if (!sock.enviar(buildUpdateReserva(idReserva, sesion.getId(), idNuevoServicio, fecha)))
     {
         std::cout << "Error: no se pudieron enviar los parametros.\n";
         return;
@@ -388,19 +384,8 @@ static void gestionModificarReserva(SocketClient&   sock,
     {
         std::cout << "Reserva #" << idReserva << " actualizada correctamente.\n";
 
-        /* Actualizar plazas en cache local sin nueva peticion al servidor.
-         * FIX: antes se llamaba cargarReservas() aqui. */
-        NegocioOO* negAntiguo = cache.buscarNegocioPorId(idServicioAntiguo);
-        if (negAntiguo != nullptr)
-            negAntiguo->setPlazasOcupadas(negAntiguo->getPlazasOcupadas() - 1);
-
-        NegocioOO* negNuevo = cache.buscarNegocioPorId(idNuevoServicio);
-        if (negNuevo != nullptr)
-            negNuevo->setPlazasOcupadas(negNuevo->getPlazasOcupadas() + 1);
-
-        /* Marcar cache de reservas como sucia para forzar recarga la
-         * proxima vez que el usuario entre al menu de reservas o negocios. */
-        cache.limpiarReservas();
+        /* Recargar cache para reflejar el cambio */
+        cargarReservas(sock, cache, sesion);
     }
     else if (esError(respuesta))
     {

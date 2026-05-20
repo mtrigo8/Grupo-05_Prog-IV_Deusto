@@ -167,11 +167,15 @@ inline std::string buildFilterServicios(const std::string& tipo,
 
 /*
  * buildCreateReserva
- *  Construye: "id_usuario|id_servicio"
+ *  Construye: "id_usuario|id_servicio|fecha"
+ *  fecha formato: yyyy-mm-dd
  */
-inline std::string buildCreateReserva(int idUsuario, int idServicio)
+inline std::string buildCreateReserva(int idUsuario, int idServicio,
+                                      const std::string& fecha)
 {
-    return std::to_string(idUsuario) + SEP + std::to_string(idServicio);
+    return std::to_string(idUsuario) + SEP +
+           std::to_string(idServicio) + SEP +
+           fecha;
 }
 
 /*
@@ -194,15 +198,18 @@ inline std::string buildCancelReserva(int idReserva, int idUsuario)
 
 /*
  * buildUpdateReserva
- *  Construye: "id_reserva|id_usuario|id_nuevo_servicio"
+ *  Construye: "id_reserva|id_usuario|id_nuevo_servicio|fecha"
+ *  fecha formato: yyyy-mm-dd
  */
 inline std::string buildUpdateReserva(int idReserva,
                                       int idUsuario,
-                                      int idNuevoServicio)
+                                      int idNuevoServicio,
+                                      const std::string& fecha)
 {
     return std::to_string(idReserva) + SEP +
            std::to_string(idUsuario) + SEP +
-           std::to_string(idNuevoServicio);
+           std::to_string(idNuevoServicio) + SEP +
+           fecha;
 }
 
 /* -- Conexion ------------------------------------------------------------- */
@@ -242,6 +249,7 @@ struct ParsedServicio
     std::string tipo;
     int         capacidad;    /* capacidad_maxima de la BD                     */
     std::string descripcion;  /* campo especial: tipoCocina / descripcion / -  */
+    int         ocupadas;     /* reservas actuales (subquery en servidor)       */
 };
 
 /* Resultado de parseReserva (una linea de la lista) */
