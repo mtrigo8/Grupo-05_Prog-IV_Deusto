@@ -21,8 +21,7 @@ NegocioOO* NegocioFactory::crear(const ParsedServicio& parsed, int capacidad)
                 parsed.horaApertura,
                 parsed.horaCierre,
                 capacidad,
-                parsed.descripcion, /* tipoCocina viene de descripcion en BD */
-                ""                  /* menuDelDia: no almacenado en BD       */
+                parsed.descripcion   /* tipoCocina viene del campo descripcion de la BD */
             );
 
         case TIPO_ACTIVIDAD:
@@ -34,8 +33,8 @@ NegocioOO* NegocioFactory::crear(const ParsedServicio& parsed, int capacidad)
                 parsed.horaApertura,
                 parsed.horaCierre,
                 capacidad,
-                parsed.dias,  /* dias de la actividad */
-                0             /* plazasOcupadas: se calcula en servidor     */
+                parsed.descripcion,  /* descripcion de la actividad */
+                parsed.dias          /* dias en que se celebra      */
             );
 
         case TIPO_SERVICIO:
@@ -47,7 +46,7 @@ NegocioOO* NegocioFactory::crear(const ParsedServicio& parsed, int capacidad)
                 parsed.horaApertura,
                 parsed.horaCierre,
                 capacidad,
-                parsed.descripcion, /* descripcion viene directamente de BD */
+                parsed.descripcion,  /* descripcion viene directamente de BD */
                 parsed.dias
             );
 
@@ -78,7 +77,7 @@ NegocioOO* NegocioFactory::crearDesdeLinea(const std::string& linea,
 {
     ParsedServicio parsed = parseServicio(linea);
 
-    /* Si el caller no pasa capacidad explícita (0) usamos la del protocolo */
+    /* Si el caller no pasa capacidad explicita (0) usamos la del protocolo */
     int cap = (capacidad != 0) ? capacidad : parsed.capacidad;
 
     return crear(parsed, cap);

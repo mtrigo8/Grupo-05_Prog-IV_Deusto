@@ -202,6 +202,23 @@ void CacheOO::mostrarReservas() const
     }
 }
 
+/* ── contarReservasPorServicio ──────────────────────────────────────────── */
+
+int CacheOO::contarReservasPorServicio(int idServicio) const
+{
+    int count = 0;
+
+    for (int i = 0; i < (int)_reservas.size(); i++)
+    {
+        if (_reservas[i]->getIdServicio() == idServicio)
+        {
+            count++;
+        }
+    }
+
+    return count;
+}
+
 /* =====================================================================
  * UTILIDAD GENERAL
  * ===================================================================== */

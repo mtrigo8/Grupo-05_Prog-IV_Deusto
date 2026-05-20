@@ -12,13 +12,14 @@ Actividad::Actividad(int                id,
                      const std::string& horaApertura,
                      const std::string& horaCierre,
                      int                capacidad,
-                     const std::string& dias,
-                     int                plazasOcupadas)
+                     const std::string& descripcion,
+                     const std::string& dias)
     : NegocioOO(id, nombre, municipio, horaApertura, horaCierre, capacidad),
-      _dias(dias),
-      _plazasOcupadas(plazasOcupadas)
+      _descripcion(descripcion),
+      _dias(dias)
 {
-    /* cuerpo vacio: la lista de inicializacion asigna todos los campos */
+    /* _plazasOcupadas se inicializa a 0 en NegocioOO y se actualiza desde
+     * la cache de reservas cuando se carga el listado de negocios          */
 }
 
 /* ── Destructor ─────────────────────────────────────────────────────────── */
@@ -39,8 +40,15 @@ std::string Actividad::getTipo() const
 
 void Actividad::mostrar() const
 {
-    /* Bloque comun: [actividad] nombre / municipio / horario / capacidad */
+    /* Bloque comun: [actividad] nombre / municipio / horario /
+     * "Plazas: X libres / Y totales"                          */
     mostrarComun();
+
+    /* Descripcion de la actividad */
+    if (!_descripcion.empty())
+    {
+        std::cout << "Descripcion : " << _descripcion << "\n";
+    }
 
     /* Dias en que se celebra la actividad */
     if (!_dias.empty())
@@ -52,38 +60,29 @@ void Actividad::mostrar() const
         std::cout << "Dias        : no especificados\n";
     }
 
-    /* Plazas disponibles */
-    std::cout << "Plazas      : " << getPlazasLibres()
-              << " libres / " << _capacidad << " totales\n";
-
     std::cout << "-------------------------\n";
 }
 
 /* ── Getters propios ────────────────────────────────────────────────────── */
+
+const std::string& Actividad::getDescripcion() const
+{
+    return _descripcion;
+}
 
 const std::string& Actividad::getDias() const
 {
     return _dias;
 }
 
-int Actividad::getPlazasOcupadas() const
-{
-    return _plazasOcupadas;
-}
-
-int Actividad::getPlazasLibres() const
-{
-    return _capacidad - _plazasOcupadas;
-}
-
 /* ── Setters propios ────────────────────────────────────────────────────── */
+
+void Actividad::setDescripcion(const std::string& descripcion)
+{
+    _descripcion = descripcion;
+}
 
 void Actividad::setDias(const std::string& dias)
 {
     _dias = dias;
-}
-
-void Actividad::setPlazasOcupadas(int plazasOcupadas)
-{
-    _plazasOcupadas = plazasOcupadas;
 }

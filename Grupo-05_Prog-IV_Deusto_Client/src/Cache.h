@@ -41,6 +41,12 @@ public:
     Reserva* buscarReservaPorId(int idReserva) const;
     void mostrarReservas() const;
 
+    /**
+     * Devuelve cuantas reservas de la cache corresponden a idServicio.
+     * Sirve para calcular las plazas ocupadas de un negocio concreto.
+     */
+    int contarReservasPorServicio(int idServicio) const;
+
     /* =====================================================================
      * UTILIDAD GENERAL
      * ===================================================================== */

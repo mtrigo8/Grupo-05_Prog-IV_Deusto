@@ -6,8 +6,8 @@
 #include <limits>
 #include <vector>
 #include <string>
-#include <algorithm> // Requerido para std::copy_if
-#include <iterator>  // Requerido para std::back_inserter
+#include <algorithm>
+#include <iterator>
 
 /* ── Vista ───────────────────────────────────────────────────────────────── */
 
@@ -26,6 +26,10 @@ void crearMenuNegocios()
 
 /* ── Helpers internos ────────────────────────────────────────────────────── */
 
+/**
+ * Carga todos los negocios del servidor y sincroniza las plazas ocupadas
+ * con la cache de reservas del usuario actual.
+ */
 static void cargarNegocios(SocketClient& sock, CacheOO& cache)
 {
     cache.limpiarNegocios();
@@ -59,6 +63,16 @@ static void cargarNegocios(SocketClient& sock, CacheOO& cache)
     }
 
     std::cout << cache.getTotalNegocios() << " negocios cargados desde el servidor.\n";
+
+    /* Sincronizar plazas ocupadas con la cache de reservas del usuario.
+     * Si el usuario tiene reservas cargadas, cada negocio mostrara
+     * correctamente cuantas plazas estan ocupadas.                   */
+    for (int i = 0; i < cache.getTotalNegocios(); i++)
+    {
+        NegocioOO* n = cache.getNegocio(i);
+        int ocupadas = cache.contarReservasPorServicio(n->getId());
+        n->setPlazasOcupadas(ocupadas);
+    }
 }
 
 static void mostrarTodos(SocketClient& sock, CacheOO& cache)
@@ -92,28 +106,27 @@ static void mostrarPorTipo(SocketClient& sock, CacheOO& cache, TipoNegocio tipo)
     {
         std::cout << "\n--- Mostrando negocios del tipo: " << tipoAString(tipo) << " ---\n";
 
-        // 1. Obtenemos la lista completa de la cache usando el nuevo método público
         const std::vector<NegocioOO*>& todosLosNegocios = cache.getNegocios();
 
-        // 2. Creamos un vector temporal para guardar los elementos filtrados
         std::vector<NegocioOO*> negociosFiltrados;
 
-        for(int i = 0; i < todosLosNegocios.size(); i++){
-        	if(tipo == todosLosNegocios[i]->getTipoEnum()){
-        		negociosFiltrados.push_back(todosLosNegocios[i]);
-        	}
+        for (int i = 0; i < (int)todosLosNegocios.size(); i++)
+        {
+            if (tipo == todosLosNegocios[i]->getTipoEnum())
+            {
+                negociosFiltrados.push_back(todosLosNegocios[i]);
+            }
         }
 
-        // 4. Recorremos e imprimimos el resultado de tu filtrado algorítmico
         if (negociosFiltrados.empty())
         {
             std::cout << "No se encontraron negocios del tipo \"" << tipoAString(tipo) << "\".\n";
         }
         else
         {
-            for (NegocioOO* negocio : negociosFiltrados)
+            for (int i = 0; i < (int)negociosFiltrados.size(); i++)
             {
-                negocio->mostrar(); // Llama al método mostrar de cada objeto individual
+                negociosFiltrados[i]->mostrar();
             }
         }
     }

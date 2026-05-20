@@ -17,7 +17,8 @@ NegocioOO::NegocioOO(int                id,
       _municipio(municipio),
       _horaApertura(horaApertura),
       _horaCierre(horaCierre),
-      _capacidad(capacidad)
+      _capacidad(capacidad),
+      _plazasOcupadas(0)
 {
 }
 
@@ -67,6 +68,17 @@ int NegocioOO::getCapacidad() const
     return _capacidad;
 }
 
+int NegocioOO::getPlazasOcupadas() const
+{
+    return _plazasOcupadas;
+}
+
+int NegocioOO::getPlazasLibres() const
+{
+    int libres = _capacidad - _plazasOcupadas;
+    return (libres < 0) ? 0 : libres;
+}
+
 /* ── Setters ────────────────────────────────────────────────────────────── */
 
 void NegocioOO::setCapacidad(int capacidad)
@@ -84,6 +96,11 @@ void NegocioOO::setHoraCierre(const std::string& horaCierre)
     _horaCierre = horaCierre;
 }
 
+void NegocioOO::setPlazasOcupadas(int plazasOcupadas)
+{
+    _plazasOcupadas = (plazasOcupadas < 0) ? 0 : plazasOcupadas;
+}
+
 /* ── mostrarComun ───────────────────────────────────────────────────────── */
 
 void NegocioOO::mostrarComun() const
@@ -93,6 +110,7 @@ void NegocioOO::mostrarComun() const
               << "  (ID: " << _id << ")\n"
               << "Municipio  : " << _municipio    << "\n"
               << "Horario    : " << _horaApertura << " - " << _horaCierre << "\n"
-              << "Capacidad  : " << _capacidad    << " plazas\n"
+              << "Plazas     : " << getPlazasLibres()
+              << " libres / "    << _capacidad << " totales\n"
               << "-------------------------\n";
 }

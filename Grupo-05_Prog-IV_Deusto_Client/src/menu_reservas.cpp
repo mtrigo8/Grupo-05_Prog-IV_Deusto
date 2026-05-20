@@ -71,6 +71,14 @@ static void cargarReservas(SocketClient&   sock,
     }
 
     std::cout << cache.getTotalReservas() << " reservas cargadas.\n";
+
+    /* Sincronizar plazas ocupadas en los negocios que esten en cache */
+    for (int i = 0; i < cache.getTotalNegocios(); i++)
+    {
+        NegocioOO* n = cache.getNegocio(i);
+        int ocupadas = cache.contarReservasPorServicio(n->getId());
+        n->setPlazasOcupadas(ocupadas);
+    }
 }
 
 /* ── gestionVerReservas ───────────────────────────────────────────────────
@@ -98,7 +106,8 @@ static void gestionVerReservas(SocketClient&   sock,
 
 /* ── gestionHacerReserva ──────────────────────────────────────────────────
  * CREATE_RESERVA: pide un id de servicio y crea la reserva.
- * Actualiza la cache recargandola tras el exito.
+ * Actualiza la cache recargandola tras el exito y descuenta una plaza
+ * del negocio correspondiente si este esta en la cache de negocios.
  * ------------------------------------------------------------------------- */
 static void gestionHacerReserva(SocketClient&   sock,
                                 CacheOO&        cache,
@@ -142,7 +151,14 @@ static void gestionHacerReserva(SocketClient&   sock,
     {
         std::cout << "Reserva creada correctamente.\n";
 
-        /* Recargar cache para reflejar la nueva reserva */
+        /* Decrementar una plaza libre en el negocio si esta en cache */
+        NegocioOO* negocio = cache.buscarNegocioPorId(idServicio);
+        if (negocio != nullptr)
+        {
+            negocio->setPlazasOcupadas(negocio->getPlazasOcupadas() + 1);
+        }
+
+        /* Recargar cache de reservas para reflejar la nueva reserva */
         cargarReservas(sock, cache, sesion);
     }
     else if (esError(respuesta))
@@ -162,7 +178,7 @@ static void gestionHacerReserva(SocketClient&   sock,
 
 /* ── gestionCancelarReserva ───────────────────────────────────────────────
  * CANCEL_RESERVA: muestra reservas, pide id y cancela la elegida.
- * Limpia la cache tras el exito.
+ * Libera una plaza en el negocio correspondiente y limpia la cache.
  * ------------------------------------------------------------------------- */
 static void gestionCancelarReserva(SocketClient&   sock,
                                    CacheOO&        cache,
@@ -198,7 +214,7 @@ static void gestionCancelarReserva(SocketClient&   sock,
         return;
     }
 
-    /* Validar en cache antes de ir al servidor. */
+    /* Validar en cache antes de ir al servidor */
     Reserva* reserva = cache.buscarReservaPorId(idReserva);
 
     if (reserva == nullptr)
@@ -214,7 +230,10 @@ static void gestionCancelarReserva(SocketClient&   sock,
         return;
     }
 
-    /* Enviar comando y parametros. */
+    /* Guardar idServicio antes de limpiar la cache */
+    int idServicio = reserva->getIdServicio();
+
+    /* Enviar comando y parametros */
     if (!sock.enviar(CMD_CANCEL_RESERVA))
     {
         std::cout << "Error: no se pudo enviar el comando al servidor.\n";
@@ -233,7 +252,14 @@ static void gestionCancelarReserva(SocketClient&   sock,
     {
         std::cout << "Reserva #" << idReserva << " cancelada correctamente.\n";
 
-        /* Limpiar cache: ya no esta activa */
+        /* Liberar una plaza en el negocio si esta en cache */
+        NegocioOO* negocio = cache.buscarNegocioPorId(idServicio);
+        if (negocio != nullptr)
+        {
+            negocio->setPlazasOcupadas(negocio->getPlazasOcupadas() - 1);
+        }
+
+        /* Limpiar cache de reservas: ya no esta activa */
         cache.limpiarReservas();
     }
     else if (esError(respuesta))
@@ -306,6 +332,9 @@ static void gestionModificarReserva(SocketClient&   sock,
         return;
     }
 
+    /* Guardar el servicio antiguo antes de modificar */
+    int idServicioAntiguo = reserva->getIdServicio();
+
     /* Pedir el nuevo servicio */
     std::cout << "Introduce el ID del nuevo servicio (0 para volver): ";
     int idNuevoServicio = 0;
@@ -343,8 +372,16 @@ static void gestionModificarReserva(SocketClient&   sock,
     {
         std::cout << "Reserva #" << idReserva << " actualizada correctamente.\n";
 
+        /* Actualizar plazas: liberar en el servicio antiguo y ocupar en el nuevo */
+        NegocioOO* negAntiguo = cache.buscarNegocioPorId(idServicioAntiguo);
+        if (negAntiguo != nullptr)
+            negAntiguo->setPlazasOcupadas(negAntiguo->getPlazasOcupadas() - 1);
 
-        /* Recargar cache para reflejar el cambio */
+        NegocioOO* negNuevo = cache.buscarNegocioPorId(idNuevoServicio);
+        if (negNuevo != nullptr)
+            negNuevo->setPlazasOcupadas(negNuevo->getPlazasOcupadas() + 1);
+
+        /* Recargar cache de reservas para reflejar el cambio */
         cargarReservas(sock, cache, sesion);
     }
     else if (esError(respuesta))

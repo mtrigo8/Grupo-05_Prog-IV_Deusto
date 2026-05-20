@@ -20,8 +20,6 @@ enum TipoNegocio
 
 inline TipoNegocio tipoDesdeString(const std::string& tipo)
 {
-    /* Convertir a minusculas para que funcione tanto si el servidor
-     * envia "Restaurante" como "restaurante" o "RESTAURANTE" */
     std::string lower = tipo;
     for (size_t i = 0; i < lower.size(); i++)
     {
@@ -73,18 +71,21 @@ public:
 
     /* ── Getters ─────────────────────────────────────────────────────────── */
 
-    int                getId()           const;
-    const std::string& getNombre()       const;
-    const std::string& getMunicipio()    const;
-    const std::string& getHoraApertura() const;
-    const std::string& getHoraCierre()   const;
-    int                getCapacidad()    const;
+    int                getId()            const;
+    const std::string& getNombre()        const;
+    const std::string& getMunicipio()     const;
+    const std::string& getHoraApertura()  const;
+    const std::string& getHoraCierre()    const;
+    int                getCapacidad()     const;
+    int                getPlazasOcupadas() const;
+    int                getPlazasLibres()   const;   /* capacidad - ocupadas */
 
     /* ── Setters ─────────────────────────────────────────────────────────── */
 
     void setCapacidad(int capacidad);
     void setHoraApertura(const std::string& horaApertura);
     void setHoraCierre(const std::string& horaCierre);
+    void setPlazasOcupadas(int plazasOcupadas);
 
 protected:
 
@@ -96,6 +97,7 @@ protected:
     std::string _horaApertura;
     std::string _horaCierre;
     int         _capacidad;
+    int         _plazasOcupadas;   /* reservas activas para este servicio */
 
     /* ── Helper protegido ────────────────────────────────────────────────── */
 
