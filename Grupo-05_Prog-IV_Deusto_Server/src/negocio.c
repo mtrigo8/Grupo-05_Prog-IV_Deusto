@@ -1,14 +1,5 @@
 /*
  * negocio.c
- *
- *  Implementacion de:
- *    - negocio_free       : libera los campos dinamicos de un Negocio
- *    - convertirDiasInt   : string "LUNES, MARTES, ..." -> mascara de bits
- *    - convertirIntDias   : mascara de bits             -> string "LUNES, MARTES, ..."
- *    - get_negocios       : consulta todos los servicios de la BD
- *    - insert_negocio     : inserta un nuevo servicio en la BD
- *    - delete_negocio     : elimina un servicio de la BD
- *    - update_negocio     : actualiza un servicio existente en la BD
  */
 
 #include "negocio.h"
@@ -32,7 +23,7 @@ void negocio_free(Negocio *n) {
     free(n->tipo);          n->tipo          = NULL;
     free(n->dias);          n->dias          = NULL;
     free(n->descripcion);   n->descripcion   = NULL;
-    /* fecha es int, no se libera */
+    /* fecha y capacidad_max son int, no se liberan */
 }
 
 /* ──────────────────────────────────────────────
@@ -92,7 +83,6 @@ Negocio *get_negocios(sqlite3 *db, int *total_negocios) {
 
     *total_negocios = 0;
 
-    /* Contar registros */
     const char sql_count[] = "SELECT COUNT(*) FROM servicio";
     if (sqlite3_prepare_v2(db, sql_count, -1, &stmt, NULL) != SQLITE_OK) {
         printf("Error preparando el COUNT: %s\n", sqlite3_errmsg(db));
@@ -113,13 +103,11 @@ Negocio *get_negocios(sqlite3 *db, int *total_negocios) {
         fflush(stdout);
         return NULL;
     }
-    /* Inicializar todos los punteros a NULL para que negocio_free sea seguro
-     * aunque falle strdup a mitad de la inicializacion */
     memset(lista, 0, cantidad * sizeof(Negocio));
 
     const char sql_datos[] =
         "SELECT nombre_servicio, municipio, hora_apertura, hora_cierre, "
-        "       fecha, tipo_servicio "
+        "       fecha, tipo_servicio, capacidad_max "
         "FROM servicio";
 
     if (sqlite3_prepare_v2(db, sql_datos, -1, &stmt, NULL) != SQLITE_OK) {
@@ -145,12 +133,13 @@ Negocio *get_negocios(sqlite3 *db, int *total_negocios) {
         val = (const char *)sqlite3_column_text(stmt, 3);
         lista[i].hora_cierre   = val ? strdup(val) : NULL;
 
-        lista[i].fecha = sqlite3_column_int(stmt, 4);
+        lista[i].fecha         = sqlite3_column_int(stmt, 4);
 
         val = (const char *)sqlite3_column_text(stmt, 5);
         lista[i].tipo          = val ? strdup(val) : NULL;
 
-        /* descripcion y dias no vienen de esta consulta; quedan NULL */
+        /* FIX: leer capacidad_max de la BD */
+        lista[i].capacidad_max = sqlite3_column_int(stmt, 6);
 
         i++;
     }
@@ -168,10 +157,17 @@ Negocio *get_negocios(sqlite3 *db, int *total_negocios) {
 int insert_negocio(sqlite3 *db, Negocio n) {
     sqlite3_stmt *stmt;
 
+    /*
+     * FIX: la version anterior no incluia capacidad_max ni descripcion
+     * en el INSERT, por lo que todos los negocios creados desde el Admin
+     * quedaban con capacidad_max = 0 en la BD. El servidor interpretaba
+     * eso como "sin cupos" y rechazaba todas las reservas con ERR|SIN_CUPOS.
+     */
     const char sql[] =
         "INSERT INTO servicio "
-        "(nombre_servicio, municipio, hora_apertura, hora_cierre, fecha, tipo_servicio) "
-        "VALUES (?, ?, ?, ?, ?, ?)";
+        "(nombre_servicio, municipio, hora_apertura, hora_cierre, "
+        " fecha, tipo_servicio, capacidad_max, descripcion) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
     int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (result != SQLITE_OK) {
@@ -186,6 +182,8 @@ int insert_negocio(sqlite3 *db, Negocio n) {
     sqlite3_bind_text(stmt, 4, n.hora_cierre,    -1, SQLITE_TRANSIENT);
     sqlite3_bind_int (stmt, 5, n.fecha);
     sqlite3_bind_text(stmt, 6, n.tipo,           -1, SQLITE_TRANSIENT);
+    sqlite3_bind_int (stmt, 7, n.capacidad_max);                        /* FIX */
+    sqlite3_bind_text(stmt, 8, n.descripcion,    -1, SQLITE_TRANSIENT); /* FIX */
 
     result = sqlite3_step(stmt);
     sqlite3_finalize(stmt);
@@ -198,10 +196,12 @@ int insert_negocio(sqlite3 *db, Negocio n) {
                  n.nombre ? n.nombre : "(sin nombre)");
         registrar_log(db, 0, "ERROR", msg);
     } else {
-        snprintf(msg, sizeof(msg), "Negocio insertado: %s en %s (tipo: %s)",
+        snprintf(msg, sizeof(msg),
+                 "Negocio insertado: %s en %s (tipo: %s, capacidad: %d)",
                  n.nombre    ? n.nombre    : "",
                  n.municipio ? n.municipio : "",
-                 n.tipo      ? n.tipo      : "");
+                 n.tipo      ? n.tipo      : "",
+                 n.capacidad_max);
         registrar_log(db, 0, "INFO", msg);
     }
 

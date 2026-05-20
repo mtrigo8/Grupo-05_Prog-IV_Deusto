@@ -26,6 +26,7 @@ typedef struct {
     char *tipo;             /* malloc — max ~49 chars util */
     char *dias;             /* malloc — dias en string, provisional */
     char *descripcion;      /* malloc — puede ser largo (hasta ~999 chars) */
+    int   capacidad_max;    /* FIX: capacidad maxima del servicio */
 } Negocio;
 
 enum Dias {
@@ -40,33 +41,18 @@ enum Dias {
 
 /* ── Gestion de memoria ── */
 
-/* Libera todos los campos dinamicos de un Negocio y los pone a NULL.
- * NO libera el propio puntero n (solo sus campos internos). */
 void negocio_free(Negocio *n);
 
 /* ── Conversion de dias ── */
 
-/* Convierte una cadena de dias separados por comas a mascara de bits */
 int  convertirDiasInt(char dias[]);
-
-/* Convierte una mascara de bits a cadena de dias separados por comas.
- * 'resultado' debe tener al menos 100 bytes. */
 void convertirIntDias(int mascara, char resultado[]);
 
 /* ── Operaciones CRUD en base de datos ── */
 
-/* Obtiene todos los negocios de la BD.
- * Devuelve un array asignado con malloc; el llamador debe liberarlo con
- * negocio_free() en cada elemento y luego free() sobre el array. */
 Negocio *get_negocios(sqlite3 *db, int *total_negocios);
-
-/* Inserta un nuevo negocio; devuelve SQLITE_DONE si tiene exito */
 int insert_negocio(sqlite3 *db, Negocio n);
-
-/* Elimina el negocio con ese nombre; devuelve SQLITE_DONE si tiene exito */
 int delete_negocio(sqlite3 *db, char *nombre);
-
-/* Actualiza los datos de un negocio existente; devuelve SQLITE_DONE si exito */
 int update_negocio(sqlite3 *db, char *nombre_actual, Negocio n_nuevo);
 
 #endif /* NEGOCIO_H_ */

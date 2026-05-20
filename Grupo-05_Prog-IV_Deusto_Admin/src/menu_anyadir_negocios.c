@@ -22,7 +22,10 @@ void crearMenuAnyadirNegocios(Negocio n) {
     printf("Hora apertura (hh:mm): %s\n",      n.hora_apertura ? n.hora_apertura : "");
     printf("Hora cierre  (hh:mm): %s\n",       n.hora_cierre   ? n.hora_cierre   : "");
     printf("Tipo de negocio: %s\n",            n.tipo          ? n.tipo          : "");
-    printf("Dias abierto separados por comas: %s\n", n.dias   ? n.dias           : "");
+    printf("Dias abierto separados por comas: %s\n", n.dias    ? n.dias          : "");
+    /* FIX: mostrar capacidad maxima en la vista */
+    printf("Capacidad maxima: %d\n",           n.capacidad_max);
+    printf("Descripcion: %s\n",                n.descripcion   ? n.descripcion   : "");
     printf("Pulse Enter al finalizar \n");
     printf("======================= \n");
 }
@@ -31,9 +34,8 @@ void crearMenuAnyadirNegocios(Negocio n) {
 void gestionMenuAnyadirNegocios(sqlite3 *db) {
     Negocio n;
     memset(&n, 0, sizeof(Negocio));
-    /* Todos los punteros son NULL; se iran asignando con strdup */
 
-    char tmp[1024]; /* buffer temporal de lectura */
+    char tmp[1024];
 
     /* Nombre */
     crearMenuAnyadirNegocios(n);
@@ -109,16 +111,45 @@ void gestionMenuAnyadirNegocios(sqlite3 *db) {
         tmp[0] = '\0';
         sscanf(_buf, "%255[^\n]", tmp);
         free(n.dias);
-        n.dias = strdup(tmp);
+        n.dias  = strdup(tmp);
         n.fecha = convertirDiasInt(tmp);
+        fflush(stdin);
+    }
+
+    /*
+     * FIX: pedir capacidad maxima al usuario.
+     * Antes este campo nunca se recogía, por lo que quedaba a 0 en la BD
+     * y el servidor rechazaba todas las reservas con ERR|SIN_CUPOS.
+     */
+    crearMenuAnyadirNegocios(n);
+    fflush(stdout);
+    {
+        char _buf[32];
+        fgets(_buf, sizeof(_buf), stdin);
+        int cap = 0;
+        sscanf(_buf, "%d", &cap);
+        n.capacidad_max = (cap > 0) ? cap : 1;  /* minimo 1 para evitar 0 */
+        fflush(stdin);
+    }
+
+    /* Descripcion */
+    crearMenuAnyadirNegocios(n);
+    fflush(stdout);
+    {
+        char _buf[1024];
+        fgets(_buf, sizeof(_buf), stdin);
+        tmp[0] = '\0';
+        sscanf(_buf, "%999[^\n]", tmp);
+        free(n.descripcion);
+        n.descripcion = strdup(tmp);
         fflush(stdin);
     }
 
     int res = insert_negocio(db, n);
 
     if (res == SQLITE_DONE) {
-        printf("\n¡Negocio '%s' anyadido con exito a la base de datos!\n",
-               n.nombre ? n.nombre : "");
+        printf("\n¡Negocio '%s' anyadido con exito (capacidad: %d)!\n",
+               n.nombre ? n.nombre : "", n.capacidad_max);
     } else {
         printf("\nError: No se pudo anyadir (¿Quizas ese nombre ya existe?).\n");
     }
@@ -127,6 +158,5 @@ void gestionMenuAnyadirNegocios(sqlite3 *db) {
     fflush(stdout);
     getchar();
 
-    /* Liberar todos los campos dinamicos del negocio */
     negocio_free(&n);
 }
