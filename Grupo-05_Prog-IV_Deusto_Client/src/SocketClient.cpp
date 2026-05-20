@@ -156,3 +156,5 @@ std::string SocketClient::recibir() {
 bool SocketClient::estaConectado() const {
     return _conectado;
 }
+
+

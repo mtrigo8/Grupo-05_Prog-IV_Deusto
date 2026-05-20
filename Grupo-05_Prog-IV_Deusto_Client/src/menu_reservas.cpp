@@ -29,7 +29,7 @@ void crearMenuReservas()
  * ========================================================================= */
 
 /* ── cargarReservas ────────────────────────────────────────────────────── */
-static void cargarReservas(SocketClient&   sock,
+ void cargarReservas(SocketClient&   sock,
                            CacheOO&        cache,
                            const SesionOO& sesion)
 {

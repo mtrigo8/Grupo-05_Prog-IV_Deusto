@@ -311,3 +311,27 @@
 [2026-05-20 08:58:37] [INFO ] UPDATE_RESERVA procesado
 [2026-05-20 08:58:50] [INFO ] GET_SERVICIOS: 50 servicios enviados (todos los tipos)
 [2026-05-20 08:58:50] [INFO ] GET_SERVICIOS procesado
+[2026-05-20 09:34:17] [INFO ] Conexion cerrada por el cliente o error de red
+[2026-05-20 09:34:17] [INFO ] Servidor cerrado correctamente
+[2026-05-20 09:34:25] [INFO ] Cargando configuracion...
+[2026-05-20 09:34:25] [INFO ] Migracion DB: columna 'descripcion' verificada
+[2026-05-20 09:34:25] [INFO ] Servidor arrancado en 127.0.0.1:8080
+[2026-05-20 09:34:30] [INFO ] Cliente conectado
+[2026-05-20 09:35:32] [INFO ] LOGIN exitoso: id=1 nombre=Markel DNI=22761560R
+[2026-05-20 09:35:32] [INFO ] LOGIN procesado
+[2026-05-20 09:35:40] [INFO ] GET_RESERVA procesado
+[2026-05-20 09:57:14] [INFO ] Conexion cerrada por el cliente o error de red
+[2026-05-20 09:57:14] [INFO ] Servidor cerrado correctamente
+[2026-05-20 09:57:58] [INFO ] Cargando configuracion...
+[2026-05-20 09:57:58] [INFO ] Migracion DB: columna 'descripcion' verificada
+[2026-05-20 09:57:58] [INFO ] Servidor arrancado en 127.0.0.1:8080
+[2026-05-20 09:58:03] [INFO ] Cliente conectado
+[2026-05-20 09:58:12] [INFO ] LOGIN exitoso: id=1 nombre=Markel DNI=22761560R
+[2026-05-20 09:58:12] [INFO ] LOGIN procesado
+[2026-05-20 09:58:17] [INFO ] GET_RESERVA procesado
+[2026-05-20 09:58:27] [INFO ] GET_RESERVA procesado
+[2026-05-20 09:58:39] [INFO ] GET_RESERVA procesado
+[2026-05-20 09:58:47] [INFO ] UPDATE_RESERVA procesado
+[2026-05-20 09:58:52] [INFO ] GET_RESERVA procesado
+[2026-05-20 09:58:55] [INFO ] Reserva actualizada: id=4 nuevo_servicio=5 usuario=1
+[2026-05-20 09:58:55] [INFO ] UPDATE_RESERVA procesado

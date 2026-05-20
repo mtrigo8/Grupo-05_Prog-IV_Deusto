@@ -18,6 +18,6 @@
 void crearMenuNegocios();
 
 /* Punto de entrada al submenu de negocios desde menu_principal */
-void gestionMenuNegocios(SocketClient& sock, CacheOO& cache);
+void gestionMenuNegocios(SocketClient& sock, CacheOO& cache, const SesionOO& sesion);
 
 #endif /* MENU_NEGOCIOS_H_ */

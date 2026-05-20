@@ -86,7 +86,7 @@ void gestionMenuPrincipal(SocketClient& sock,
         {
             case 1:
                 /* Delegar al nuevo submenu de negocios */
-                gestionMenuNegocios(sock, cache);
+                gestionMenuNegocios(sock, cache, sesion);
                 break;
 
             case 2:

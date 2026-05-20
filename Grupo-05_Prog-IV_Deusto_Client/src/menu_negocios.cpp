@@ -1,6 +1,7 @@
 #include "menu_negocios.h"
 #include "Protocol.h"
 #include "NegocioFactory.h"
+#include "menu_reservas.h"
 
 #include <iostream>
 #include <limits>
@@ -30,8 +31,9 @@ void crearMenuNegocios()
  * Carga todos los negocios del servidor y sincroniza las plazas ocupadas
  * con la cache de reservas del usuario actual.
  */
-static void cargarNegocios(SocketClient& sock, CacheOO& cache)
+static void cargarNegocios(SocketClient& sock, CacheOO& cache, const SesionOO& sesion)
 {
+    cargarReservas(sock, cache, sesion);
     cache.limpiarNegocios();
 
     if (!sock.enviar(CMD_GET_SERVICIOS))
@@ -75,10 +77,10 @@ static void cargarNegocios(SocketClient& sock, CacheOO& cache)
     }
 }
 
-static void mostrarTodos(SocketClient& sock, CacheOO& cache)
+static void mostrarTodos(SocketClient& sock, CacheOO& cache, const SesionOO& sesion)
 {
     std::cout << "\nCargando negocios del servidor...\n";
-    cargarNegocios(sock, cache);
+    cargarNegocios(sock, cache, sesion);
 
     if (cache.getTotalNegocios() == 0)
     {
@@ -93,10 +95,10 @@ static void mostrarTodos(SocketClient& sock, CacheOO& cache)
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
-static void mostrarPorTipo(SocketClient& sock, CacheOO& cache, TipoNegocio tipo)
+static void mostrarPorTipo(SocketClient& sock, CacheOO& cache, TipoNegocio tipo, const SesionOO& sesion)
 {
     std::cout << "\nCargando negocios del servidor...\n";
-    cargarNegocios(sock, cache);
+    cargarNegocios(sock, cache, sesion);
 
     if (cache.getTotalNegocios() == 0)
     {
@@ -138,7 +140,7 @@ static void mostrarPorTipo(SocketClient& sock, CacheOO& cache, TipoNegocio tipo)
 
 /* ── Logica principal ────────────────────────────────────────────────────── */
 
-void gestionMenuNegocios(SocketClient& sock, CacheOO& cache)
+void gestionMenuNegocios(SocketClient& sock, CacheOO& cache, const SesionOO& sesion)
 {
     int  opcion = 0;
     bool salir  = false;
@@ -161,16 +163,16 @@ void gestionMenuNegocios(SocketClient& sock, CacheOO& cache)
         switch (opcion)
         {
             case 1:
-                mostrarPorTipo(sock, cache, TIPO_ACTIVIDAD);
+                mostrarPorTipo(sock, cache, TIPO_ACTIVIDAD, sesion);
                 break;
             case 2:
-                mostrarPorTipo(sock, cache, TIPO_RESTAURANTE);
+                mostrarPorTipo(sock, cache, TIPO_RESTAURANTE, sesion);
                 break;
             case 3:
-                mostrarPorTipo(sock, cache, TIPO_SERVICIO);
+                mostrarPorTipo(sock, cache, TIPO_SERVICIO, sesion);
                 break;
             case 4:
-                mostrarTodos(sock, cache);
+                mostrarTodos(sock, cache, sesion);
                 break;
             case 5:
                 salir = true;

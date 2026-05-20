@@ -13,4 +13,6 @@ void gestionMenuReservas(SocketClient&   sock,
                          CacheOO&        cache,
                          const SesionOO& sesion);
 
+void cargarReservas(SocketClient& sock, CacheOO& cache, const SesionOO& sesion);
+
 #endif /* MENU_RESERVAS_H_ */
