@@ -198,7 +198,7 @@ static void gestionCancelarReserva(SocketClient&   sock,
         return;
     }
 
-    /* Validar en cache antes de ir al servidor */
+    /* Validar en cache antes de ir al servidor. */
     Reserva* reserva = cache.buscarReservaPorId(idReserva);
 
     if (reserva == nullptr)
