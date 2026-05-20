@@ -457,3 +457,13 @@
 [2026-05-20 14:39:59] [INFO ] LOGOUT procesado
 [2026-05-20 14:40:00] [INFO ] Conexion cerrada por el cliente o error de red
 [2026-05-20 14:40:00] [INFO ] Servidor cerrado correctamente
+[2026-05-20 19:59:48] [INFO ] Cargando configuracion...
+[2026-05-20 19:59:48] [INFO ] Migracion DB: columna 'descripcion' verificada
+[2026-05-20 19:59:48] [INFO ] Servidor arrancado en 127.0.0.1:8080
+[2026-05-20 19:59:52] [INFO ] Cliente conectado
+[2026-05-20 20:00:06] [INFO ] LOGIN exitoso: id=1 nombre=Markel DNI=22761560R
+[2026-05-20 20:00:06] [INFO ] LOGIN procesado
+[2026-05-20 20:00:29] [INFO ] Reserva creada: id=7 usuario=1 servicio=16
+[2026-05-20 20:00:29] [INFO ] CREATE_RESERVA procesado
+[2026-05-20 20:00:29] [INFO ] GET_RESERVA procesado
+[2026-05-20 20:00:34] [INFO ] GET_RESERVA procesado
