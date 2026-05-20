@@ -28,12 +28,22 @@ void crearMenuNegocios()
 /* ── Helpers internos ────────────────────────────────────────────────────── */
 
 /**
- * Carga todos los negocios del servidor y sincroniza las plazas ocupadas
- * con la cache de reservas del usuario actual.
+ * Carga todos los negocios del servidor.
+ * NO carga reservas — eso es responsabilidad del llamador si lo necesita.
+ * Sincroniza plazas ocupadas con las reservas que ya estén en caché.
+ *
+ * FIX: Se eliminó la llamada a cargarReservas() desde aquí para evitar
+ * enviar dos peticiones seguidas al servidor (GET_RESERVA + GET_SERVICIOS)
+ * sin esperar la respuesta completa de cada una, lo que causaba que los
+ * frames de ambas listas se mezclaran en el buffer TCP y el cliente los
+ * leyera desordenados.
  */
 static void cargarNegocios(SocketClient& sock, CacheOO& cache, const SesionOO& sesion)
 {
-    cargarReservas(sock, cache, sesion);
+    /* ELIMINADO: cargarReservas(sock, cache, sesion);
+     * Las reservas deben cargarse por separado ANTES de llamar a esta
+     * función si se necesita sincronización de plazas. */
+
     cache.limpiarNegocios();
 
     if (!sock.enviar(CMD_GET_SERVICIOS))
@@ -67,8 +77,8 @@ static void cargarNegocios(SocketClient& sock, CacheOO& cache, const SesionOO& s
     std::cout << cache.getTotalNegocios() << " negocios cargados desde el servidor.\n";
 
     /* Sincronizar plazas ocupadas con la cache de reservas del usuario.
-     * Si el usuario tiene reservas cargadas, cada negocio mostrara
-     * correctamente cuantas plazas estan ocupadas.                   */
+     * Si el usuario tiene reservas ya cargadas en cache, cada negocio
+     * mostrara correctamente cuantas plazas estan ocupadas.           */
     for (int i = 0; i < cache.getTotalNegocios(); i++)
     {
         NegocioOO* n = cache.getNegocio(i);
@@ -77,10 +87,21 @@ static void cargarNegocios(SocketClient& sock, CacheOO& cache, const SesionOO& s
     }
 }
 
+/**
+ * Carga reservas y luego negocios, en ese orden, esperando la respuesta
+ * completa de cada petición antes de enviar la siguiente.
+ * Esta es la función que debe usarse cuando se necesitan ambos datos.
+ */
+static void cargarReservasYNegocios(SocketClient& sock, CacheOO& cache, const SesionOO& sesion)
+{
+    cargarReservas(sock, cache, sesion);   /* 1º: GET_RESERVA completo      */
+    cargarNegocios(sock, cache, sesion);   /* 2º: GET_SERVICIOS completo     */
+}
+
 static void mostrarTodos(SocketClient& sock, CacheOO& cache, const SesionOO& sesion)
 {
     std::cout << "\nCargando negocios del servidor...\n";
-    cargarNegocios(sock, cache, sesion);
+    cargarReservasYNegocios(sock, cache, sesion);
 
     if (cache.getTotalNegocios() == 0)
     {
@@ -98,7 +119,7 @@ static void mostrarTodos(SocketClient& sock, CacheOO& cache, const SesionOO& ses
 static void mostrarPorTipo(SocketClient& sock, CacheOO& cache, TipoNegocio tipo, const SesionOO& sesion)
 {
     std::cout << "\nCargando negocios del servidor...\n";
-    cargarNegocios(sock, cache, sesion);
+    cargarReservasYNegocios(sock, cache, sesion);
 
     if (cache.getTotalNegocios() == 0)
     {

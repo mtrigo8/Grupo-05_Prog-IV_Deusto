@@ -5,14 +5,13 @@
 
 #pragma comment(lib, "ws2_32.lib")
 
-/* Tamaño del buffer de recepción */
-static const int BUFFER_SIZE = 4096;
+/* Tamaño del frame: debe coincidir con BUFF_SIZE del servidor (protocol.h) */
+static const int FRAME_SIZE = 1024;
 
 /* ── Constructor ── */
 SocketClient::SocketClient()
     : _sockfd(INVALID_SOCKET), _conectado(false)
 {
-    // Inicializar Winsock (versión 2.2)
     WSADATA wsaData;
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
         std::cerr << "[SocketClient] Error al inicializar Winsock: "
@@ -33,7 +32,6 @@ bool SocketClient::conectar(const std::string& ip, int puerto) {
         return false;
     }
 
-    // 1. Crear el socket TCP
     _sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (_sockfd == INVALID_SOCKET) {
         std::cerr << "[SocketClient] Error al crear socket: "
@@ -41,14 +39,12 @@ bool SocketClient::conectar(const std::string& ip, int puerto) {
         return false;
     }
 
-    // 2. Rellenar la estructura de dirección (igual que el servidor con inet_addr)
     struct sockaddr_in serv_addr;
     std::memset(&serv_addr, 0, sizeof(serv_addr));
     serv_addr.sin_family      = AF_INET;
     serv_addr.sin_port        = htons(static_cast<u_short>(puerto));
     serv_addr.sin_addr.s_addr = inet_addr(ip.c_str());
 
-    // 3. Conectar
     if (connect(_sockfd,
                 reinterpret_cast<struct sockaddr*>(&serv_addr),
                 sizeof(serv_addr)) == SOCKET_ERROR)
@@ -74,20 +70,43 @@ void SocketClient::desconectar() {
     _conectado = false;
 }
 
-/* ── enviar ── */
+/* ── enviar ──
+ *
+ * FIX: La version anterior enviaba exactamente mensaje.size() bytes.
+ * Como el servidor hace recv(sock, buf, BUFF_SIZE=1024), TCP puede
+ * coalescer dos send() consecutivos (p.ej. "GET_SERVICIOS" + "TODOS")
+ * en un unico recv() del servidor, que recibe "GET_SERVICIOSTODOS" y
+ * lo trata como comando desconocido.
+ *
+ * La solucion es enviar siempre un frame de exactamente FRAME_SIZE bytes
+ * (igual que recibir() lee exactamente FRAME_SIZE bytes), rellenando con
+ * ceros el espacio sobrante. Asi cada recv() del servidor corresponde
+ * exactamente a un mensaje y strcmp() funciona correctamente.
+ */
 bool SocketClient::enviar(const std::string& mensaje) {
     if (!_conectado) {
         std::cerr << "[SocketClient] No hay conexion activa para enviar.\n";
         return false;
     }
 
-    // Enviamos el mensaje completo (send puede enviar menos bytes de lo pedido)
-    int total   = static_cast<int>(mensaje.size());
+    /* Construir frame de tamano fijo relleno de ceros */
+    char frame[FRAME_SIZE];
+    std::memset(frame, 0, sizeof(frame));
+
+    /* Copiar el mensaje, truncando si supera el frame (no deberia ocurrir) */
+    std::size_t copiar = mensaje.size();
+    if (copiar >= static_cast<std::size_t>(FRAME_SIZE)) {
+        copiar = FRAME_SIZE - 1;   /* dejar al menos un \0 al final */
+    }
+    std::memcpy(frame, mensaje.c_str(), copiar);
+
+    /* Enviar el frame completo */
+    int total   = FRAME_SIZE;
     int enviado = 0;
 
     while (enviado < total) {
         int n = send(_sockfd,
-                     mensaje.c_str() + enviado,
+                     frame + enviado,
                      total - enviado,
                      0);
         if (n == SOCKET_ERROR) {
@@ -109,20 +128,11 @@ std::string SocketClient::recibir() {
         return "";
     }
 
-    /* El servidor envía mensajes de tamaño fijo BUFF_SIZE (1024 bytes).
-     * Hay que leer exactamente ese número de bytes por mensaje para no
-     * consumir datos de mensajes posteriores ni perder bytes del actual.
-     * TCP puede entregar varios mensajes juntos (coalescing), por lo que
-     * un recv() con buffer > BUFF_SIZE haría que std::string(buffer)
-     * descartara silenciosamente todo lo que viene después del primer \0. */
-    static const int FRAME_SIZE = 1024;   /* debe coincidir con BUFF_SIZE del servidor */
-
-    char    buffer[FRAME_SIZE];
-    int     leido = 0;
+    char buffer[FRAME_SIZE];
+    int  leido = 0;
 
     std::memset(buffer, 0, sizeof(buffer));
 
-    /* Bucle hasta completar el frame completo (igual que enviar()) */
     while (leido < FRAME_SIZE)
     {
         int n = recv(_sockfd,
@@ -138,7 +148,6 @@ std::string SocketClient::recibir() {
         }
 
         if (n == 0) {
-            /* El servidor cerró la conexión */
             desconectar();
             return "";
         }
@@ -146,9 +155,6 @@ std::string SocketClient::recibir() {
         leido += n;
     }
 
-    /* Construir el string como C-string para que se detenga en el primer \0
-     * y las comparaciones de protocolo ("LIST_START", "LIST_END", etc.)
-     * funcionen correctamente. */
     return std::string(buffer);
 }
 
@@ -156,5 +162,3 @@ std::string SocketClient::recibir() {
 bool SocketClient::estaConectado() const {
     return _conectado;
 }
-
-

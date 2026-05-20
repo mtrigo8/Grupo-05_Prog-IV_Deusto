@@ -335,3 +335,86 @@
 [2026-05-20 09:58:52] [INFO ] GET_RESERVA procesado
 [2026-05-20 09:58:55] [INFO ] Reserva actualizada: id=4 nuevo_servicio=5 usuario=1
 [2026-05-20 09:58:55] [INFO ] UPDATE_RESERVA procesado
+[2026-05-20 10:10:31] [INFO ] Cargando configuracion...
+[2026-05-20 10:10:31] [ERROR] No se pudo abrir la base de datos
+[2026-05-20 10:15:46] [INFO ] Cargando configuracion...
+[2026-05-20 10:15:46] [INFO ] Migracion DB: columna 'descripcion' verificada
+[2026-05-20 10:15:46] [INFO ] Servidor arrancado en 127.0.0.1:8080
+[2026-05-20 10:16:02] [INFO ] Cliente conectado
+[2026-05-20 10:16:58] [WARN ] LOGIN: credenciales invalidas
+[2026-05-20 10:16:58] [INFO ] LOGIN procesado
+[2026-05-20 10:17:32] [INFO ] Conexion cerrada por el cliente o error de red
+[2026-05-20 10:17:32] [INFO ] Servidor cerrado correctamente
+[2026-05-20 10:18:24] [INFO ] Cargando configuracion...
+[2026-05-20 10:18:24] [INFO ] Migracion DB: columna 'descripcion' verificada
+[2026-05-20 10:18:24] [INFO ] Servidor arrancado en 127.0.0.1:8080
+[2026-05-20 10:18:29] [INFO ] Cliente conectado
+[2026-05-20 10:18:50] [INFO ] Conexion cerrada por el cliente o error de red
+[2026-05-20 10:18:50] [INFO ] Servidor cerrado correctamente
+[2026-05-20 10:19:05] [INFO ] Cargando configuracion...
+[2026-05-20 10:19:05] [INFO ] Migracion DB: columna 'descripcion' verificada
+[2026-05-20 10:19:05] [INFO ] Servidor arrancado en 127.0.0.1:8080
+[2026-05-20 10:19:19] [INFO ] Cliente conectado
+[2026-05-20 10:21:57] [INFO ] REGISTER exitoso: id=50 nombre=gaizka DNI=assasas
+[2026-05-20 10:21:57] [INFO ] REGISTER procesado
+[2026-05-20 10:22:19] [INFO ] LOGIN exitoso: id=3 nombre=gaizka DNI=assasas
+[2026-05-20 10:22:19] [INFO ] LOGIN procesado
+[2026-05-20 10:22:29] [INFO ] GET_RESERVA procesado
+[2026-05-20 10:22:37] [INFO ] GET_RESERVA procesado
+[2026-05-20 10:22:39] [INFO ] GET_RESERVA procesado
+[2026-05-20 10:22:41] [INFO ] GET_RESERVA procesado
+[2026-05-20 10:22:47] [INFO ] GET_RESERVA procesado
+[2026-05-20 10:22:52] [INFO ] GET_RESERVA procesado
+[2026-05-20 10:22:56] [INFO ] GET_RESERVA procesado
+[2026-05-20 10:25:52] [INFO ] Conexion cerrada por el cliente o error de red
+[2026-05-20 10:25:52] [INFO ] Servidor cerrado correctamente
+[2026-05-20 10:28:40] [INFO ] Cargando configuracion...
+[2026-05-20 10:28:40] [INFO ] Migracion DB: columna 'descripcion' verificada
+[2026-05-20 10:28:40] [INFO ] Servidor arrancado en 127.0.0.1:8080
+[2026-05-20 10:28:48] [INFO ] Cliente conectado
+[2026-05-20 10:29:17] [INFO ] REGISTER exitoso: id=52 nombre=gaizka DNI=1234
+[2026-05-20 10:29:17] [INFO ] REGISTER procesado
+[2026-05-20 10:29:24] [INFO ] LOGIN exitoso: id=4 nombre=gaizka DNI=1234
+[2026-05-20 10:29:24] [INFO ] LOGIN procesado
+[2026-05-20 10:29:43] [INFO ] GET_RESERVA procesado
+[2026-05-20 10:29:47] [INFO ] GET_RESERVA procesado
+[2026-05-20 10:29:48] [INFO ] GET_RESERVA procesado
+[2026-05-20 10:29:52] [INFO ] GET_RESERVA procesado
+[2026-05-20 10:30:14] [INFO ] Conexion cerrada por el cliente o error de red
+[2026-05-20 10:30:14] [INFO ] Servidor cerrado correctamente
+[2026-05-20 10:31:14] [INFO ] Cargando configuracion...
+[2026-05-20 10:31:14] [INFO ] Migracion DB: columna 'descripcion' verificada
+[2026-05-20 10:31:14] [INFO ] Servidor arrancado en 127.0.0.1:8080
+[2026-05-20 10:31:17] [INFO ] Cliente conectado
+[2026-05-20 10:31:30] [INFO ] LOGIN exitoso: id=4 nombre=gaizka DNI=1234
+[2026-05-20 10:31:30] [INFO ] LOGIN procesado
+[2026-05-20 10:31:34] [INFO ] GET_RESERVA procesado
+[2026-05-20 10:31:44] [INFO ] GET_RESERVA procesado
+[2026-05-20 10:31:45] [INFO ] GET_RESERVA procesado
+[2026-05-20 10:31:46] [INFO ] GET_RESERVA procesado
+[2026-05-20 10:31:49] [INFO ] GET_RESERVA procesado
+[2026-05-20 11:03:11] [INFO ] Cargando configuracion...
+[2026-05-20 11:03:11] [INFO ] Migracion DB: columna 'descripcion' verificada
+[2026-05-20 11:03:11] [INFO ] Servidor arrancado en 127.0.0.1:8080
+[2026-05-20 11:03:26] [INFO ] Cliente conectado
+[2026-05-20 11:03:35] [INFO ] LOGIN exitoso: id=4 nombre=gaizka DNI=1234
+[2026-05-20 11:03:35] [INFO ] LOGIN procesado
+[2026-05-20 11:03:41] [INFO ] GET_RESERVA procesado
+[2026-05-20 11:03:55] [INFO ] GET_RESERVA procesado
+[2026-05-20 11:04:01] [INFO ] GET_RESERVA procesado
+[2026-05-20 11:04:02] [INFO ] GET_RESERVA procesado
+[2026-05-20 11:04:48] [INFO ] GET_RESERVA procesado
+[2026-05-20 11:09:49] [INFO ] Cargando configuracion...
+[2026-05-20 11:09:49] [INFO ] Migracion DB: columna 'descripcion' verificada
+[2026-05-20 11:09:49] [INFO ] Servidor arrancado en 127.0.0.1:8080
+[2026-05-20 11:10:03] [INFO ] Cliente conectado
+[2026-05-20 11:10:30] [INFO ] LOGIN exitoso: id=4 nombre=gaizka DNI=1234
+[2026-05-20 11:10:30] [INFO ] LOGIN procesado
+[2026-05-20 11:10:40] [INFO ] GET_RESERVA procesado
+[2026-05-20 11:10:40] [INFO ] GET_SERVICIOS: 50 servicios enviados (todos los tipos)
+[2026-05-20 11:10:40] [INFO ] GET_SERVICIOS procesado
+[2026-05-20 11:11:10] [INFO ] GET_RESERVA procesado
+[2026-05-20 11:11:10] [INFO ] GET_SERVICIOS: 50 servicios enviados (todos los tipos)
+[2026-05-20 11:11:10] [INFO ] GET_SERVICIOS procesado
+[2026-05-20 11:11:46] [INFO ] Conexion cerrada por el cliente o error de red
+[2026-05-20 11:11:46] [INFO ] Servidor cerrado correctamente

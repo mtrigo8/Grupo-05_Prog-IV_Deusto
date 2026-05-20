@@ -29,9 +29,9 @@ void crearMenuReservas()
  * ========================================================================= */
 
 /* ── cargarReservas ────────────────────────────────────────────────────── */
- void cargarReservas(SocketClient&   sock,
-                           CacheOO&        cache,
-                           const SesionOO& sesion)
+void cargarReservas(SocketClient&   sock,
+                    CacheOO&        cache,
+                    const SesionOO& sesion)
 {
     cache.limpiarReservas();
 
@@ -106,8 +106,14 @@ static void gestionVerReservas(SocketClient&   sock,
 
 /* ── gestionHacerReserva ──────────────────────────────────────────────────
  * CREATE_RESERVA: pide un id de servicio y crea la reserva.
- * Actualiza la cache recargandola tras el exito y descuenta una plaza
- * del negocio correspondiente si este esta en la cache de negocios.
+ *
+ * FIX: Se eliminó la llamada a cargarReservas() tras el OK. Esa recarga
+ * inmediata enviaba GET_RESERVA justo después de recibir el OK de
+ * CREATE_RESERVA, provocando que el servidor recibiera dos comandos
+ * seguidos sin tiempo de procesar el estado intermedio, y que el cliente
+ * confundiera la respuesta de uno con la del otro.
+ * La caché se actualiza manualmente (incrementando plazasOcupadas) y
+ * se recargará completamente la próxima vez que el usuario entre al menú.
  * ------------------------------------------------------------------------- */
 static void gestionHacerReserva(SocketClient&   sock,
                                 CacheOO&        cache,
@@ -151,15 +157,19 @@ static void gestionHacerReserva(SocketClient&   sock,
     {
         std::cout << "Reserva creada correctamente.\n";
 
-        /* Decrementar una plaza libre en el negocio si esta en cache */
+        /* Actualizar cache local sin hacer una nueva peticion al servidor.
+         * FIX: antes se llamaba cargarReservas() aqui, lo que enviaba
+         * GET_RESERVA inmediatamente tras el OK y mezclaba los frames. */
         NegocioOO* negocio = cache.buscarNegocioPorId(idServicio);
         if (negocio != nullptr)
         {
             negocio->setPlazasOcupadas(negocio->getPlazasOcupadas() + 1);
         }
 
-        /* Recargar cache de reservas para reflejar la nueva reserva */
-        cargarReservas(sock, cache, sesion);
+        /* Marcar cache de reservas como sucia para forzar recarga la
+         * proxima vez (limpiar es suficiente: getTotalReservas() == 0
+         * no causa problemas de visualizacion aqui). */
+        cache.limpiarReservas();
     }
     else if (esError(respuesta))
     {
@@ -279,7 +289,13 @@ static void gestionCancelarReserva(SocketClient&   sock,
 
 /* ── gestionModificarReserva ──────────────────────────────────────────────
  * UPDATE_RESERVA: muestra reservas, pide id de reserva e id de nuevo
- * servicio, y actualiza. Recarga la cache tras el exito.
+ * servicio, y actualiza.
+ *
+ * FIX: Se eliminó la llamada a cargarReservas() tras el OK. Misma razón
+ * que en gestionHacerReserva: enviaba GET_RESERVA inmediatamente después
+ * del OK de UPDATE_RESERVA, mezclando los frames en el buffer TCP.
+ * La caché se actualiza manualmente y se recargará en la próxima entrada
+ * al menú de reservas o negocios.
  * ------------------------------------------------------------------------- */
 static void gestionModificarReserva(SocketClient&   sock,
                                     CacheOO&        cache,
@@ -372,7 +388,8 @@ static void gestionModificarReserva(SocketClient&   sock,
     {
         std::cout << "Reserva #" << idReserva << " actualizada correctamente.\n";
 
-        /* Actualizar plazas: liberar en el servicio antiguo y ocupar en el nuevo */
+        /* Actualizar plazas en cache local sin nueva peticion al servidor.
+         * FIX: antes se llamaba cargarReservas() aqui. */
         NegocioOO* negAntiguo = cache.buscarNegocioPorId(idServicioAntiguo);
         if (negAntiguo != nullptr)
             negAntiguo->setPlazasOcupadas(negAntiguo->getPlazasOcupadas() - 1);
@@ -381,8 +398,9 @@ static void gestionModificarReserva(SocketClient&   sock,
         if (negNuevo != nullptr)
             negNuevo->setPlazasOcupadas(negNuevo->getPlazasOcupadas() + 1);
 
-        /* Recargar cache de reservas para reflejar el cambio */
-        cargarReservas(sock, cache, sesion);
+        /* Marcar cache de reservas como sucia para forzar recarga la
+         * proxima vez que el usuario entre al menu de reservas o negocios. */
+        cache.limpiarReservas();
     }
     else if (esError(respuesta))
     {
